@@ -12,42 +12,53 @@ export default function AuthSplitLayout({
 
     return (
         <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            <div className="relative hidden h-full flex-col items-center justify-center overflow-hidden bg-muted p-12 lg:flex">
-                {/* Subtle Background Pattern */}
-                <div
-                    className="absolute inset-0 opacity-[0.02]"
-                    style={{
-                        backgroundImage: `radial-gradient(circle at 1px 1px, hsl(var(--foreground)) 1px, transparent 0)`,
-                        backgroundSize: '24px 24px',
-                    }}
-                />
+            <div className="relative hidden h-full flex-col overflow-hidden bg-muted p-10 text-foreground lg:flex">
+                {/* Logo & Brand */}
+                <Link
+                    href={home()}
+                    className="relative z-20 flex items-center gap-3"
+                >
+                    <AppLogoIcon className="h-10 w-10 object-contain" />
+                    <div className="flex flex-col">
+                        <span className="text-xs font-medium text-muted-foreground">College of Education</span>
+                        <span className="font-semibold text-foreground">{name as string}</span>
+                        <span className="text-[10px] italic text-muted-foreground">Western Mindanao State University</span>
+                    </div>
+                </Link>
 
-                {/* Center Content */}
-                <div className="relative z-10 flex flex-col items-center text-center">
-                    {/* Large Logo */}
+                {/* Main Content */}
+                <div className="relative z-20 mt-auto flex flex-1 flex-col justify-center">
                     <div className="mb-8">
-                        <AppLogoIcon className="h-24 w-24 object-contain opacity-90" />
+                        <h2 className="mb-4 text-3xl font-bold leading-tight text-foreground lg:text-4xl">
+                            Faculty Scheduling
+                            <span className="block text-muted-foreground">System</span>
+                        </h2>
+                        <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
+                            Manage faculty profiles, organize course schedules, and optimize academic resources across all departments.
+                        </p>
                     </div>
 
-                    {/* Institution Name */}
-                    <h2 className="mb-2 text-2xl font-bold tracking-tight text-foreground">
-                        Western Mindanao State University
-                    </h2>
-                    <p className="mb-6 text-sm font-medium text-muted-foreground">
-                        College of Education
-                    </p>
-
-                    {/* System Name */}
-                    <div className="rounded-full border border-border bg-card px-6 py-2">
-                        <span className="text-sm font-semibold text-foreground">{name as string}</span>
+                    {/* Feature List */}
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-center gap-3">
+                            <svg className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-sm text-foreground">Conflict Detection</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <svg className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-sm text-foreground">Room Optimization</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <svg className="h-5 w-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-sm text-foreground">Faculty Profiles</span>
+                        </div>
                     </div>
-                </div>
-
-                {/* Bottom Quote */}
-                <div className="absolute bottom-12 left-0 right-0 px-12 text-center">
-                    <p className="text-xs italic text-muted-foreground">
-                        "Excellence in Education, Research, and Service"
-                    </p>
                 </div>
             </div>
             <div className="w-full lg:p-8">
