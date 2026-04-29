@@ -83,11 +83,11 @@ export default function Edit({ user }: UsersFormProps) {
     );
 }
 
-Edit.layout = (page: React.ReactNode, props: UsersFormProps) => (
+Edit.layout = (page: React.ReactNode) => (
     <AppLayout
         breadcrumbs={[
             { title: 'Users', href: users() },
-            { title: props.user?.name || 'Edit', href: '#' },
+            { title: 'Edit User', href: '#' },
         ]}
     >
         {page}

@@ -96,23 +96,29 @@ export default function Show({ user }: UsersShowProps) {
             </div>
 
             <Dialog open={showDelete} onOpenChange={setShowDelete}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Confirm Delete</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to delete &quot;{user.name}&quot;? This action cannot be undone.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowDelete(false)}>
+                <DialogContent className="max-w-[440px] gap-0 p-0 overflow-hidden">
+                    <div className="flex items-start gap-4 p-6">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/10">
+                            <Trash2 className="h-5 w-5 text-destructive" />
+                        </div>
+                        <div className="pt-0.5">
+                            <DialogHeader className="space-y-1">
+                                <DialogTitle className="text-base font-semibold">Delete User</DialogTitle>
+                                <DialogDescription className="text-sm text-muted-foreground">
+                                    Are you sure you want to delete{' '}
+                                    <span className="font-medium text-foreground">{user.name}</span>?
+                                    This action cannot be undone.
+                                </DialogDescription>
+                            </DialogHeader>
+                        </div>
+                    </div>
+                    <DialogFooter className="border-t border-border bg-muted/40 px-6 py-4">
+                        <Button variant="outline" size="sm" onClick={() => setShowDelete(false)}>
                             Cancel
                         </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={handleDelete}
-                            disabled={isDeleting}
-                        >
-                            {isDeleting ? 'Deleting...' : 'Delete'}
+                        <Button variant="destructive" size="sm" onClick={handleDelete} disabled={isDeleting}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {isDeleting ? 'Deleting…' : 'Delete User'}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -121,11 +127,11 @@ export default function Show({ user }: UsersShowProps) {
     );
 }
 
-Show.layout = (page: React.ReactNode, props: UsersShowProps) => (
+Show.layout = (page: React.ReactNode) => (
     <AppLayout
         breadcrumbs={[
             { title: 'Users', href: users() },
-            { title: props.user.name, href: '#' },
+            { title: 'View User', href: '#' },
         ]}
     >
         {page}
