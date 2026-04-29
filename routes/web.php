@@ -18,6 +18,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('users/{user}/edit', [App\Http\Controllers\UserController::class, 'edit'])->name('users.edit');
     Route::put('users/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('users.destroy');
+
+    // Teachers Routes
+    Route::get('teachers', [App\Http\Controllers\TeacherController::class, 'index'])->name('teachers.index');
+    Route::get('teachers/create', [App\Http\Controllers\TeacherController::class, 'create'])->name('teachers.create');
+    Route::post('teachers', [App\Http\Controllers\TeacherController::class, 'store'])->name('teachers.store');
+    Route::get('teachers/{teacher}', [App\Http\Controllers\TeacherController::class, 'show'])->name('teachers.show');
+    Route::get('teachers/{teacher}/edit', [App\Http\Controllers\TeacherController::class, 'edit'])->name('teachers.edit');
+    Route::put('teachers/{teacher}', [App\Http\Controllers\TeacherController::class, 'update'])->name('teachers.update');
+    Route::delete('teachers/{teacher}', [App\Http\Controllers\TeacherController::class, 'destroy'])->name('teachers.destroy');
 });
 
 require __DIR__.'/settings.php';
