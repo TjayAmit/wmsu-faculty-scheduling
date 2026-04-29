@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users } from 'lucide-react';
+import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -16,6 +16,7 @@ import {
 import { dashboard } from '@/routes';
 import { index as users } from '@/routes/users';
 import { index as teachers } from '@/routes/teachers';
+import { index as subjects } from '@/routes/subjects';
 import type { NavGroup } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
@@ -45,6 +46,11 @@ const navGroups: NavGroup[] = [
                 title: 'Teachers',
                 href: teachers(),
                 icon: GraduationCap,
+            },
+            {
+                title: 'Subjects',
+                href: subjects(),
+                icon: Library,
             },
         ],
     },
