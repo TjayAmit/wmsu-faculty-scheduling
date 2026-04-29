@@ -15,22 +15,36 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as users } from '@/routes/users';
-import type { NavItem } from '@/types';
+import type { NavGroup } from '@/types';
 
-const mainNavItems: NavItem[] = [
+// ── Navigation groups ──────────────────────────────────────────────────────────
+// Add new groups or items here. Each group renders its own labeled section in
+// the sidebar. Items with icons from lucide-react are supported.
+// ──────────────────────────────────────────────────────────────────────────────
+const navGroups: NavGroup[] = [
     {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
+        title: 'Overview',
+        items: [
+            {
+                title: 'Dashboard',
+                href: dashboard(),
+                icon: LayoutGrid,
+            },
+        ],
     },
     {
-        title: 'Users',
-        href: users(),
-        icon: Users,
+        title: 'Management',
+        items: [
+            {
+                title: 'Users',
+                href: users(),
+                icon: Users,
+            },
+        ],
     },
 ];
 
-const footerNavItems: NavItem[] = [
+const footerNavItems = [
     {
         title: 'Repository',
         href: 'https://github.com/laravel/react-starter-kit',
@@ -58,8 +72,8 @@ export function AppSidebar() {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
-                <NavMain items={mainNavItems} />
+            <SidebarContent className="pt-7">
+                <NavMain groups={navGroups} />
             </SidebarContent>
 
             <SidebarFooter>

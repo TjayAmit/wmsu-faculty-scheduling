@@ -1,9 +1,7 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { Plus, Search, MoreHorizontal, Pencil, Trash2, Eye } from 'lucide-react';
-import { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
+import { MoreVertical, Pencil, Trash2, Eye, Users } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -16,28 +14,48 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
+import { TablePagination } from '@/components/table-pagination';
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
-import { index as users, create as usersCreate, show as usersShow, edit as usersEdit, destroy as usersDestroy } from '@/routes/users';
+    index as users,
+    create as usersCreate,
+    show as usersShow,
+    edit as usersEdit,
+    destroy as usersDestroy,
+} from '@/routes/users';
 import type { UsersIndexProps } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters }: UsersIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
+    const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        router.get(users(), { search }, { preserveState: true, preserveScroll: true });
+    const navigate = (params: Record<string, unknown> = {}) => {
+        router.get(
+            users(),
+            { search, per_page: perPage, ...params },
+            { preserveState: true, preserveScroll: true },
+        );
+    };
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        clearTimeout(searchTimeout.current);
+        searchTimeout.current = setTimeout(() => {
+            navigate({ search: value, page: 1 });
+        }, 350);
+    };
+
+    const handlePerPageChange = (value: number) => {
+        setPerPage(value);
+        navigate({ per_page: value, page: 1 });
     };
 
     const handleDelete = () => {
@@ -51,175 +69,151 @@ export default function Index({ data, filters }: UsersIndexProps) {
         });
     };
 
-    const paginationLinks = () => {
-        const links = [];
-        for (let i = 1; i <= data.last_page; i++) {
-            links.push(
-                <Button
-                    key={i}
-                    variant={data.current_page === i ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => router.get(users(), { page: i, search }, { preserveState: true })}
-                >
-                    {i}
-                </Button>
-            );
-        }
-        return links;
-    };
-
     return (
         <>
             <Head title="Users" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                        <h2 className="text-xl font-semibold">Users</h2>
-                        <div className="flex items-center gap-4">
-                            <form onSubmit={handleSearch} className="flex items-center gap-2">
-                                <div className="relative">
-                                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        type="search"
-                                        placeholder="Search..."
-                                        className="w-64 pl-8"
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
-                                    />
-                                </div>
-                                <Button type="submit" size="sm" variant="secondary">
-                                    Search
-                                </Button>
-                            </form>
-                            <Button asChild size="sm">
-                                <Link href={usersCreate()}>
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    Add New
-                                </Link>
-                            </Button>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+
+                    <TablePageHeader
+                        title="Users"
+                        count={data.total}
+                        search={search}
+                        searchPlaceholder="Search users…"
+                        onSearchChange={handleSearchChange}
+                        createHref={usersCreate().url}
+                        createLabel="New User"
+                    />
+
+                    <Table>
+                        <TableHeader>
+                            <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
+                                <TableHead className="h-11 py-0 pl-6 pr-4 text-sm font-medium text-muted-foreground">
+                                    Name
+                                </TableHead>
+                                <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
+                                    Email
+                                </TableHead>
+                                <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
+                                    Date
+                                </TableHead>
+                                <TableHead className="h-11 w-12 py-0 pl-4 pr-6">
+                                    <span className="sr-only">Actions</span>
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                            {data.data.length === 0 ? (
                                 <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Created At</TableHead>
-                                    <TableHead className="w-[100px]">Actions</TableHead>
+                                    <TableCell colSpan={4} className="h-40 text-center">
+                                        <div className="flex flex-col items-center gap-3 text-muted-foreground">
+                                            <div className="rounded-full bg-muted p-3">
+                                                <Users className="h-5 w-5 opacity-50" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium">No users found</p>
+                                                {search && (
+                                                    <p className="mt-0.5 text-sm">
+                                                        Try a different search or{' '}
+                                                        <button
+                                                            onClick={() => handleSearchChange('')}
+                                                            className="text-primary hover:underline"
+                                                        >
+                                                            clear the filter
+                                                        </button>
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </TableCell>
                                 </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {data.data.length === 0 ? (
-                                    <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
-                                            No records found
+                            ) : (
+                                data.data.map((item) => (
+                                    <TableRow
+                                        key={item.id}
+                                        className="cursor-pointer border-b border-border/60 last:border-0 transition-colors hover:bg-muted/30"
+                                        onClick={() => router.get(usersShow(item.id))}
+                                    >
+                                        <TableCell className="py-3.5 pl-6 pr-4">
+                                            <span className="text-sm font-medium text-foreground">
+                                                {item.name}
+                                            </span>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
+                                            {item.email}
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
+                                            {item.created_at}
+                                        </TableCell>
+
+                                        <TableCell
+                                            className="py-3.5 pl-4 pr-6"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                                                    >
+                                                        <MoreVertical className="h-4 w-4" />
+                                                        <span className="sr-only">Open actions</span>
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-40">
+                                                    <DropdownMenuItem onClick={() => router.get(usersShow(item.id))}>
+                                                        <Eye className="mr-2 h-4 w-4" />
+                                                        View
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => router.get(usersEdit(item.id))}>
+                                                        <Pencil className="mr-2 h-4 w-4" />
+                                                        Edit
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    <DropdownMenuItem
+                                                        onClick={() => setDeleteId(item.id)}
+                                                        className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                                    >
+                                                        <Trash2 className="mr-2 h-4 w-4" />
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
-                                ) : (
-                                    data.data.map((item) => (
-                                        <TableRow key={item.id}>
-                                            <TableCell className="font-medium">
-                                                <Link 
-                                                    href={usersShow(item.id)}
-                                                    className="hover:underline"
-                                                >
-                                                    {item.name}
-                                                </Link>
-                                            </TableCell>
-                                            <TableCell>{item.email}</TableCell>
-                                            <TableCell>{item.created_at}</TableCell>
-                                            <TableCell>
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="sm">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem asChild>
-                                                            <Link href={usersShow(item.id)}>
-                                                                <Eye className="mr-2 h-4 w-4" />
-                                                                View
-                                                            </Link>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild>
-                                                            <Link href={usersEdit(item.id)}>
-                                                                <Pencil className="mr-2 h-4 w-4" />
-                                                                Edit
-                                                            </Link>
-                                                        </DropdownMenuItem>
-                                                        <DropdownMenuItem
-                                                            onClick={() => setDeleteId(item.id)}
-                                                            className="text-destructive focus:text-destructive"
-                                                        >
-                                                            <Trash2 className="mr-2 h-4 w-4" />
-                                                            Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))
-                                )}
-                            </TableBody>
-                        </Table>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
 
-                        {data.last_page > 1 && (
-                            <div className="flex items-center justify-between pt-4">
-                                <p className="text-sm text-muted-foreground">
-                                    Showing {data.from} to {data.to} of {data.total} results
-                                </p>
-                                <div className="flex items-center gap-1">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => router.get(users(), { page: data.current_page - 1, search }, { preserveState: true })}
-                                        disabled={data.current_page === 1}
-                                    >
-                                        Previous
-                                    </Button>
-                                    <div className="flex items-center gap-1">
-                                        {paginationLinks()}
-                                    </div>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => router.get(users(), { page: data.current_page + 1, search }, { preserveState: true })}
-                                        disabled={data.current_page === data.last_page}
-                                    >
-                                        Next
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                    <TablePagination
+                        meta={{
+                            total: data.total,
+                            from: data.from,
+                            to: data.to,
+                            current_page: data.current_page,
+                            last_page: data.last_page,
+                        }}
+                        perPage={perPage}
+                        onPerPageChange={handlePerPageChange}
+                        onPageChange={(page) => navigate({ page })}
+                    />
+                </div>
             </div>
 
-            <Dialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Confirm Delete</DialogTitle>
-                        <DialogDescription>
-                            Are you sure you want to delete this user? This action cannot be undone.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setDeleteId(null)}>
-                            Cancel
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            onClick={handleDelete}
-                            disabled={isDeleting}
-                        >
-                            {isDeleting ? 'Deleting...' : 'Delete'}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            <ConfirmDeleteDialog
+                open={!!deleteId}
+                onOpenChange={() => setDeleteId(null)}
+                title="Delete User"
+                itemName={data.data.find((u) => u.id === deleteId)?.name}
+                onConfirm={handleDelete}
+                isLoading={isDeleting}
+            />
         </>
     );
 }
