@@ -109,6 +109,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('teacher-schedules/{teacherSchedule}/complete', [App\Http\Controllers\TeacherScheduleController::class, 'complete'])->name('teacher-schedules.complete');
     Route::post('teacher-schedules/regenerate/{draftScheduleId}', [App\Http\Controllers\TeacherScheduleController::class, 'regenerateFromDraft'])->name('teacher-schedules.regenerate');
     Route::get('teacher-schedules/teacher/{teacherId}/semester/{semesterId}', [App\Http\Controllers\TeacherScheduleController::class, 'teacherSemesterSchedules'])->name('teacher-schedules.teacher-semester');
+
+    // Assign Schedules Routes (Admin direct assignment with auto-approval)
+    Route::get('assign-schedules', [App\Http\Controllers\AssignScheduleController::class, 'index'])->name('assign-schedules.index');
+    Route::get('assign-schedules/create', [App\Http\Controllers\AssignScheduleController::class, 'create'])->name('assign-schedules.create');
+    Route::post('assign-schedules', [App\Http\Controllers\AssignScheduleController::class, 'store'])->name('assign-schedules.store');
+    Route::get('assign-schedules/{draftSchedule}', [App\Http\Controllers\AssignScheduleController::class, 'show'])->name('assign-schedules.show');
+    Route::delete('assign-schedules/{draftSchedule}', [App\Http\Controllers\AssignScheduleController::class, 'destroy'])->name('assign-schedules.destroy');
 });
 
 require __DIR__.'/settings.php';
