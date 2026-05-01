@@ -3,9 +3,9 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Schedule;
-use App\Repositories\ScheduleRepositoryInterface;
+use App\Repositories\ScheduleRepository;
 
-class ScheduleRepository implements ScheduleRepositoryInterface
+class EloquentScheduleRepository implements ScheduleRepository
 {
     public function all(): iterable
     {

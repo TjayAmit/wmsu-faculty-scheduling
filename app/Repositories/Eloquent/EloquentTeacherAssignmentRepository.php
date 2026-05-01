@@ -3,9 +3,9 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\TeacherAssignment;
-use App\Repositories\TeacherAssignmentRepositoryInterface;
+use App\Repositories\TeacherAssignmentRepository;
 
-class TeacherAssignmentRepository implements TeacherAssignmentRepositoryInterface
+class EloquentTeacherAssignmentRepository implements TeacherAssignmentRepository
 {
     public function all(): iterable
     {

@@ -3,9 +3,9 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Semester;
-use App\Repositories\SemesterRepositoryInterface;
+use App\Repositories\SemesterRepository;
 
-class SemesterRepository implements SemesterRepositoryInterface
+class EloquentSemesterRepository implements SemesterRepository
 {
     public function all(): iterable
     {

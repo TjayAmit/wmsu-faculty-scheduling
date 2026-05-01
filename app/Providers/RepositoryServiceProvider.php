@@ -9,43 +9,43 @@ class RepositoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            \App\Repositories\UserRepositoryInterface::class,
-            \App\Repositories\Eloquent\UserRepository::class
+            \App\Repositories\UserRepository::class,
+            \App\Repositories\Eloquent\EloquentUserRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\TeacherRepositoryInterface::class,
-            \App\Repositories\Eloquent\TeacherRepository::class
+            \App\Repositories\TeacherRepository::class,
+            \App\Repositories\Eloquent\EloquentTeacherRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\SubjectRepositoryInterface::class,
-            \App\Repositories\Eloquent\SubjectRepository::class
+            \App\Repositories\SubjectRepository::class,
+            \App\Repositories\Eloquent\EloquentSubjectRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\SemesterRepositoryInterface::class,
-            \App\Repositories\Eloquent\SemesterRepository::class
+            \App\Repositories\SemesterRepository::class,
+            \App\Repositories\Eloquent\EloquentSemesterRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\TimeSlotRepositoryInterface::class,
-            \App\Repositories\Eloquent\TimeSlotRepository::class
+            \App\Repositories\TimeSlotRepository::class,
+            \App\Repositories\Eloquent\EloquentTimeSlotRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\ScheduleRepositoryInterface::class,
-            \App\Repositories\Eloquent\ScheduleRepository::class
+            \App\Repositories\ScheduleRepository::class,
+            \App\Repositories\Eloquent\EloquentScheduleRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\TeacherAssignmentRepositoryInterface::class,
-            \App\Repositories\Eloquent\TeacherAssignmentRepository::class
+            \App\Repositories\TeacherAssignmentRepository::class,
+            \App\Repositories\Eloquent\EloquentTeacherAssignmentRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\AttendanceRecordRepositoryInterface::class,
-            \App\Repositories\Eloquent\AttendanceRecordRepository::class
+            \App\Repositories\AttendanceRecordRepository::class,
+            \App\Repositories\Eloquent\EloquentAttendanceRecordRepository::class
         );
     }
 }

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays } from 'lucide-react';
+import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -18,6 +18,8 @@ import { index as users } from '@/routes/users';
 import { index as teachers } from '@/routes/teachers';
 import { index as subjects } from '@/routes/subjects';
 import { index as schedules } from '@/routes/schedules';
+import { index as semesters } from '@/routes/semesters';
+import { index as timeSlots } from '@/routes/timeSlots';
 import type { NavGroup } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
@@ -42,6 +44,16 @@ const navGroups: NavGroup[] = [
                 title: 'Schedules',
                 href: schedules(),
                 icon: CalendarDays,
+            },
+            {
+                title: 'Semesters',
+                href: semesters(),
+                icon: Calendar,
+            },
+            {
+                title: 'Time Slots',
+                href: timeSlots(),
+                icon: Clock,
             },
         ],
     },

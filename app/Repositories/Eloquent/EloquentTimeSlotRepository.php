@@ -3,9 +3,9 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\TimeSlot;
-use App\Repositories\TimeSlotRepositoryInterface;
+use App\Repositories\TimeSlotRepository;
 
-class TimeSlotRepository implements TimeSlotRepositoryInterface
+class EloquentTimeSlotRepository implements TimeSlotRepository
 {
     public function all(): iterable
     {
