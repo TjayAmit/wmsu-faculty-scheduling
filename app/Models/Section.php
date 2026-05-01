@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['section_code', 'program_id', 'semester_id', 'year_level', 'max_students', 'current_students', 'adviser_id', 'is_active'])]
 class Section extends Model

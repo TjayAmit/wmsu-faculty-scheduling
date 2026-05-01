@@ -66,6 +66,23 @@ class ClassroomService
         return $result;
     }
 
+    public function createFromRequest(Request $request): Classroom
+    {
+        return $this->create($request);
+    }
+
+    public function updateFromRequest(int $id, Request $request): Classroom
+    {
+        $model = $this->repository->findById($id);
+        return $this->update($request, $model);
+    }
+
+    public function deleteById(int $id): bool
+    {
+        $model = $this->repository->findById($id);
+        return $this->delete($model);
+    }
+
     protected function getDtoClass(): string
     {
         return ClassroomData::class;

@@ -14,3 +14,5 @@ export type * from './teacherSchedules';
 export type * from './facultyDraftSchedules';
 export type * from './assignSchedules';
 export type * from './staff';
+export type * from './classrooms';
+export type * from './curricula';

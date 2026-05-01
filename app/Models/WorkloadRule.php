@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['employment_type', 'max_teaching_hours', 'max_units', 'min_units', 'max_preparation_hours', 'overtime_rate', 'description', 'is_active', 'effective_date'])]
 #[Cast(['max_teaching_hours' => 'decimal:1', 'max_units' => 'decimal:1', 'min_units' => 'decimal:1', 'max_preparation_hours' => 'decimal:1', 'overtime_rate' => 'decimal:2', 'is_active' => 'boolean'])]

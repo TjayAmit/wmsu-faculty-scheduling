@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AssignScheduleController;
+use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\DraftScheduleController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ScheduleController;
@@ -39,6 +41,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('staff/{user}/edit', [StaffController::class, 'edit'])->name('staff.edit');
     Route::put('staff/{user}', [StaffController::class, 'update'])->name('staff.update');
     Route::delete('staff/{user}', [StaffController::class, 'destroy'])->name('staff.destroy');
+
+    // Classrooms Routes
+    Route::get('classrooms', [ClassroomController::class, 'index'])->name('classrooms.index');
+    Route::get('classrooms/create', [ClassroomController::class, 'create'])->name('classrooms.create');
+    Route::post('classrooms', [ClassroomController::class, 'store'])->name('classrooms.store');
+    Route::get('classrooms/{classroom}', [ClassroomController::class, 'show'])->name('classrooms.show');
+    Route::get('classrooms/{classroom}/edit', [ClassroomController::class, 'edit'])->name('classrooms.edit');
+    Route::put('classrooms/{classroom}', [ClassroomController::class, 'update'])->name('classrooms.update');
+    Route::delete('classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');
+
+    // Curriculum Routes
+    Route::get('curricula', [CurriculumController::class, 'index'])->name('curricula.index');
+    Route::get('curricula/create', [CurriculumController::class, 'create'])->name('curricula.create');
+    Route::post('curricula', [CurriculumController::class, 'store'])->name('curricula.store');
+    Route::get('curricula/{curriculum}', [CurriculumController::class, 'show'])->name('curricula.show');
+    Route::get('curricula/{curriculum}/edit', [CurriculumController::class, 'edit'])->name('curricula.edit');
+    Route::put('curricula/{curriculum}', [CurriculumController::class, 'update'])->name('curricula.update');
+    Route::delete('curricula/{curriculum}', [CurriculumController::class, 'destroy'])->name('curricula.destroy');
 
     // Teachers Routes
     Route::get('teachers', [TeacherController::class, 'index'])->name('teachers.index');
