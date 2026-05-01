@@ -36,6 +36,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('subjects/{subject}/edit', [App\Http\Controllers\SubjectController::class, 'edit'])->name('subjects.edit');
     Route::put('subjects/{subject}', [App\Http\Controllers\SubjectController::class, 'update'])->name('subjects.update');
     Route::delete('subjects/{subject}', [App\Http\Controllers\SubjectController::class, 'destroy'])->name('subjects.destroy');
+
+    // Schedules Routes
+    Route::get('schedules', [App\Http\Controllers\ScheduleController::class, 'index'])->name('schedules.index');
+    Route::get('schedules/create', [App\Http\Controllers\ScheduleController::class, 'create'])->name('schedules.create');
+    Route::post('schedules', [App\Http\Controllers\ScheduleController::class, 'store'])->name('schedules.store');
+    Route::get('schedules/{schedule}', [App\Http\Controllers\ScheduleController::class, 'show'])->name('schedules.show');
+    Route::get('schedules/{schedule}/edit', [App\Http\Controllers\ScheduleController::class, 'edit'])->name('schedules.edit');
+    Route::put('schedules/{schedule}', [App\Http\Controllers\ScheduleController::class, 'update'])->name('schedules.update');
+    Route::delete('schedules/{schedule}', [App\Http\Controllers\ScheduleController::class, 'destroy'])->name('schedules.destroy');
 });
 
 require __DIR__.'/settings.php';
