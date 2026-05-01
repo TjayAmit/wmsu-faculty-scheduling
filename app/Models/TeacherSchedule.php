@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'attendance_record_id',
     'notes',
     'is_holiday',
-    'holiday_name'
+    'holiday_name',
 ])]
 class TeacherSchedule extends Model
 {
@@ -121,7 +121,7 @@ class TeacherSchedule extends Model
     public function scopeForTeacherSemester($query, $teacherId, $semesterId)
     {
         return $query->where('teacher_id', $teacherId)
-                    ->where('semester_id', $semesterId);
+            ->where('semester_id', $semesterId);
     }
 
     /**
@@ -151,8 +151,8 @@ class TeacherSchedule extends Model
      */
     public function getFormattedDateTimeAttribute(): string
     {
-        return $this->scheduled_date->format('M d, Y') . ' ' . 
-               $this->start_time->format('g:i A') . ' - ' . 
+        return $this->scheduled_date->format('M d, Y').' '.
+               $this->start_time->format('g:i A').' - '.
                $this->end_time->format('g:i A');
     }
 
@@ -175,7 +175,7 @@ class TeacherSchedule extends Model
             $this->start_time->minute,
             $this->start_time->second
         );
-        
+
         return $scheduleDateTime->isPast($now);
     }
 
@@ -184,7 +184,7 @@ class TeacherSchedule extends Model
      */
     public function canBeCancelled(): bool
     {
-        return $this->status === TeacherScheduleStatus::SCHEDULED && 
-               !$this->isPast();
+        return $this->status === TeacherScheduleStatus::SCHEDULED &&
+               ! $this->isPast();
     }
 }

@@ -4,19 +4,19 @@ namespace Database\Factories;
 
 use App\Enums\DraftScheduleStatus;
 use App\Models\DraftSchedule;
-use App\Models\TeacherAssignment;
 use App\Models\Schedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\DraftSchedule>
+ * @extends Factory<DraftSchedule>
  */
 class DraftScheduleFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
-     * @var class-string<\Illuminate\Database\Eloquent\Model>
+     * @var class-string<Model>
      */
     protected $model = DraftSchedule::class;
 

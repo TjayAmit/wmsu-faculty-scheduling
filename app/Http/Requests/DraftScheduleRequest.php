@@ -17,7 +17,7 @@ class DraftScheduleRequest extends FormRequest
         return [
             'teacher_id' => 'required|exists:teachers,id',
             'schedule_id' => 'required|exists:schedules,id',
-            'status' => 'sometimes|in:' . implode(',', DraftScheduleStatus::values()),
+            'status' => 'sometimes|in:'.implode(',', DraftScheduleStatus::values()),
             'notes' => 'nullable|string|max:1000',
             'reviewed_by' => 'nullable|exists:users,id',
             'reviewed_at' => 'nullable|date',

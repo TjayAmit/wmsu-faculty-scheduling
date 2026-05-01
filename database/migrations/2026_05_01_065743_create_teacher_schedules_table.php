@@ -39,40 +39,40 @@ return new class extends Migration
 
             // Foreign keys
             $table->foreign('teacher_assignment_id')
-                  ->references('id')
-                  ->on('teacher_assignments')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('teacher_assignments')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->foreign('draft_schedule_id')
-                  ->references('id')
-                  ->on('draft_schedules')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('draft_schedules')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->foreign('subject_id')
-                  ->references('id')
-                  ->on('subjects')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('subjects')
+                ->onDelete('restrict')
+                ->onUpdate('cascade');
 
             $table->foreign('semester_id')
-                  ->references('id')
-                  ->on('semesters')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('semesters')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->foreign('teacher_id')
-                  ->references('id')
-                  ->on('teachers')
-                  ->onDelete('cascade')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('teachers')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
 
             $table->foreign('attendance_record_id')
-                  ->references('id')
-                  ->on('attendance_records')
-                  ->onDelete('set null')
-                  ->onUpdate('cascade');
+                ->references('id')
+                ->on('attendance_records')
+                ->onDelete('set null')
+                ->onUpdate('cascade');
         });
     }
 

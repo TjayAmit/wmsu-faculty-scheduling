@@ -26,41 +26,43 @@ class EloquentTeacherScheduleRepository implements TeacherScheduleRepository
     {
         $teacherSchedule = $this->findById($id);
         $teacherSchedule->update($data);
+
         return $teacherSchedule;
     }
 
     public function delete(int $id): bool
     {
         $teacherSchedule = $this->findById($id);
+
         return $teacherSchedule->delete();
     }
 
     public function findByTeacherAndSemester(int $teacherId, int $semesterId): iterable
     {
         return TeacherSchedule::forTeacherSemester($teacherId, $semesterId)
-                              ->orderBy('scheduled_date')
-                              ->get();
+            ->orderBy('scheduled_date')
+            ->get();
     }
 
     public function findByDraftSchedule(int $draftScheduleId): iterable
     {
         return TeacherSchedule::where('draft_schedule_id', $draftScheduleId)
-                              ->orderBy('scheduled_date')
-                              ->get();
+            ->orderBy('scheduled_date')
+            ->get();
     }
 
     public function findByDateRange(string $startDate, string $endDate): iterable
     {
         return TeacherSchedule::betweenDates($startDate, $endDate)
-                              ->orderBy('scheduled_date')
-                              ->get();
+            ->orderBy('scheduled_date')
+            ->get();
     }
 
     public function findByStatus(string $status): iterable
     {
         return TeacherSchedule::where('status', $status)
-                              ->orderBy('scheduled_date')
-                              ->get();
+            ->orderBy('scheduled_date')
+            ->get();
     }
 
     public function deleteByDraftSchedule(int $draftScheduleId): bool

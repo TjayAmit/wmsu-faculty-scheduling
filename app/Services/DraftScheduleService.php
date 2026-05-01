@@ -55,7 +55,7 @@ class DraftScheduleService
 
         $this->logActivity('updated', $updatedModel, [
             'old' => $oldData,
-            'new' => $dto->toArray()
+            'new' => $dto->toArray(),
         ]);
 
         return $updatedModel;
@@ -83,7 +83,7 @@ class DraftScheduleService
         $updatedModel = null;
 
         DB::transaction(function () use ($model, &$updatedModel) {
-            if (!$model->canBeSubmitted()) {
+            if (! $model->canBeSubmitted()) {
                 throw new \InvalidArgumentException('Draft schedule can only be submitted from draft status.');
             }
 
@@ -95,7 +95,7 @@ class DraftScheduleService
 
         $this->logActivity('submitted_for_review', $updatedModel, [
             'old' => $oldData,
-            'new' => $updatedModel->toArray()
+            'new' => $updatedModel->toArray(),
         ]);
 
         return $updatedModel;
@@ -108,7 +108,7 @@ class DraftScheduleService
         $updatedModel = null;
 
         DB::transaction(function () use ($model, $comments, &$updatedModel) {
-            if (!$model->canBeReviewed()) {
+            if (! $model->canBeReviewed()) {
                 throw new \InvalidArgumentException('Draft schedule can only be reviewed from pending review status.');
             }
 
@@ -122,7 +122,7 @@ class DraftScheduleService
 
         $this->logActivity('approved', $updatedModel, [
             'old' => $oldData,
-            'new' => $updatedModel->toArray()
+            'new' => $updatedModel->toArray(),
         ]);
 
         return $updatedModel;
@@ -135,7 +135,7 @@ class DraftScheduleService
         $updatedModel = null;
 
         DB::transaction(function () use ($model, $comments, &$updatedModel) {
-            if (!$model->canBeReviewed()) {
+            if (! $model->canBeReviewed()) {
                 throw new \InvalidArgumentException('Draft schedule can only be reviewed from pending review status.');
             }
 
@@ -149,7 +149,7 @@ class DraftScheduleService
 
         $this->logActivity('rejected', $updatedModel, [
             'old' => $oldData,
-            'new' => $updatedModel->toArray()
+            'new' => $updatedModel->toArray(),
         ]);
 
         return $updatedModel;
@@ -169,7 +169,7 @@ class DraftScheduleService
 
         $this->logActivity('linked_to_assignment', $updatedModel, [
             'old' => $oldData,
-            'new' => $updatedModel->toArray()
+            'new' => $updatedModel->toArray(),
         ]);
 
         return $updatedModel;
@@ -211,6 +211,6 @@ class DraftScheduleService
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->withProperties($properties)
-            ->log("{$action} " . class_basename($model));
+            ->log("{$action} ".class_basename($model));
     }
 }

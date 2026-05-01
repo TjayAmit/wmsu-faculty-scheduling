@@ -67,9 +67,9 @@ class DraftScheduleObserver implements ShouldHandleEventsAfterCommit
             $this->generationService->generateFromDraft($draftSchedule);
         } catch (\Exception $e) {
             // Log the error but don't fail the observer
-            \Log::error('Failed to generate teacher schedules for draft ' . $draftSchedule->id, [
+            \Log::error('Failed to generate teacher schedules for draft '.$draftSchedule->id, [
                 'error' => $e->getMessage(),
-                'draft_schedule_id' => $draftSchedule->id
+                'draft_schedule_id' => $draftSchedule->id,
             ]);
         }
     }

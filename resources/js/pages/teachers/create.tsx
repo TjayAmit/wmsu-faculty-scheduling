@@ -6,14 +6,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import InputError from '@/components/input-error';
 import { index as teachers, store as teachersStore } from '@/routes/teachers';
 import type { TeachersFormProps } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 
-export default function Create({ users, employmentTypes }: TeachersFormProps) {
+export default function Create({ employmentTypes }: TeachersFormProps) {
     const { data, setData, post, processing, errors } = useForm({
-        user_id: '',
+        email: '',
+        first_name: '',
+        last_name: '',
         employee_id: '',
         department: '',
         rank: '',
@@ -49,120 +52,157 @@ export default function Create({ users, employmentTypes }: TeachersFormProps) {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="user_id">User</Label>
-                                <Select
-                                    value={data.user_id}
-                                    onValueChange={(value) => setData('user_id', value)}
-                                >
-                                    <SelectTrigger id="user_id">
-                                        <SelectValue placeholder="Select a user" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {users.map((user) => (
-                                            <SelectItem key={user.id} value={user.id.toString()}>
-                                                {user.name} ({user.email})
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <InputError message={errors.user_id} />
-                            </div>
+                            {/* Personal Information */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-medium">Personal Information</h3>
+                                
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="first_name">First Name</Label>
+                                        <Input
+                                            id="first_name"
+                                            type="text"
+                                            value={data.first_name}
+                                            onChange={(e) => setData('first_name', e.target.value)}
+                                            placeholder="Enter first name"
+                                            required
+                                        />
+                                        <InputError message={errors.first_name} />
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="employee_id">Employee ID</Label>
-                                <Input
-                                    id="employee_id"
-                                    value={data.employee_id}
-                                    onChange={(e) => setData('employee_id', e.target.value)}
-                                    placeholder="Enter employee ID"
-                                    required
-                                />
-                                <InputError message={errors.employee_id} />
-                            </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="last_name">Last Name</Label>
+                                        <Input
+                                            id="last_name"
+                                            type="text"
+                                            value={data.last_name}
+                                            onChange={(e) => setData('last_name', e.target.value)}
+                                            placeholder="Enter last name"
+                                            required
+                                        />
+                                        <InputError message={errors.last_name} />
+                                    </div>
+                                </div>
 
-                            <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-2">
-                                    <Label htmlFor="department">Department</Label>
+                                    <Label htmlFor="email">Email Address</Label>
                                     <Input
-                                        id="department"
-                                        value={data.department}
-                                        onChange={(e) => setData('department', e.target.value)}
-                                        placeholder="Enter department"
+                                        id="email"
+                                        type="email"
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
+                                        placeholder="teacher@example.com"
+                                        required
                                     />
-                                    <InputError message={errors.department} />
+                                    <InputError message={errors.email} />
                                 </div>
+                            </div>
 
+                            {/* Employment Information */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-medium">Employment Information</h3>
+                                
                                 <div className="space-y-2">
-                                    <Label htmlFor="rank">Rank</Label>
+                                    <Label htmlFor="employee_id">Employee ID</Label>
                                     <Input
-                                        id="rank"
-                                        value={data.rank}
-                                        onChange={(e) => setData('rank', e.target.value)}
-                                        placeholder="Enter rank"
+                                        id="employee_id"
+                                        value={data.employee_id}
+                                        onChange={(e) => setData('employee_id', e.target.value)}
+                                        placeholder="Enter employee ID"
+                                        required
                                     />
-                                    <InputError message={errors.rank} />
+                                    <InputError message={errors.employee_id} />
+                                </div>
+
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="employment_type">Employment Type</Label>
+                                        <Select
+                                            value={data.employment_type}
+                                            onValueChange={(value) => setData('employment_type', value as 'full_time' | 'part_time' | 'casual')}
+                                        >
+                                            <SelectTrigger id="employment_type">
+                                                <SelectValue placeholder="Select employment type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {employmentTypes.map((type) => (
+                                                    <SelectItem key={type.value} value={type.value}>
+                                                        {type.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.employment_type} />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="date_hired">Date Hired</Label>
+                                        <Input
+                                            id="date_hired"
+                                            type="date"
+                                            value={data.date_hired}
+                                            onChange={(e) => setData('date_hired', e.target.value)}
+                                        />
+                                        <InputError message={errors.date_hired} />
+                                    </div>
+                                </div>
+
+                                <div className="grid gap-4 sm:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="department">Department</Label>
+                                        <Input
+                                            id="department"
+                                            value={data.department}
+                                            onChange={(e) => setData('department', e.target.value)}
+                                            placeholder="Enter department"
+                                        />
+                                        <InputError message={errors.department} />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="rank">Academic Rank</Label>
+                                        <Input
+                                            id="rank"
+                                            value={data.rank}
+                                            onChange={(e) => setData('rank', e.target.value)}
+                                            placeholder="Enter academic rank"
+                                        />
+                                        <InputError message={errors.rank} />
+                                    </div>
                                 </div>
                             </div>
 
-                            <div className="grid gap-4 sm:grid-cols-2">
+                            {/* Contact Information */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-medium">Contact Information</h3>
+                                
                                 <div className="space-y-2">
-                                    <Label htmlFor="employment_type">Employment Type</Label>
-                                    <Select
-                                        value={data.employment_type}
-                                        onValueChange={(value) => setData('employment_type', value as 'full_time' | 'part_time' | 'casual')}
-                                    >
-                                        <SelectTrigger id="employment_type">
-                                            <SelectValue placeholder="Select employment type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {employmentTypes.map((type) => (
-                                                <SelectItem key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.employment_type} />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="date_hired">Date Hired</Label>
+                                    <Label htmlFor="phone">Phone Number</Label>
                                     <Input
-                                        id="date_hired"
-                                        type="date"
-                                        value={data.date_hired}
-                                        onChange={(e) => setData('date_hired', e.target.value)}
+                                        id="phone"
+                                        type="tel"
+                                        value={data.phone}
+                                        onChange={(e) => setData('phone', e.target.value)}
+                                        placeholder="Enter phone number"
                                     />
-                                    <InputError message={errors.date_hired} />
+                                    <InputError message={errors.phone} />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label htmlFor="address">Address</Label>
+                                    <textarea
+                                        id="address"
+                                        value={data.address}
+                                        onChange={(e) => setData('address', e.target.value)}
+                                        placeholder="Enter residential address"
+                                        rows={3}
+                                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                    />
+                                    <InputError message={errors.address} />
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="phone">Phone</Label>
-                                <Input
-                                    id="phone"
-                                    type="tel"
-                                    value={data.phone}
-                                    onChange={(e) => setData('phone', e.target.value)}
-                                    placeholder="Enter phone number"
-                                />
-                                <InputError message={errors.phone} />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="address">Address</Label>
-                                <textarea
-                                    id="address"
-                                    value={data.address}
-                                    onChange={(e) => setData('address', e.target.value)}
-                                    placeholder="Enter address"
-                                    rows={3}
-                                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                                />
-                                <InputError message={errors.address} />
-                            </div>
-
+                            {/* Status */}
                             <div className="flex items-center space-x-2">
                                 <Checkbox
                                     id="is_active"
@@ -170,9 +210,15 @@ export default function Create({ users, employmentTypes }: TeachersFormProps) {
                                     onCheckedChange={(checked) => setData('is_active', checked as boolean)}
                                 />
                                 <Label htmlFor="is_active" className="text-sm font-normal">
-                                    Active teacher
+                                    Teacher is active
                                 </Label>
                             </div>
+
+                            <Alert>
+                                <AlertDescription>
+                                    Note: User account for login access can be created separately after teacher profile is created.
+                                </AlertDescription>
+                            </Alert>
 
                             <div className="flex items-center gap-4 pt-4">
                                 <Button type="submit" disabled={processing}>

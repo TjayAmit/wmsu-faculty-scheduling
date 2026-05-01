@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, GraduationCap } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, GraduationCap, UserPlus, UserX, Filter } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,6 +18,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
 import { TablePagination } from '@/components/table-pagination';
@@ -28,14 +30,15 @@ import {
     edit as teachersEdit,
     destroy as teachersDestroy,
 } from '@/routes/teachers';
-import type { TeachersIndexProps } from '@/types';
+import type { TeachersIndexProps, TeacherFilters } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 
-export default function Index({ data, filters }: TeachersIndexProps) {
+export default function Index({ data, filters, employmentTypes }: TeachersIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [showFilters, setShowFilters] = useState(false);
     const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     const navigate = (params: Record<string, unknown> = {}) => {
@@ -52,6 +55,24 @@ export default function Index({ data, filters }: TeachersIndexProps) {
         searchTimeout.current = setTimeout(() => {
             navigate({ search: value, page: 1 });
         }, 350);
+    };
+
+    const handleFilterChange = (key: keyof TeacherFilters, value: any) => {
+        router.get(teachers(), { ...filters, [key]: value }, { preserveState: true });
+    };
+
+    const createUserAccount = (teacherId: number) => {
+        router.get(`/teachers/${teacherId}/create-user-account`);
+    };
+
+    const linkUserAccount = (teacherId: number) => {
+        router.get(`/teachers/${teacherId}/link-user-account`);
+    };
+
+    const unlinkUserAccount = (teacherId: number) => {
+        if (confirm('Are you sure you want to unlink the user account from this teacher?')) {
+            router.delete(`/teachers/${teacherId}/unlink-user-account`);
+        }
     };
 
     const handlePerPageChange = (value: number) => {
@@ -101,11 +122,85 @@ export default function Index({ data, filters }: TeachersIndexProps) {
                         createLabel="New Teacher"
                     />
 
+                    {showFilters && (
+                        <div className="px-6 py-4 border-b border-border">
+                            <div className="flex justify-between items-center mb-4">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setShowFilters(!showFilters)}
+                                >
+                                    <Filter className="w-4 h-4 mr-2" />
+                                    {showFilters ? 'Hide' : 'Show'} Filters
+                                </Button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id="without_user"
+                                        checked={filters.without_user || false}
+                                        onCheckedChange={(checked) => handleFilterChange('without_user', checked)}
+                                    />
+                                    <label htmlFor="without_user" className="text-sm">
+                                        Without User Account
+                                    </label>
+                                </div>
+
+                                <Select
+                                    value={filters.is_active?.toString() || ''}
+                                    onValueChange={(value) => handleFilterChange('is_active', value ? value === 'true' : undefined)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All Status</SelectItem>
+                                        <SelectItem value="true">Active</SelectItem>
+                                        <SelectItem value="false">Inactive</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Select
+                                    value={filters.employment_type || ''}
+                                    onValueChange={(value) => handleFilterChange('employment_type', value || undefined)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Employment Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All Types</SelectItem>
+                                        {employmentTypes?.map((type) => (
+                                            <SelectItem key={type.value} value={type.value}>
+                                                {type.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <Select
+                                    value={filters.department || ''}
+                                    onValueChange={(value) => handleFilterChange('department', value || undefined)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Department" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="">All Departments</SelectItem>
+                                        {/* Departments would be populated from API */}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                    )}
+
                     <Table>
                         <TableHeader>
                             <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
                                 <TableHead className="h-11 py-0 pl-6 pr-4 text-sm font-medium text-muted-foreground">
                                     Name
+                                </TableHead>
+                                <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
+                                    Email
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     Employee ID
@@ -119,6 +214,9 @@ export default function Index({ data, filters }: TeachersIndexProps) {
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     Status
                                 </TableHead>
+                                <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
+                                    User Account
+                                </TableHead>
                                 <TableHead className="h-11 w-12 py-0 pl-4 pr-6">
                                     <span className="sr-only">Actions</span>
                                 </TableHead>
@@ -128,7 +226,7 @@ export default function Index({ data, filters }: TeachersIndexProps) {
                         <TableBody>
                             {data.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-40 text-center">
+                                    <TableCell colSpan={8} className="h-40 text-center">
                                         <div className="flex flex-col items-center gap-3 text-muted-foreground">
                                             <div className="rounded-full bg-muted p-3">
                                                 <GraduationCap className="h-5 w-5 opacity-50" />
@@ -160,12 +258,16 @@ export default function Index({ data, filters }: TeachersIndexProps) {
                                         <TableCell className="py-3.5 pl-6 pr-4">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-medium text-foreground">
-                                                    {item.user.name}
+                                                    {item.full_name}
                                                 </span>
                                                 <span className="text-xs text-muted-foreground">
-                                                    {item.user.email}
+                                                    {item.rank}
                                                 </span>
                                             </div>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
+                                            {item.email}
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
@@ -184,6 +286,25 @@ export default function Index({ data, filters }: TeachersIndexProps) {
                                             <Badge variant={item.is_active ? 'default' : 'secondary'}>
                                                 {item.is_active ? 'Active' : 'Inactive'}
                                             </Badge>
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3.5">
+                                            {item.has_user_account ? (
+                                                <div className="flex items-center space-x-1">
+                                                    <Badge variant="default">
+                                                        <UserPlus className="w-3 h-3 mr-1" />
+                                                        Linked
+                                                    </Badge>
+                                                    <span className="text-sm text-muted-foreground">
+                                                        {item.user?.name}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <Badge variant="secondary">
+                                                    <UserX className="w-3 h-3 mr-1" />
+                                                    No Account
+                                                </Badge>
+                                            )}
                                         </TableCell>
 
                                         <TableCell
@@ -210,6 +331,21 @@ export default function Index({ data, filters }: TeachersIndexProps) {
                                                         <Pencil className="mr-2 h-4 w-4" />
                                                         Edit
                                                     </DropdownMenuItem>
+                                                    <DropdownMenuSeparator />
+                                                    {!item.has_user_account ? (
+                                                        <DropdownMenuItem onClick={() => createUserAccount(item.id)}>
+                                                            <UserPlus className="mr-2 h-4 w-4" />
+                                                            Create Account
+                                                        </DropdownMenuItem>
+                                                    ) : (
+                                                        <DropdownMenuItem 
+                                                            onClick={() => unlinkUserAccount(item.id)}
+                                                            className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                                                        >
+                                                            <UserX className="mr-2 h-4 w-4" />
+                                                            Unlink Account
+                                                        </DropdownMenuItem>
+                                                    )}
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem
                                                         onClick={() => setDeleteId(item.id)}
@@ -246,7 +382,7 @@ export default function Index({ data, filters }: TeachersIndexProps) {
                 open={!!deleteId}
                 onOpenChange={() => setDeleteId(null)}
                 title="Delete Teacher"
-                itemName={data.data.find((t) => t.id === deleteId)?.user.name}
+                itemName={data.data.find((t) => t.id === deleteId)?.full_name || 'Unknown'}
                 onConfirm={handleDelete}
                 isLoading={isDeleting}
             />

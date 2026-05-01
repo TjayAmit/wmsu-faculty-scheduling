@@ -6,42 +6,39 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import InputError from '@/components/input-error';
-import { index as timeSlots, show as timeSlotsShow, update as timeSlotsUpdate } from '@/routes/timeSlots';
-import type { TimeSlotsFormProps } from '@/types';
+import { index as timeSlots, store as timeSlotsStore } from '@/routes/time-slots';
 import AppLayout from '@/layouts/app-layout';
 
-export default function Edit({ timeSlot }: TimeSlotsFormProps) {
-    const { data, setData, put, processing, errors } = useForm({
-        name: timeSlot?.name || '',
-        start_time: timeSlot?.start_time || '',
-        end_time: timeSlot?.end_time || '',
-        is_active: timeSlot?.is_active ?? true,
+export default function Create() {
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        start_time: '',
+        end_time: '',
+        is_active: true,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (timeSlot) {
-            put(timeSlotsUpdate.url(timeSlot.id));
-        }
+        post(timeSlotsStore.url());
     };
 
     return (
         <>
-            <Head title="Edit Time Slot" />
+            <Head title="Create Time Slot" />
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div>
                     <Button variant="ghost" size="sm" asChild>
-                        <Link href={timeSlot ? timeSlotsShow(timeSlot.id) : timeSlots()}>
+                        <Link href={timeSlots()}>
                             <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to details
+                            Back to list
                         </Link>
                     </Button>
                 </div>
 
                 <Card className="max-w-2xl">
                     <CardHeader>
-                        <CardTitle>Edit Time Slot</CardTitle>
+                        <CardTitle>Create New Time Slot</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
@@ -96,10 +93,10 @@ export default function Edit({ timeSlot }: TimeSlotsFormProps) {
 
                             <div className="flex items-center gap-4 pt-4">
                                 <Button type="submit" disabled={processing}>
-                                    {processing ? 'Saving...' : 'Save Changes'}
+                                    {processing ? 'Creating...' : 'Create Time Slot'}
                                 </Button>
                                 <Button variant="outline" asChild>
-                                    <Link href={timeSlot ? timeSlotsShow(timeSlot.id) : timeSlots()}>Cancel</Link>
+                                    <Link href={timeSlots()}>Cancel</Link>
                                 </Button>
                             </div>
                         </form>
@@ -110,11 +107,11 @@ export default function Edit({ timeSlot }: TimeSlotsFormProps) {
     );
 }
 
-Edit.layout = (page: React.ReactNode) => (
+Create.layout = (page: React.ReactNode) => (
     <AppLayout
         breadcrumbs={[
             { title: 'Time Slots', href: timeSlots() },
-            { title: 'Edit Time Slot', href: '#' },
+            { title: 'Create', href: '#' },
         ]}
     >
         {page}

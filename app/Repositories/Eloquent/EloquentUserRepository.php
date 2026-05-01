@@ -26,12 +26,14 @@ class EloquentUserRepository implements UserRepository
     {
         $user = $this->findById($id);
         $user->update($data);
+
         return $user;
     }
 
     public function delete(int $id): bool
     {
         $user = $this->findById($id);
+
         return $user->delete();
     }
 }

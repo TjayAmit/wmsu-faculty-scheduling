@@ -54,7 +54,7 @@ class TimeSlotService
 
         $this->logActivity('updated', $updatedModel, [
             'old' => $oldData,
-            'new' => $dto->toArray()
+            'new' => $dto->toArray(),
         ]);
 
         return $updatedModel;
@@ -100,7 +100,7 @@ class TimeSlotService
 
         $this->logActivity('updated', $updatedModel, [
             'old' => $oldData,
-            'new' => $dto->toArray()
+            'new' => $dto->toArray(),
         ]);
 
         return $updatedModel;
@@ -127,6 +127,6 @@ class TimeSlotService
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->withProperties($properties)
-            ->log("{$action} " . class_basename($model));
+            ->log("{$action} ".class_basename($model));
     }
 }

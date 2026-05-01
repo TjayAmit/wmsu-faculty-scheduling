@@ -12,7 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { index as timeSlots, edit as timeSlotsEdit, destroy as timeSlotsDestroy } from '@/routes/timeSlots';
+import { index as timeSlots, edit as timeSlotsEdit, destroy as timeSlotsDestroy } from '@/routes/time-slots';
 import type { TimeSlotsShowProps } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 import { router } from '@inertiajs/react';

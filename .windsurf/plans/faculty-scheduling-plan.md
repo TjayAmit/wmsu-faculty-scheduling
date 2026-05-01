@@ -18,9 +18,11 @@
 ## Functional Requirements
 
 1. **Teacher Registration**
-   - Faculty staff can register new teachers into the system
-   - Each teacher has personal information and employment details
-   - Teachers can be assigned roles (instructor, faculty staff, dean)
+   - Faculty staff can register new teacher profiles without requiring user accounts
+   - Each teacher has personal information, employment details, and email address
+   - Teacher profiles can exist independently of user accounts
+   - User accounts can be created later and linked to existing teacher profiles
+   - Teachers can be assigned roles (instructor, faculty staff, dean) when user account is created
 
 2. **Subject Management**
    - Faculty staff can register subjects offered by the College
@@ -69,8 +71,8 @@
 
 ## Data Entities Identified
 
-- **Users**: Extended Laravel users table with Spatie role-based access for teachers, faculty staff, and dean
-- **Teachers**: Profile information for instructors (extends users)
+- **Users**: Extended Laravel users table with Spatie role-based access for teachers, faculty staff, and dean (created separately from teacher profiles)
+- **Teachers**: Profile information for instructors with email, can exist without user account
 - **Subjects**: Course/subject catalog with unit information
 - **Semesters**: Academic semester definitions (e.g., First Semester 2024-2025)
 - **TimeSlots**: Time slot definitions (e.g., 7:00 AM - 9:00 AM)
@@ -180,7 +182,7 @@ $table->enum('employment_type', EmploymentType::values())->default(EmploymentTyp
 
 ## Relationships
 
-- **Users** → **Teachers**: One-to-One (users can be teachers)
+- **Users** → **Teachers**: One-to-Optional (teacher profiles can exist without users, users can be linked later)
 - **Teachers** → **TeacherAssignments**: One-to-Many (one teacher has many assignments)
 - **Teachers** → **DraftSchedules**: One-to-Many (one teacher can create many draft schedules)
 - **Subjects** → **Schedules**: One-to-Many (one subject can have multiple schedule instances)
@@ -509,11 +511,11 @@ $table->enum('employment_type', EmploymentType::values())->default(EmploymentTyp
 
 ### Users to Teachers
 
-- **Relationship Type**: One-to-One
-- **Foreign Key**: teachers.user_id → users.id
-- **Cascade Rules**: ON DELETE CASCADE
-- **Business Rule**: Not all users are teachers (some are faculty staff or deans), but all teachers are users
-- **Query Pattern**: Join to get teacher profile when user logs in
+- **Relationship Type**: One-to-Optional
+- **Foreign Key**: teachers.user_id → users.id (nullable)
+- **Cascade Rules**: ON DELETE SET NULL (preserve teacher profile if user deleted)
+- **Business Rule**: Teacher profiles can exist without user accounts; user accounts can be linked later
+- **Query Pattern**: Join to get teacher profile when user logs in; find teachers without user accounts
 
 ### Teachers to TeacherAssignments
 
@@ -578,14 +580,17 @@ $table->enum('employment_type', EmploymentType::values())->default(EmploymentTyp
 ### teachers Table
 
 #### Purpose
-Store detailed profile information for instructors including employment details and contact information.
+Store detailed profile information for instructors including employment details and contact information. Teacher profiles can exist independently of user accounts.
 
 #### Columns
 
 | Column | Type | Nullable | Default | Description |
 |--------|------|----------|---------|-------------|
 | id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
-| user_id | bigint unsigned | NO | - | Foreign key to users table |
+| user_id | bigint unsigned | YES | NULL | Foreign key to users table (optional) |
+| email | varchar(255) | NO | - | Teacher email address (unique) |
+| first_name | varchar(255) | NO | - | Teacher first name |
+| last_name | varchar(255) | NO | - | Teacher last name |
 | employee_id | varchar(50) | NO | - | Unique employee identification number |
 | department | varchar(255) | YES | NULL | Department within College of Education |
 | rank | varchar(100) | YES | NULL | Academic rank (Instructor, Assistant Professor, etc.) |
@@ -614,8 +619,23 @@ Store detailed profile information for instructors including employment details 
     },
     "user_id": {
       "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users table (optional)"
+    },
+    "email": {
+      "type": "varchar(255)",
       "nullable": false,
-      "description": "Foreign key to users table"
+      "description": "Teacher email address (unique)"
+    },
+    "first_name": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Teacher first name"
+    },
+    "last_name": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Teacher last name"
     },
     "employee_id": {
       "type": "varchar(50)",
@@ -674,6 +694,7 @@ Store detailed profile information for instructors including employment details 
   "indexes": {
     "primary": ["id"],
     "teachers_user_id_unique": ["user_id"],
+    "teachers_email_unique": ["email"],
     "teachers_employee_id_unique": ["employee_id"],
     "teachers_is_active_index": ["is_active"]
   },
@@ -690,7 +711,7 @@ Store detailed profile information for instructors including employment details 
 
 #### Indexes
 - **Primary**: id
-- **Unique**: user_id, employee_id
+- **Unique**: user_id (when not null), email, employee_id
 - **Regular**: is_active (for filtering active teachers)
 
 #### Foreign Keys
@@ -698,17 +719,21 @@ Store detailed profile information for instructors including employment details 
 
 #### Business Rules
 - employee_id must be unique across all teachers
+- email must be unique across all teachers
 - A user can only have one teacher profile
+- A teacher can exist without a user account
 - Soft delete through is_active flag instead of hard delete
 
 #### Access Patterns
 - **Read**: 
   - By user_id (when teacher logs in)
+  - By email (for teacher lookup)
   - By is_active (for dropdown lists)
   - By department (for departmental reports)
 - **Write**: 
-  - Insert during teacher registration
+  - Insert during teacher registration (without user account)
   - Update for profile changes
+  - Update user_id when account is created
   - Update is_active for deactivation
 
 ### subjects Table

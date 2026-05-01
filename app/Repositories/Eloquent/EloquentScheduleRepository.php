@@ -4,7 +4,6 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Schedule;
 use App\Repositories\ScheduleRepository;
-use Illuminate\Support\Facades\DB;
 
 class EloquentScheduleRepository implements ScheduleRepository
 {
@@ -27,12 +26,14 @@ class EloquentScheduleRepository implements ScheduleRepository
     {
         $schedule = $this->findById($id);
         $schedule->update($data);
+
         return $schedule;
     }
 
     public function delete(int $id): bool
     {
         $schedule = $this->findById($id);
+
         return $schedule->delete();
     }
 

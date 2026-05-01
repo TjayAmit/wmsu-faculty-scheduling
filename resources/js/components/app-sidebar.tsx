@@ -19,7 +19,7 @@ import { index as teachers } from '@/routes/teachers';
 import { index as subjects } from '@/routes/subjects';
 import { index as schedules } from '@/routes/schedules';
 import { index as semesters } from '@/routes/semesters';
-import { index as timeSlots } from '@/routes/timeSlots';
+import { index as timeSlots } from '@/routes/time-slots';
 import { index as activityLogs } from '@/routes/activityLogs';
 import { index as roles } from '@/routes/roles';
 import { index as draftSchedules } from '@/routes/draft-schedules';

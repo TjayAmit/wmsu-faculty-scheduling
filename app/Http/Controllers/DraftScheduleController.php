@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DraftScheduleRequest;
 use App\Models\DraftSchedule;
-use App\Models\Teacher;
 use App\Models\Schedule;
+use App\Models\Teacher;
 use App\Services\DraftScheduleService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -135,7 +135,7 @@ class DraftScheduleController extends Controller
     {
         $teacher = auth()->user()->teacher;
 
-        if (!$teacher) {
+        if (! $teacher) {
             return redirect()->route('dashboard')->with('error', 'Teacher profile not found');
         }
 

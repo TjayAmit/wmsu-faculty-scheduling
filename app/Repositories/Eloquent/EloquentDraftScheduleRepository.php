@@ -27,12 +27,14 @@ class EloquentDraftScheduleRepository implements DraftScheduleRepository
     {
         $draftSchedule = $this->findById($id);
         $draftSchedule->update($data);
+
         return $draftSchedule;
     }
 
     public function delete(int $id): bool
     {
         $draftSchedule = $this->findById($id);
+
         return $draftSchedule->delete();
     }
 

@@ -15,7 +15,6 @@ class DraftSchedule extends Model
 {
     use HasFactory, SoftDeletes;
 
-    
     /**
      * Get the teacher who proposed the draft.
      */

@@ -26,12 +26,14 @@ class EloquentSemesterRepository implements SemesterRepository
     {
         $semester = $this->findById($id);
         $semester->update($data);
+
         return $semester;
     }
 
     public function delete(int $id): bool
     {
         $semester = $this->findById($id);
+
         return $semester->delete();
     }
 }

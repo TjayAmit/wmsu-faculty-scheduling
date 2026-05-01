@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\TeacherSchedule;
 
+use App\Models\TeacherSchedule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -13,7 +14,7 @@ class StoreTeacherScheduleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->user()->can('create', \App\Models\TeacherSchedule::class);
+        return auth()->user()->can('create', TeacherSchedule::class);
     }
 
     /**
