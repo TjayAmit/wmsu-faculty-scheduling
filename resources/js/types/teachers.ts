@@ -1,4 +1,5 @@
 import type { User } from './auth';
+import type { Role } from './roles';
 
 export interface Teacher {
     id: number;
@@ -24,15 +25,6 @@ export interface Teacher {
     user?: User | null;
     assignments_count?: number;
     active_assignments_count?: number;
-}
-
-export interface Role {
-    id: number;
-    name: string;
-    guard_name: string;
-    display_name?: string;
-    description?: string;
-    is_active?: boolean;
 }
 
 export interface CreateTeacherRequest {

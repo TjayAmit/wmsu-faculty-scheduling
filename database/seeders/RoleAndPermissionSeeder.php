@@ -69,6 +69,12 @@ class RoleAndPermissionSeeder extends Seeder
             'users.create',
             'users.edit',
             'users.delete',
+
+            // Staff Management
+            'staff.view',
+            'staff.create',
+            'staff.edit',
+            'staff.delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -99,11 +105,8 @@ class RoleAndPermissionSeeder extends Seeder
             // View attendance records
             'attendance_records.view',
 
-            // View activity logs only
-            'activity_logs.view',
-
-            // View users
-            'users.view',
+            // Staff Management
+            'staff.view', 'staff.create', 'staff.edit', 'staff.delete',
         ]);
 
         // Faculty Staff - Actions without delete in scheduling management and teacher profiles
