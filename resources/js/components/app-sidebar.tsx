@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText } from 'lucide-react';
+import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -23,6 +23,8 @@ import { index as timeSlots } from '@/routes/timeSlots';
 import { index as activityLogs } from '@/routes/activityLogs';
 import { index as roles } from '@/routes/roles';
 import { index as draftSchedules } from '@/routes/draft-schedules';
+import { index as teacherSchedules } from '@/routes/teacher-schedules';
+import { index as facultyDraftSchedules } from '@/routes/faculty-draft-schedules';
 import type { NavGroup } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
@@ -41,8 +43,23 @@ const navGroups: NavGroup[] = [
         ],
     },
     {
+        title: 'Request Management',
+        items: [
+            {
+                title: 'Draft Schedules',
+                href: facultyDraftSchedules(),
+                icon: FileText,
+            },
+        ]
+    },
+    {
         title: 'Scheduling Management',
         items: [
+            {
+                title: 'Teachers',
+                href: teachers(),
+                icon: GraduationCap,
+            },
             {
                 title: 'Schedules',
                 href: schedules(),
@@ -66,17 +83,17 @@ const navGroups: NavGroup[] = [
         ],
     },
     {
-        title: 'Teacher Profiles',
+        title: 'Schedule Management',
         items: [
-            {
-                title: 'Teachers',
-                href: teachers(),
-                icon: GraduationCap,
-            },
             {
                 title: 'Assign Schedule',
                 href: draftSchedules(),
                 icon: FileText,
+            },
+            {
+                title: 'My Schedule',
+                href: teacherSchedules(),
+                icon: CalendarCheck,
             },
         ],
     },

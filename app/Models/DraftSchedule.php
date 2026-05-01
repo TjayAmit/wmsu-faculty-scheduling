@@ -15,9 +15,7 @@ class DraftSchedule extends Model
 {
     use HasFactory, SoftDeletes;
 
-    #[Cast(type: DraftScheduleStatus::class)]
-    protected DraftScheduleStatus|string $status;
-
+    
     /**
      * Get the teacher who proposed the draft.
      */
@@ -47,7 +45,7 @@ class DraftSchedule extends Model
      */
     public function teacherAssignment(): BelongsTo
     {
-        return $this->belongsTo(TeacherAssignment::class);
+        return $this->belongsTo(TeacherAssignment::class, 'teacher_assignment_id');
     }
 
     /**

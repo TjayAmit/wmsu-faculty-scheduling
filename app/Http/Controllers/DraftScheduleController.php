@@ -113,6 +113,24 @@ class DraftScheduleController extends Controller
         return redirect()->route('draft-schedules.show', $draftSchedule->id)->with('success', 'Draft schedule rejected');
     }
 
+    /**
+     * Display all draft schedules for faculty/admin review.
+     */
+    public function facultyIndex(Request $request)
+    {
+        $query = DraftSchedule::query()
+            ->with(['teacher.user', 'schedule.subject', 'schedule.semester', 'reviewer']);
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        return Inertia::render('faculty-draft-schedules/index', [
+            'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
+            'filters' => $request->only(['status', 'per_page']),
+        ]);
+    }
+
     public function myDrafts(Request $request)
     {
         $teacher = auth()->user()->teacher;
