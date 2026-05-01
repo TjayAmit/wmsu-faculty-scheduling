@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck } from 'lucide-react';
+import { BookOpen, DoorOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -28,6 +28,8 @@ import { index as teacherSchedules } from '@/routes/teacher-schedules';
 import { index as facultyDraftSchedules } from '@/routes/faculty-draft-schedules';
 import { index as assignSchedules } from '@/routes/assign-schedules';
 import { index as staff } from '@/routes/staff';
+import { index as classrooms } from '@/routes/classrooms';
+import { index as curricula } from '@/routes/curricula';
 import type { NavGroup } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
@@ -81,10 +83,20 @@ const navGroups: NavGroup[] = [
                 icon: Users,
                 roles: ['Admin', 'Faculty Admin'],
             },
-            // Note: Classrooms - would need: Rooms/locations management
+            {
+                title: 'Classrooms',
+                href: classrooms(),
+                icon: DoorOpen,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Curriculum',
+                href: curricula(),
+                icon: BookOpen,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
             // Note: Departments - would need: Department configuration
             // Note: Programs - would need: Degree program management
-            // Note: Curriculum - would need: Subject requirements per program
             // Note: Sections - would need: Class sections per semester
             // Note: Holidays - would need: Non-teaching days configuration
             // Note: Workload Rules - would need: Max hours per faculty settings

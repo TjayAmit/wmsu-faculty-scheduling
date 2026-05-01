@@ -3,8 +3,12 @@
 namespace App\Providers;
 
 use App\Repositories\AttendanceRecordRepository;
+use App\Repositories\ClassroomRepository;
+use App\Repositories\CurriculumRepository;
 use App\Repositories\DraftScheduleRepository;
 use App\Repositories\Eloquent\EloquentAttendanceRecordRepository;
+use App\Repositories\Eloquent\EloquentClassroomRepository;
+use App\Repositories\Eloquent\EloquentCurriculumRepository;
 use App\Repositories\Eloquent\EloquentDraftScheduleRepository;
 use App\Repositories\Eloquent\EloquentScheduleRepository;
 use App\Repositories\Eloquent\EloquentSemesterRepository;
@@ -64,6 +68,11 @@ class RepositoryServiceProvider extends ServiceProvider
         );
 
         $this->app->bind(
+            ClassroomRepository::class,
+            EloquentClassroomRepository::class
+        );
+
+        $this->app->bind(
             AttendanceRecordRepository::class,
             EloquentAttendanceRecordRepository::class
         );
@@ -76,6 +85,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             TeacherScheduleRepository::class,
             EloquentTeacherScheduleRepository::class
+        );
+
+        $this->app->bind(
+            CurriculumRepository::class,
+            EloquentCurriculumRepository::class
         );
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['code', 'name', 'degree_level', 'department_id', 'description', 'duration_years', 'total_units', 'is_active'])]
 #[Cast(['duration_years' => 'decimal:1', 'total_units' => 'decimal:1', 'is_active' => 'boolean'])]
