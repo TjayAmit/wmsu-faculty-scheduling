@@ -91,6 +91,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('draft-schedules/{draftSchedule}/reject', [App\Http\Controllers\DraftScheduleController::class, 'reject'])->name('draft-schedules.reject');
     Route::get('my-drafts', [App\Http\Controllers\DraftScheduleController::class, 'myDrafts'])->name('draft-schedules.my-drafts');
 
+    // Faculty Draft Schedules Routes (for faculty/admin review)
+    Route::get('faculty-draft-schedules', [App\Http\Controllers\DraftScheduleController::class, 'facultyIndex'])->name('faculty-draft-schedules.index');
+    Route::get('faculty-draft-schedules/{draftSchedule}', [App\Http\Controllers\DraftScheduleController::class, 'show'])->name('faculty-draft-schedules.show');
+    Route::post('faculty-draft-schedules/{draftSchedule}/approve', [App\Http\Controllers\DraftScheduleController::class, 'approve'])->name('faculty-draft-schedules.approve');
+    Route::post('faculty-draft-schedules/{draftSchedule}/reject', [App\Http\Controllers\DraftScheduleController::class, 'reject'])->name('faculty-draft-schedules.reject');
+
     // Teacher Schedules Routes
     Route::get('teacher-schedules', [App\Http\Controllers\TeacherScheduleController::class, 'index'])->name('teacher-schedules.index');
     Route::get('teacher-schedules/create', [App\Http\Controllers\TeacherScheduleController::class, 'create'])->name('teacher-schedules.create');

@@ -26,47 +26,30 @@ class TeacherScheduleController extends Controller
      */
     public function index(Request $request): Response
     {
-        $filters = $request->only(['teacher_id', 'semester_id', 'status', 'start_date', 'end_date']);
+        $filters = $request->only(['teacher_id', 'semester_id', 'status', 'start_date', 'end_date', 'per_page']);
         
-        $schedules = $this->repository->all();
+        $query = TeacherSchedule::query()->with(['teacher.user', 'subject', 'semester']);
         
-        if (isset($filters['teacher_id']) && isset($filters['semester_id'])) {
-            $schedules = $this->service->findByTeacherAndSemester(
-                $filters['teacher_id'], 
-                $filters['semester_id']
-            );
-        } elseif (isset($filters['status'])) {
-            $schedules = $this->service->findByStatus($filters['status']);
-        } elseif (isset($filters['start_date']) && isset($filters['end_date'])) {
-            $schedules = $this->service->findByDateRange(
-                $filters['start_date'], 
-                $filters['end_date']
-            );
+        if (isset($filters['teacher_id'])) {
+            $query->where('teacher_id', $filters['teacher_id']);
+        }
+        
+        if (isset($filters['semester_id'])) {
+            $query->where('semester_id', $filters['semester_id']);
+        }
+        
+        if (isset($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+        
+        if (isset($filters['start_date']) && isset($filters['end_date'])) {
+            $query->whereBetween('scheduled_date', [$filters['start_date'], $filters['end_date']]);
         }
 
-        return Inertia::render('TeacherSchedules/Index', [
-            'schedules' => $schedules->load(['teacher.user', 'subject', 'semester']),
+        return Inertia::render('teacher-schedules/index', [
+            'schedules' => $query->latest()->paginate($filters['per_page'] ?? 10)->withQueryString(),
             'filters' => $filters,
         ]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): Response
-    {
-        return Inertia::render('TeacherSchedules/Create');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreTeacherScheduleRequest $request): RedirectResponse
-    {
-        $schedule = $this->service->create($request);
-        
-        return redirect()->route('teacher-schedules.show', $schedule->id)
-            ->with('success', 'Teacher schedule created successfully');
     }
 
     /**
@@ -74,7 +57,7 @@ class TeacherScheduleController extends Controller
      */
     public function show(TeacherSchedule $teacherSchedule): Response
     {
-        return Inertia::render('TeacherSchedules/Show', [
+        return Inertia::render('teacher-schedules/show', [
             'schedule' => $teacherSchedule->load([
                 'teacher.user',
                 'subject',
@@ -84,31 +67,6 @@ class TeacherScheduleController extends Controller
                 'attendanceRecord'
             ]),
         ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(TeacherSchedule $teacherSchedule): Response
-    {
-        return Inertia::render('TeacherSchedules/Edit', [
-            'schedule' => $teacherSchedule->load([
-                'teacher.user',
-                'subject',
-                'semester'
-            ]),
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateTeacherScheduleRequest $request, TeacherSchedule $teacherSchedule): RedirectResponse
-    {
-        $schedule = $this->service->update($request, $teacherSchedule);
-        
-        return redirect()->route('teacher-schedules.show', $schedule->id)
-            ->with('success', 'Teacher schedule updated successfully');
     }
 
     /**
@@ -160,19 +118,5 @@ class TeacherScheduleController extends Controller
         
         return redirect()->back()
             ->with('success', "Regenerated {$schedules->count()} schedule sessions");
-    }
-
-    /**
-     * Display schedules for a specific teacher and semester.
-     */
-    public function teacherSemesterSchedules(int $teacherId, int $semesterId): Response
-    {
-        $schedules = $this->service->findByTeacherAndSemester($teacherId, $semesterId);
-        
-        return Inertia::render('TeacherSchedules/TeacherSemester', [
-            'schedules' => $schedules->load(['subject', 'attendanceRecord']),
-            'teacherId' => $teacherId,
-            'semesterId' => $semesterId,
-        ]);
     }
 }
