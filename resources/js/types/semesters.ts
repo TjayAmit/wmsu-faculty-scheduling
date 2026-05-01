@@ -1,4 +1,4 @@
-export interface Semester {
+export interface SemesterModel {
     id: number;
     name: string;
     academic_year: string;
@@ -12,7 +12,7 @@ export interface Semester {
 
 export interface SemestersIndexProps {
     data: {
-        data: Semester[];
+        data: SemesterModel[];
         current_page: number;
         last_page: number;
         per_page: number;
@@ -27,7 +27,7 @@ export interface SemestersIndexProps {
 }
 
 export interface SemestersFormProps {
-    semester?: Semester;
+    semester?: SemesterModel;
     semesterTypes: {
         name: string;
         value: string;
@@ -36,5 +36,5 @@ export interface SemestersFormProps {
 }
 
 export interface SemestersShowProps {
-    semester: Semester;
+    semester: SemesterModel;
 }

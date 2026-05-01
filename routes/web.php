@@ -45,6 +45,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('schedules/{schedule}/edit', [App\Http\Controllers\ScheduleController::class, 'edit'])->name('schedules.edit');
     Route::put('schedules/{schedule}', [App\Http\Controllers\ScheduleController::class, 'update'])->name('schedules.update');
     Route::delete('schedules/{schedule}', [App\Http\Controllers\ScheduleController::class, 'destroy'])->name('schedules.destroy');
+
+    // Semesters Routes
+    Route::get('semesters', [App\Http\Controllers\SemesterController::class, 'index'])->name('semesters.index');
+    Route::get('semesters/create', [App\Http\Controllers\SemesterController::class, 'create'])->name('semesters.create');
+    Route::post('semesters', [App\Http\Controllers\SemesterController::class, 'store'])->name('semesters.store');
+    Route::get('semesters/{semester}', [App\Http\Controllers\SemesterController::class, 'show'])->name('semesters.show');
+    Route::get('semesters/{semester}/edit', [App\Http\Controllers\SemesterController::class, 'edit'])->name('semesters.edit');
+    Route::put('semesters/{semester}', [App\Http\Controllers\SemesterController::class, 'update'])->name('semesters.update');
+    Route::delete('semesters/{semester}', [App\Http\Controllers\SemesterController::class, 'destroy'])->name('semesters.destroy');
+
+    // TimeSlots Routes
+    Route::get('timeSlots', [App\Http\Controllers\TimeSlotController::class, 'index'])->name('timeSlots.index');
+    Route::get('timeSlots/create', [App\Http\Controllers\TimeSlotController::class, 'create'])->name('timeSlots.create');
+    Route::post('timeSlots', [App\Http\Controllers\TimeSlotController::class, 'store'])->name('timeSlots.store');
+    Route::get('timeSlots/{timeSlot}', [App\Http\Controllers\TimeSlotController::class, 'show'])->name('timeSlots.show');
+    Route::get('timeSlots/{timeSlot}/edit', [App\Http\Controllers\TimeSlotController::class, 'edit'])->name('timeSlots.edit');
+    Route::put('timeSlots/{timeSlot}', [App\Http\Controllers\TimeSlotController::class, 'update'])->name('timeSlots.update');
+    Route::delete('timeSlots/{timeSlot}', [App\Http\Controllers\TimeSlotController::class, 'destroy'])->name('timeSlots.destroy');
 });
 
 require __DIR__.'/settings.php';

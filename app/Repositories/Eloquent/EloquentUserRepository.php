@@ -3,9 +3,9 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\User;
-use App\Repositories\UserRepositoryInterface;
+use App\Repositories\UserRepository;
 
-class UserRepository implements UserRepositoryInterface
+class EloquentUserRepository implements UserRepository
 {
     public function all(): iterable
     {

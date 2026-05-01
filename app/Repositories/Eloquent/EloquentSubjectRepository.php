@@ -3,9 +3,9 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Subject;
-use App\Repositories\SubjectRepositoryInterface;
+use App\Repositories\SubjectRepository;
 
-class SubjectRepository implements SubjectRepositoryInterface
+class EloquentSubjectRepository implements SubjectRepository
 {
     public function all(): iterable
     {
