@@ -2,8 +2,8 @@
 
 namespace App\DTOs;
 
-use App\Models\TeacherSchedule;
 use App\Enums\TeacherScheduleStatus;
+use App\Models\TeacherSchedule;
 use Illuminate\Http\Request;
 
 class TeacherScheduleData

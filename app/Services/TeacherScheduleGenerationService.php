@@ -2,24 +2,24 @@
 
 namespace App\Services;
 
+use App\DTOs\TeacherAssignmentData;
+use App\DTOs\TeacherScheduleData;
+use App\Enums\DayOfWeek;
 use App\Models\DraftSchedule;
 use App\Models\Semester;
 use App\Models\TeacherAssignment;
 use App\Models\TeacherSchedule;
-use App\DTOs\TeacherScheduleData;
-use App\DTOs\TeacherAssignmentData;
-use App\Enums\DayOfWeek;
-use App\Enums\TeacherScheduleStatus;
-use App\Repositories\TeacherScheduleRepository;
-use App\Repositories\TeacherAssignmentRepository;
+use App\Models\TimeSlot;
 use App\Repositories\DraftScheduleRepository;
+use App\Repositories\TeacherAssignmentRepository;
+use App\Repositories\TeacherScheduleRepository;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class TeacherScheduleGenerationService
 {
@@ -35,23 +35,23 @@ class TeacherScheduleGenerationService
     public function generateFromDraft(DraftSchedule $draftSchedule): Collection
     {
         try {
-            if (!$draftSchedule->isApproved()) {
+            if (! $draftSchedule->isApproved()) {
                 throw new \InvalidArgumentException('Draft schedule must be approved');
             }
 
             $schedules = null;
             $teacherAssignment = null;
             $semester = null;
-            
+
             DB::transaction(function () use ($draftSchedule, &$schedules, &$teacherAssignment, &$semester) {
                 $schedule = $draftSchedule->schedule;
                 $semester = $schedule->semester;
-                
+
                 // Create TeacherAssignment if it doesn't exist
-                if (!$draftSchedule->teacher_assignment_id) {
+                if (! $draftSchedule->teacher_assignment_id) {
                     $teacherAssignment = $this->createTeacherAssignment($draftSchedule);
                     $this->draftScheduleRepository->update($draftSchedule->id, [
-                        'teacher_assignment_id' => $teacherAssignment->id
+                        'teacher_assignment_id' => $teacherAssignment->id,
                     ]);
                 } else {
                     $teacherAssignment = $draftSchedule->teacherAssignment;
@@ -61,11 +61,11 @@ class TeacherScheduleGenerationService
 
                 foreach ($schedule->time_slots as $timeSlot) {
                     $dayOfWeek = DayOfWeek::from($timeSlot['day']);
-                    
+
                     // Get TimeSlot details if time_slot_id is provided
                     if (isset($timeSlot['time_slot_id'])) {
-                        $timeSlotModel = \App\Models\TimeSlot::find($timeSlot['time_slot_id']);
-                        if (!$timeSlotModel) {
+                        $timeSlotModel = TimeSlot::find($timeSlot['time_slot_id']);
+                        if (! $timeSlotModel) {
                             throw new \InvalidArgumentException("Time slot with ID {$timeSlot['time_slot_id']} not found");
                         }
                         $startTime = $timeSlotModel->start_time->format('H:i');
@@ -75,7 +75,7 @@ class TeacherScheduleGenerationService
                         $startTime = $timeSlot['start_time'] ?? '09:00';
                         $endTime = $timeSlot['end_time'] ?? '11:00';
                     }
-                    
+
                     $sessionSchedules = $this->generateSessionsForDay(
                         $teacherAssignment,
                         $draftSchedule,
@@ -97,19 +97,19 @@ class TeacherScheduleGenerationService
                 'schedules_count' => $schedules->count(),
                 'semester' => $semester->name,
                 'teacher' => $teacherAssignment->teacher->name,
-                'subject' => $teacherAssignment->schedule->subject->name
+                'subject' => $teacherAssignment->schedule->subject->name,
             ]);
 
             return $schedules;
-            
+
         } catch (Exception $e) {
             Log::error('Schedule generation failed', [
                 'draft_schedule_id' => $draftSchedule->id,
                 'error' => $e->getMessage(),
-                'service' => static::class
+                'service' => static::class,
             ]);
-            
-            throw new Exception('Failed to generate teacher schedules: ' . $e->getMessage());
+
+            throw new Exception('Failed to generate teacher schedules: '.$e->getMessage());
         }
     }
 
@@ -125,7 +125,7 @@ class TeacherScheduleGenerationService
             assigned_by: $draftSchedule->reviewed_by, // User who approved the draft
             is_active: true,
         );
-        
+
         return $this->teacherAssignmentRepository->create($data->toArray());
     }
 
@@ -237,6 +237,7 @@ class TeacherScheduleGenerationService
         ];
 
         $monthDay = $date->format('m-d');
+
         return in_array($monthDay, $holidays);
     }
 
@@ -255,6 +256,7 @@ class TeacherScheduleGenerationService
         ];
 
         $monthDay = $date->format('m-d');
+
         return $holidayNames[$monthDay] ?? null;
     }
 
@@ -265,7 +267,7 @@ class TeacherScheduleGenerationService
     {
         try {
             $schedules = null;
-            
+
             DB::transaction(function () use ($draftSchedule, &$schedules) {
                 // Delete existing schedules
                 $this->repository->deleteByDraftSchedule($draftSchedule->id);
@@ -277,19 +279,19 @@ class TeacherScheduleGenerationService
             // Log activity after successful regeneration
             $this->logActivity('regenerated_schedules', $draftSchedule, [
                 'draft_schedule_id' => $draftSchedule->id,
-                'schedules_count' => $schedules->count()
+                'schedules_count' => $schedules->count(),
             ]);
 
             return $schedules;
-            
+
         } catch (Exception $e) {
             Log::error('Schedule regeneration failed', [
                 'draft_schedule_id' => $draftSchedule->id,
                 'error' => $e->getMessage(),
-                'service' => static::class
+                'service' => static::class,
             ]);
-            
-            throw new Exception('Failed to regenerate teacher schedules: ' . $e->getMessage());
+
+            throw new Exception('Failed to regenerate teacher schedules: '.$e->getMessage());
         }
     }
 
@@ -300,17 +302,17 @@ class TeacherScheduleGenerationService
     {
         try {
             $allSchedules = null;
-            
+
             DB::transaction(function () use ($draftScheduleIds, &$allSchedules) {
                 $allSchedules = collect();
 
                 foreach ($draftScheduleIds as $draftScheduleId) {
                     $draftSchedule = $this->draftScheduleRepository->findById($draftScheduleId);
-                    
-                    if (!$draftSchedule) {
+
+                    if (! $draftSchedule) {
                         throw new \InvalidArgumentException("Draft schedule with ID {$draftScheduleId} not found");
                     }
-                    
+
                     if ($draftSchedule->isApproved()) {
                         $schedules = $this->generateFromDraft($draftSchedule);
                         $allSchedules = $allSchedules->merge($schedules);
@@ -322,19 +324,19 @@ class TeacherScheduleGenerationService
             $this->logActivity('bulk_generated_schedules', null, [
                 'draft_schedule_ids' => $draftScheduleIds,
                 'total_schedules_count' => $allSchedules->count(),
-                'processed_drafts_count' => count($draftScheduleIds)
+                'processed_drafts_count' => count($draftScheduleIds),
             ]);
 
             return $allSchedules;
-            
+
         } catch (Exception $e) {
             Log::error('Bulk schedule generation failed', [
                 'draft_schedule_ids' => $draftScheduleIds,
                 'error' => $e->getMessage(),
-                'service' => static::class
+                'service' => static::class,
             ]);
-            
-            throw new Exception('Failed to bulk generate teacher schedules: ' . $e->getMessage());
+
+            throw new Exception('Failed to bulk generate teacher schedules: '.$e->getMessage());
         }
     }
 
@@ -344,7 +346,7 @@ class TeacherScheduleGenerationService
     private function logActivity(string $action, ?Model $model, array $data = []): void
     {
         $properties = [];
-        
+
         // Set properties based on action type
         if (in_array($action, ['generated_schedules', 'regenerated_schedules', 'bulk_generated_schedules'])) {
             $properties = $data;

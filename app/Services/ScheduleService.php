@@ -54,7 +54,7 @@ class ScheduleService
 
         $this->logActivity('updated', $updatedModel, [
             'old' => $oldData,
-            'new' => $dto->toArray()
+            'new' => $dto->toArray(),
         ]);
 
         return $updatedModel;
@@ -100,7 +100,7 @@ class ScheduleService
 
         $this->logActivity('updated', $updatedModel, [
             'old' => $oldData,
-            'new' => $dto->toArray()
+            'new' => $dto->toArray(),
         ]);
 
         return $updatedModel;
@@ -127,7 +127,7 @@ class ScheduleService
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->withProperties($properties)
-            ->log("{$action} " . class_basename($model));
+            ->log("{$action} ".class_basename($model));
     }
 
     private function validateTimeSlots(array $timeSlots): void
@@ -141,7 +141,7 @@ class ScheduleService
         }
 
         foreach ($timeSlots as $slot) {
-            if (!isset($slot['day']) || !isset($slot['time_slot_id'])) {
+            if (! isset($slot['day']) || ! isset($slot['time_slot_id'])) {
                 throw new \InvalidArgumentException('Each time slot must have a day and time_slot_id.');
             }
         }

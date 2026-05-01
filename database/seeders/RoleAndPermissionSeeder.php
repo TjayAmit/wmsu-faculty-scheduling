@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 
 class RoleAndPermissionSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class RoleAndPermissionSeeder extends Seeder
     public function run(): void
     {
         // Reset cached roles and permissions
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         // Create permissions
         $permissions = [
@@ -88,19 +89,19 @@ class RoleAndPermissionSeeder extends Seeder
             'schedules.view', 'schedules.create', 'schedules.edit', 'schedules.delete',
             'time_slots.view', 'time_slots.create', 'time_slots.edit', 'time_slots.delete',
             'teacher_assignments.view', 'teacher_assignments.create', 'teacher_assignments.edit', 'teacher_assignments.delete',
-            
+
             // Full access to teachers profiles
             'teachers.view', 'teachers.create', 'teachers.edit', 'teachers.delete',
-            
+
             // Full access to semesters
             'semesters.view', 'semesters.create', 'semesters.edit', 'semesters.delete',
-            
+
             // View attendance records
             'attendance_records.view',
-            
+
             // View activity logs only
             'activity_logs.view',
-            
+
             // View users
             'users.view',
         ]);
@@ -113,13 +114,13 @@ class RoleAndPermissionSeeder extends Seeder
             'schedules.view', 'schedules.create', 'schedules.edit',
             'time_slots.view', 'time_slots.create', 'time_slots.edit',
             'teacher_assignments.view', 'teacher_assignments.create', 'teacher_assignments.edit',
-            
+
             // Teachers profiles without delete
             'teachers.view', 'teachers.create', 'teachers.edit',
-            
+
             // View semesters
             'semesters.view',
-            
+
             // View and manage attendance
             'attendance_records.view', 'attendance_records.create', 'attendance_records.edit',
         ]);

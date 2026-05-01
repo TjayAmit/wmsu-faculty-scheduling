@@ -3,11 +3,11 @@
 namespace App\Services;
 
 use App\DTOs\TeacherScheduleData;
+use App\Enums\TeacherScheduleStatus;
 use App\Models\TeacherSchedule;
 use App\Repositories\TeacherScheduleRepository;
-use App\Enums\TeacherScheduleStatus;
-use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -21,15 +21,15 @@ class TeacherScheduleService
     {
         $model = null;
         $dto = null;
-        
+
         DB::transaction(function () use ($request, &$model, &$dto) {
             $dto = TeacherScheduleData::fromRequest($request);
             $model = $this->repository->create($dto->toArray());
         });
-        
+
         // Log activity AFTER transaction commits to ensure data integrity
         $this->logActivity('created', $model, $dto->toArray());
-        
+
         return $model;
     }
 
@@ -38,18 +38,18 @@ class TeacherScheduleService
         $oldData = $teacherSchedule->getOriginal();
         $dto = null;
         $updatedModel = null;
-        
+
         DB::transaction(function () use ($request, $teacherSchedule, &$dto, &$updatedModel) {
             $dto = TeacherScheduleData::fromRequest($request);
             $updatedModel = $this->repository->update($teacherSchedule->id, $dto->toArray());
         });
-        
+
         // Log activity AFTER transaction commits
         $this->logActivity('updated', $updatedModel, [
             'old' => $oldData,
-            'new' => $dto->toArray()
+            'new' => $dto->toArray(),
         ]);
-        
+
         return $updatedModel;
     }
 
@@ -57,38 +57,38 @@ class TeacherScheduleService
     {
         $data = $teacherSchedule->toArray();
         $result = false;
-        
+
         DB::transaction(function () use ($teacherSchedule, &$result) {
             $result = $this->repository->delete($teacherSchedule->id);
         });
-        
+
         // Log activity AFTER transaction commits
         $this->logActivity('deleted', $teacherSchedule, $data);
-        
+
         return $result;
     }
 
     public function cancel(TeacherSchedule $teacherSchedule): TeacherSchedule
     {
-        if (!$teacherSchedule->canBeCancelled()) {
+        if (! $teacherSchedule->canBeCancelled()) {
             throw new \InvalidArgumentException('Schedule cannot be cancelled');
         }
 
         $oldData = $teacherSchedule->getOriginal();
         $updatedModel = null;
-        
+
         DB::transaction(function () use ($teacherSchedule, &$updatedModel) {
             $updatedModel = $this->repository->update($teacherSchedule->id, [
-                'status' => TeacherScheduleStatus::CANCELLED->value
+                'status' => TeacherScheduleStatus::CANCELLED->value,
             ]);
         });
-        
+
         // Log activity AFTER transaction commits
         $this->logActivity('cancelled', $updatedModel, [
             'old' => $oldData,
-            'new' => ['status' => TeacherScheduleStatus::CANCELLED->value]
+            'new' => ['status' => TeacherScheduleStatus::CANCELLED->value],
         ]);
-        
+
         return $updatedModel;
     }
 
@@ -100,19 +100,19 @@ class TeacherScheduleService
 
         $oldData = $teacherSchedule->getOriginal();
         $updatedModel = null;
-        
+
         DB::transaction(function () use ($teacherSchedule, &$updatedModel) {
             $updatedModel = $this->repository->update($teacherSchedule->id, [
-                'status' => TeacherScheduleStatus::COMPLETED->value
+                'status' => TeacherScheduleStatus::COMPLETED->value,
             ]);
         });
-        
+
         // Log activity AFTER transaction commits
         $this->logActivity('completed', $updatedModel, [
             'old' => $oldData,
-            'new' => ['status' => TeacherScheduleStatus::COMPLETED->value]
+            'new' => ['status' => TeacherScheduleStatus::COMPLETED->value],
         ]);
-        
+
         return $updatedModel;
     }
 
@@ -139,7 +139,7 @@ class TeacherScheduleService
     protected function logActivity(string $action, Model $model, array $data): void
     {
         $properties = [];
-        
+
         if ($action === 'updated') {
             $properties['old'] = $data['old'] ?? [];
             $properties['new'] = $data['new'] ?? [];
@@ -149,11 +149,11 @@ class TeacherScheduleService
         } else {
             $properties['data'] = $data;
         }
-        
+
         activity()
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->withProperties($properties)
-            ->log("{$action} " . class_basename($model));
+            ->log("{$action} ".class_basename($model));
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\DraftSchedule;
+use App\Observers\DraftScheduleObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use App\Models\DraftSchedule;
-use App\Observers\DraftScheduleObserver;
 
 class AppServiceProvider extends ServiceProvider
 {

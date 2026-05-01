@@ -26,12 +26,14 @@ class EloquentTeacherRepository implements TeacherRepository
     {
         $teacher = $this->findById($id);
         $teacher->update($data);
+
         return $teacher;
     }
 
     public function delete(int $id): bool
     {
         $teacher = $this->findById($id);
+
         return $teacher->delete();
     }
 }

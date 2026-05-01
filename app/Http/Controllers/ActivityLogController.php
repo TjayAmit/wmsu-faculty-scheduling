@@ -15,9 +15,9 @@ class ActivityLogController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('description', 'like', '%' . $search . '%')
-                  ->orWhere('log_name', 'like', '%' . $search . '%')
-                  ->orWhere('event', 'like', '%' . $search . '%');
+            $query->where('description', 'like', '%'.$search.'%')
+                ->orWhere('log_name', 'like', '%'.$search.'%')
+                ->orWhere('event', 'like', '%'.$search.'%');
         }
 
         if ($request->has('log_name')) {

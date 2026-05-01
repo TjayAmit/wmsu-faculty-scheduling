@@ -20,9 +20,9 @@ class SubjectController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('code', 'like', '%' . $search . '%')
-                  ->orWhere('title', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
+            $query->where('code', 'like', '%'.$search.'%')
+                ->orWhere('title', 'like', '%'.$search.'%')
+                ->orWhere('description', 'like', '%'.$search.'%');
         }
 
         return Inertia::render('subjects/index', [

@@ -19,10 +19,10 @@ class TimeSlotController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('name', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%'.$search.'%');
         }
 
-        return Inertia::render('timeSlots/index', [
+        return Inertia::render('time-slots/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'per_page']),
         ]);
@@ -30,7 +30,7 @@ class TimeSlotController extends Controller
 
     public function create()
     {
-        return Inertia::render('timeSlots/create');
+        return Inertia::render('time-slots/create');
     }
 
     public function store(Request $request)
@@ -44,21 +44,21 @@ class TimeSlotController extends Controller
 
         $this->service->createFromRequest($request);
 
-        return redirect()->route('timeSlots.index')->with('success', 'Time slot created successfully');
+        return redirect()->route('time-slots.index')->with('success', 'Time slot created successfully');
     }
 
     public function show(TimeSlot $timeSlot)
     {
         $timeSlot->load('schedules');
 
-        return Inertia::render('timeSlots/show', [
+        return Inertia::render('time-slots/show', [
             'timeSlot' => $timeSlot,
         ]);
     }
 
     public function edit(TimeSlot $timeSlot)
     {
-        return Inertia::render('timeSlots/edit', [
+        return Inertia::render('time-slots/edit', [
             'timeSlot' => $timeSlot,
         ]);
     }
@@ -74,13 +74,13 @@ class TimeSlotController extends Controller
 
         $this->service->updateFromRequest($timeSlot->id, $request);
 
-        return redirect()->route('timeSlots.index')->with('success', 'Time slot updated successfully');
+        return redirect()->route('time-slots.index')->with('success', 'Time slot updated successfully');
     }
 
     public function destroy(TimeSlot $timeSlot)
     {
         $this->service->delete($timeSlot->id);
 
-        return redirect()->route('timeSlots.index')->with('success', 'Time slot deleted successfully');
+        return redirect()->route('time-slots.index')->with('success', 'Time slot deleted successfully');
     }
 }

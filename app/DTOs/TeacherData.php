@@ -10,6 +10,9 @@ readonly class TeacherData
 {
     public function __construct(
         public ?int $user_id = null,
+        public ?string $email = null,
+        public ?string $first_name = null,
+        public ?string $last_name = null,
         public ?string $employee_id = null,
         public ?string $department = null,
         public ?string $rank = null,
@@ -24,6 +27,9 @@ readonly class TeacherData
     {
         return new self(
             user_id: $request->input('user_id'),
+            email: $request->input('email'),
+            first_name: $request->input('first_name'),
+            last_name: $request->input('last_name'),
             employee_id: $request->input('employee_id'),
             department: $request->input('department'),
             rank: $request->input('rank'),
@@ -39,6 +45,9 @@ readonly class TeacherData
     {
         return new self(
             user_id: $teacher->user_id,
+            email: $teacher->email,
+            first_name: $teacher->first_name,
+            last_name: $teacher->last_name,
             employee_id: $teacher->employee_id,
             department: $teacher->department,
             rank: $teacher->rank,

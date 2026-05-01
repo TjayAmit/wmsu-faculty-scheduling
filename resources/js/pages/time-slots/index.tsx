@@ -27,7 +27,7 @@ import {
     show as timeSlotsShow,
     edit as timeSlotsEdit,
     destroy as timeSlotsDestroy,
-} from '@/routes/timeSlots';
+} from '@/routes/time-slots';
 import type { TimeSlotsIndexProps } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 

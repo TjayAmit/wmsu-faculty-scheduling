@@ -26,12 +26,14 @@ class EloquentAttendanceRecordRepository implements AttendanceRecordRepository
     {
         $attendanceRecord = $this->findById($id);
         $attendanceRecord->update($data);
+
         return $attendanceRecord;
     }
 
     public function delete(int $id): bool
     {
         $attendanceRecord = $this->findById($id);
+
         return $attendanceRecord->delete();
     }
 }

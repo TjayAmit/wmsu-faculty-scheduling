@@ -6,8 +6,8 @@ use App\Models\DraftSchedule;
 use App\Models\Schedule;
 use App\Models\Teacher;
 use App\Services\TeacherScheduleGenerationService;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -50,7 +50,7 @@ class AssignScheduleController extends Controller
                 ->get()
                 ->map(fn ($s) => [
                     'id' => $s->id,
-                    'name' => $s->subject->code . ' - ' . $s->subject->title . ' (' . $s->semester->name . ')',
+                    'name' => $s->subject->code.' - '.$s->subject->title.' ('.$s->semester->name.')',
                 ]),
         ]);
     }
@@ -70,7 +70,7 @@ class AssignScheduleController extends Controller
                 ->get()
                 ->map(fn ($s) => [
                     'id' => $s->id,
-                    'name' => $s->subject->code . ' - ' . $s->subject->title,
+                    'name' => $s->subject->code.' - '.$s->subject->title,
                     'semester' => $s->semester->name,
                     'timeSlots' => $s->time_slots,
                 ]),
@@ -102,11 +102,12 @@ class AssignScheduleController extends Controller
         // Immediately generate teacher schedules
         try {
             $this->generationService->generateFromDraft($draftSchedule);
+
             return redirect()->route('assign-schedules.show', $draftSchedule->id)
                 ->with('success', 'Schedule assigned successfully and teacher schedules generated.');
         } catch (\Exception $e) {
             return redirect()->route('assign-schedules.index')
-                ->with('warning', 'Schedule assigned but teacher schedule generation failed: ' . $e->getMessage());
+                ->with('warning', 'Schedule assigned but teacher schedule generation failed: '.$e->getMessage());
         }
     }
 

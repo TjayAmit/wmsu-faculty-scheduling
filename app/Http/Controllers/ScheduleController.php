@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ScheduleRequest;
 use App\Models\Schedule;
-use App\Models\Subject;
 use App\Models\Semester;
+use App\Models\Subject;
 use App\Models\TimeSlot;
 use App\Services\ScheduleService;
 use Illuminate\Http\Request;
@@ -25,11 +25,11 @@ class ScheduleController extends Controller
         if ($request->has('search')) {
             $search = $request->search;
             $query->whereHas('subject', function ($q) use ($search) {
-                $q->where('code', 'like', '%' . $search . '%')
-                  ->orWhere('title', 'like', '%' . $search . '%');
+                $q->where('code', 'like', '%'.$search.'%')
+                    ->orWhere('title', 'like', '%'.$search.'%');
             })
-            ->orWhere('room', 'like', '%' . $search . '%')
-            ->orWhere('section', 'like', '%' . $search . '%');
+                ->orWhere('room', 'like', '%'.$search.'%')
+                ->orWhere('section', 'like', '%'.$search.'%');
         }
 
         return Inertia::render('schedules/index', [

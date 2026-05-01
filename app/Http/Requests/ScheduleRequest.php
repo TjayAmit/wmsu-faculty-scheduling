@@ -29,11 +29,11 @@ class ScheduleRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $timeSlots = $this->input('time_slots', []);
-            
+
             // Check for duplicate (day, time_slot_id) combinations
             $combinations = [];
             foreach ($timeSlots as $index => $slot) {
-                $key = $slot['day'] . '-' . $slot['time_slot_id'];
+                $key = $slot['day'].'-'.$slot['time_slot_id'];
                 if (isset($combinations[$key])) {
                     $validator->errors()->add("time_slots.{$index}", "Duplicate time slot: {$slot['day']} with time slot ID {$slot['time_slot_id']} already exists.");
                 }

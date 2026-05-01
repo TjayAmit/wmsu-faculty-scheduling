@@ -15,7 +15,7 @@ class RoleController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('name', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%'.$search.'%');
         }
 
         return Inertia::render('roles/index', [
@@ -44,7 +44,7 @@ class RoleController extends Controller
             'guard_name' => 'web',
         ]);
 
-        if (!empty($validated['permissions'])) {
+        if (! empty($validated['permissions'])) {
             $permissionNames = Permission::whereIn('id', $validated['permissions'])->pluck('name');
             $role->syncPermissions($permissionNames);
         }
@@ -74,7 +74,7 @@ class RoleController extends Controller
     public function update(Request $request, Role $role)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+            'name' => 'required|string|max:255|unique:roles,name,'.$role->id,
             'permissions' => 'array',
             'permissions.*' => 'integer|exists:permissions,id',
         ]);
@@ -83,7 +83,7 @@ class RoleController extends Controller
             'name' => $validated['name'],
         ]);
 
-        if (!empty($validated['permissions'])) {
+        if (! empty($validated['permissions'])) {
             $permissionNames = Permission::whereIn('id', $validated['permissions'])->pluck('name');
             $role->syncPermissions($permissionNames);
         } else {

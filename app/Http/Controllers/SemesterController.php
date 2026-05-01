@@ -21,8 +21,8 @@ class SemesterController extends Controller
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('academic_year', 'like', '%' . $search . '%');
+            $query->where('name', 'like', '%'.$search.'%')
+                ->orWhere('academic_year', 'like', '%'.$search.'%');
         }
 
         return Inertia::render('semesters/index', [
@@ -76,7 +76,7 @@ class SemesterController extends Controller
     public function update(SemesterRequest $request, Semester $semester)
     {
         // If setting as current, unset other current semesters
-        if (($request->validated('is_current', false)) && !$semester->is_current) {
+        if (($request->validated('is_current', false)) && ! $semester->is_current) {
             Semester::where('is_current', true)->update(['is_current' => false]);
         }
 

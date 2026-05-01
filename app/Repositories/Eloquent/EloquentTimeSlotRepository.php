@@ -26,12 +26,14 @@ class EloquentTimeSlotRepository implements TimeSlotRepository
     {
         $timeSlot = $this->findById($id);
         $timeSlot->update($data);
+
         return $timeSlot;
     }
 
     public function delete(int $id): bool
     {
         $timeSlot = $this->findById($id);
+
         return $timeSlot->delete();
     }
 }

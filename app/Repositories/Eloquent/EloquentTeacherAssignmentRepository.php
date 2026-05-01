@@ -26,12 +26,14 @@ class EloquentTeacherAssignmentRepository implements TeacherAssignmentRepository
     {
         $teacherAssignment = $this->findById($id);
         $teacherAssignment->update($data);
+
         return $teacherAssignment;
     }
 
     public function delete(int $id): bool
     {
         $teacherAssignment = $this->findById($id);
+
         return $teacherAssignment->delete();
     }
 }

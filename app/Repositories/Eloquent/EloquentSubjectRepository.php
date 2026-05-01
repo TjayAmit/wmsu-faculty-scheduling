@@ -26,12 +26,14 @@ class EloquentSubjectRepository implements SubjectRepository
     {
         $subject = $this->findById($id);
         $subject->update($data);
+
         return $subject;
     }
 
     public function delete(int $id): bool
     {
         $subject = $this->findById($id);
+
         return $subject->delete();
     }
 }

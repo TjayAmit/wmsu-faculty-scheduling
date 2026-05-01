@@ -2,33 +2,27 @@
 
 namespace App\Providers;
 
+use App\Repositories\AttendanceRecordRepository;
+use App\Repositories\DraftScheduleRepository;
+use App\Repositories\Eloquent\EloquentAttendanceRecordRepository;
+use App\Repositories\Eloquent\EloquentDraftScheduleRepository;
+use App\Repositories\Eloquent\EloquentScheduleRepository;
+use App\Repositories\Eloquent\EloquentSemesterRepository;
+use App\Repositories\Eloquent\EloquentSubjectRepository;
+use App\Repositories\Eloquent\EloquentTeacherAssignmentRepository;
+use App\Repositories\Eloquent\EloquentTeacherRepository;
+use App\Repositories\Eloquent\EloquentTeacherScheduleRepository;
+use App\Repositories\Eloquent\EloquentTimeSlotRepository;
+use App\Repositories\Eloquent\EloquentUserRepository;
+use App\Repositories\ScheduleRepository;
+use App\Repositories\SemesterRepository;
+use App\Repositories\SubjectRepository;
+use App\Repositories\TeacherAssignmentRepository;
+use App\Repositories\TeacherRepository;
+use App\Repositories\TeacherScheduleRepository;
+use App\Repositories\TimeSlotRepository;
+use App\Repositories\UserRepository;
 use Illuminate\Support\ServiceProvider;
-
-use App\Repositories\{
-    AttendanceRecordRepository,
-    DraftScheduleRepository,
-    SemesterRepository,
-    ScheduleRepository,
-    SubjectRepository,
-    TeacherAssignmentRepository,
-    TeacherRepository,
-    TeacherScheduleRepository,
-    TimeSlotRepository,
-    UserRepository,
-};
-
-use App\Repositories\Eloquent\{
-    EloquentAttendanceRecordRepository,
-    EloquentDraftScheduleRepository,
-    EloquentSemesterRepository,
-    EloquentScheduleRepository,
-    EloquentSubjectRepository,
-    EloquentTeacherAssignmentRepository,
-    EloquentTeacherRepository,
-    EloquentTeacherScheduleRepository,
-    EloquentTimeSlotRepository,
-    EloquentUserRepository,
-};
 
 class RepositoryServiceProvider extends ServiceProvider
 {
