@@ -20,12 +20,12 @@ readonly class SemesterData
     public static function fromRequest(Request $request): self
     {
         return new self(
-            name: $request->validated('name'),
-            academic_year: $request->validated('academic_year'),
-            semester_type: $request->validated('semester_type'),
-            start_date: $request->validated('start_date'),
-            end_date: $request->validated('end_date'),
-            is_current: $request->validated('is_current', false),
+            name: $request->input('name'),
+            academic_year: $request->input('academic_year'),
+            semester_type: $request->input('semester_type'),
+            start_date: $request->input('start_date'),
+            end_date: $request->input('end_date'),
+            is_current: $request->input('is_current', false),
         );
     }
 

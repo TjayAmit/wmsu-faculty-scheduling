@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\EmploymentType;
+use App\Http\Requests\TeacherRequest;
 use App\Models\Teacher;
 use App\Models\User;
 use App\Services\TeacherService;
@@ -47,20 +48,8 @@ class TeacherController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(TeacherRequest $request)
     {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id|unique:teachers,user_id',
-            'employee_id' => 'required|string|max:50|unique:teachers,employee_id',
-            'department' => 'nullable|string|max:255',
-            'rank' => 'nullable|string|max:100',
-            'employment_type' => 'required|string|in:full_time,part_time,casual',
-            'date_hired' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'is_active' => 'boolean',
-        ]);
-
         $this->service->createFromRequest($request);
 
         return redirect()->route('teachers.index')->with('success', 'Teacher created successfully');
@@ -89,20 +78,8 @@ class TeacherController extends Controller
         ]);
     }
 
-    public function update(Request $request, Teacher $teacher)
+    public function update(TeacherRequest $request, Teacher $teacher)
     {
-        $validated = $request->validate([
-            'user_id' => 'required|exists:users,id|unique:teachers,user_id,' . $teacher->id,
-            'employee_id' => 'required|string|max:50|unique:teachers,employee_id,' . $teacher->id,
-            'department' => 'nullable|string|max:255',
-            'rank' => 'nullable|string|max:100',
-            'employment_type' => 'required|string|in:full_time,part_time,casual',
-            'date_hired' => 'nullable|date',
-            'phone' => 'nullable|string|max:20',
-            'address' => 'nullable|string',
-            'is_active' => 'boolean',
-        ]);
-
         $this->service->updateFromRequest($teacher->id, $request);
 
         return redirect()->route('teachers.index')->with('success', 'Teacher updated successfully');

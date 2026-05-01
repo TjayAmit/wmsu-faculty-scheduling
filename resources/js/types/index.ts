@@ -9,3 +9,4 @@ export type * from './semesters';
 export type * from './timeSlots';
 export type * from './activityLogs';
 export type * from './roles';
+export type * from './draftSchedules';
