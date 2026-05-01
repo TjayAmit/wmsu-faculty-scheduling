@@ -17,6 +17,8 @@
 
 ## Functional Requirements
 
+### Current Implemented Features
+
 1. **Teacher Registration**
    - Faculty staff can register new teacher profiles without requiring user accounts
    - Each teacher has personal information, employment details, and email address
@@ -68,6 +70,3435 @@
    - Monitor teacher unit loads
    - Generate conflict reports
    - Dean-level oversight dashboards
+
+### Navigation Structure
+
+The application is organized into the following navigation groups based on user roles and permissions:
+
+#### Overview Group
+- **Dashboard**: Main landing page with system overview and statistics
+
+#### Faculty Admin Group (Admin, Faculty Admin, Faculty Staff)
+- **Teachers**: Teacher profile management and registration
+- **Semesters**: Academic semester configuration
+- **Time Slots**: Class time slot definitions
+- **Subjects**: Subject catalog and unit management
+- **Faculty Staff**: Administrative staff management
+
+#### Scheduling Group (Admin, Faculty Admin, Faculty Staff)
+- **Schedules**: Master schedule management
+- **Draft Schedules**: Faculty review of teacher-proposed schedules
+- **Assign Schedules**: Teacher assignment to schedules (requires teacher_assignments.view permission)
+
+#### My Schedule Group (Teacher Role)
+- **Request Schedule**: Teachers can propose draft schedules
+- **My Schedule**: View personal assigned schedules
+
+#### System Group (Permission-based)
+- **Users**: User account management (requires users.view permission)
+- **Roles**: Role management (Admin only)
+- **Activity Logs**: System activity monitoring (requires activity_logs.view permission)
+
+### Future Features (Planned/Commented in Navigation)
+
+#### Faculty Admin Future Features
+- **Classrooms**: Rooms/locations management
+- **Departments**: Department configuration
+- **Programs**: Degree program management
+- **Curriculum**: Subject requirements per program
+- **Sections**: Class sections per semester
+- **Holidays**: Non-teaching days configuration
+- **Workload Rules**: Max hours per faculty settings
+
+#### Scheduling Future Features
+- **Conflicts**: Schedule overlap detection view
+- **Schedule Analytics**: Utilization reports
+- **Mass Schedule Import**: Bulk CSV/Excel upload
+- **Room Schedules**: Room occupancy calendar
+- **Teacher Load Balance**: Hours distribution overview
+- **Schedule Conflicts Resolution**: Override/reassign conflicts
+
+#### Teacher Future Features
+- **Availability**: Set preferred/unavailable time slots
+- **Teaching History**: Past semester schedules archive
+- **Workload Report**: Hours summary by semester
+- **Substitute Requests**: Request/find substitute teachers
+- **Leave Requests**: File for absence/time off
+- **Schedule Preferences**: Preferred subjects/times settings
+
+#### Dean/Department Head Future Features
+- **Department Schedules**: Dean oversight of department schedules
+- **Approval Queue**: Dean approval workflows
+- **Department Faculty**: Department head faculty management
+- **Section Schedules**: Department head section management
+
+#### System Future Features
+- **System Settings**: Global app configuration
+- **Backup/Restore**: Database backup management
+- **Notifications**: Broadcast/email settings
+- **Audit Trail**: Data change history
+- **API Keys**: Third-party integrations
+- **Email Templates**: Customizable notifications
+- **System Health**: Status/performance dashboard
+
+## Future Module Schema Designs
+
+### Faculty Admin Module Extensions
+
+#### classrooms Table
+
+#### Purpose
+Manage physical classroom locations and their attributes for room scheduling and capacity management.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| building | varchar(100) | NO | - | Building name/identifier |
+| room_number | varchar(20) | NO | - | Room number within building |
+| room_name | varchar(100) | YES | NULL | Descriptive room name (e.g., "Computer Lab 1") |
+| capacity | int unsigned | NO | 30 | Maximum student capacity |
+| room_type | enum | NO | 'classroom' | Room type (classroom, lab, lecture_hall, office) |
+| equipment | json | YES | NULL | Available equipment (projector, computers, etc.) |
+| is_active | boolean | NO | true | Whether room is available for scheduling |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "classrooms",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "building": {
+      "type": "varchar(100)",
+      "nullable": false,
+      "description": "Building name/identifier"
+    },
+    "room_number": {
+      "type": "varchar(20)",
+      "nullable": false,
+      "description": "Room number within building"
+    },
+    "room_name": {
+      "type": "varchar(100)",
+      "nullable": true,
+      "description": "Descriptive room name"
+    },
+    "capacity": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 30,
+      "description": "Maximum student capacity"
+    },
+    "room_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "classroom",
+      "values": ["classroom", "lab", "lecture_hall", "office"],
+      "description": "Room type"
+    },
+    "equipment": {
+      "type": "json",
+      "nullable": true,
+      "description": "Available equipment list"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether room is available for scheduling"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "classrooms_building_room_unique": ["building", "room_number"],
+    "classrooms_room_type_index": ["room_type"],
+    "classrooms_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {}
+}
+```
+
+#### departments Table
+
+#### Purpose
+Organize faculty and programs into academic departments for administrative management.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| code | varchar(20) | NO | - | Department code (e.g., "EDUC") |
+| name | varchar(255) | NO | - | Department full name |
+| description | text | YES | NULL | Department description |
+| head_id | bigint unsigned | YES | NULL | Foreign key to teachers (department head) |
+| office_location | varchar(100) | YES | NULL | Department office location |
+| contact_phone | varchar(20) | YES | NULL | Department contact phone |
+| contact_email | varchar(255) | YES | NULL | Department contact email |
+| is_active | boolean | NO | true | Whether department is active |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "departments",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "code": {
+      "type": "varchar(20)",
+      "nullable": false,
+      "description": "Department code"
+    },
+    "name": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Department full name"
+    },
+    "description": {
+      "type": "text",
+      "nullable": true,
+      "description": "Department description"
+    },
+    "head_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to teachers (department head)"
+    },
+    "office_location": {
+      "type": "varchar(100)",
+      "nullable": true,
+      "description": "Department office location"
+    },
+    "contact_phone": {
+      "type": "varchar(20)",
+      "nullable": true,
+      "description": "Department contact phone"
+    },
+    "contact_email": {
+      "type": "varchar(255)",
+      "nullable": true,
+      "description": "Department contact email"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether department is active"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "departments_code_unique": ["code"],
+    "departments_head_id_index": ["head_id"],
+    "departments_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {
+    "departments_head_id_foreign": {
+      "column": "head_id",
+      "references": "teachers.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### programs Table
+
+#### Purpose
+Define academic degree programs offered by the College of Education.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| code | varchar(20) | NO | - | Program code (e.g., "BSED") |
+| name | varchar(255) | NO | - | Program full name |
+| degree_level | enum | NO | 'bachelor' | Degree level (bachelor, master, doctoral) |
+| department_id | bigint unsigned | NO | - | Foreign key to departments |
+| description | text | YES | NULL | Program description |
+| duration_years | decimal(3,1) | NO | 4.0 | Program duration in years |
+| total_units | decimal(5,1) | NO | 0.0 | Total program units required |
+| is_active | boolean | NO | true | Whether program is currently offered |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "programs",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "code": {
+      "type": "varchar(20)",
+      "nullable": false,
+      "description": "Program code"
+    },
+    "name": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Program full name"
+    },
+    "degree_level": {
+      "type": "enum",
+      "nullable": false,
+      "default": "bachelor",
+      "values": ["bachelor", "master", "doctoral"],
+      "description": "Degree level"
+    },
+    "department_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to departments"
+    },
+    "description": {
+      "type": "text",
+      "nullable": true,
+      "description": "Program description"
+    },
+    "duration_years": {
+      "type": "decimal(3,1)",
+      "nullable": false,
+      "default": 4.0,
+      "description": "Program duration in years"
+    },
+    "total_units": {
+      "type": "decimal(5,1)",
+      "nullable": false,
+      "default": 0.0,
+      "description": "Total program units required"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether program is currently offered"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "programs_code_unique": ["code"],
+    "programs_department_id_index": ["department_id"],
+    "programs_degree_level_index": ["degree_level"],
+    "programs_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {
+    "programs_department_id_foreign": {
+      "column": "department_id",
+      "references": "departments.id",
+      "on_delete": "RESTRICT",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### curriculum Table
+
+#### Purpose
+Define subject requirements and prerequisites for each academic program.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| program_id | bigint unsigned | NO | - | Foreign key to programs |
+| subject_id | bigint unsigned | NO | - | Foreign key to subjects |
+| year_level | int unsigned | NO | 1 | Year level the subject is taken |
+| semester_type | enum | NO | 'first' | Semester (first, second, summer) |
+| is_required | boolean | NO | true | Whether subject is required or elective |
+| prerequisite_subjects | json | YES | NULL | Array of prerequisite subject IDs |
+| units_override | decimal(3,1) | YES | NULL | Override units if different from subject |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "curriculum",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "program_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to programs"
+    },
+    "subject_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to subjects"
+    },
+    "year_level": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 1,
+      "description": "Year level the subject is taken"
+    },
+    "semester_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "first",
+      "values": ["first", "second", "summer"],
+      "description": "Semester"
+    },
+    "is_required": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether subject is required or elective"
+    },
+    "prerequisite_subjects": {
+      "type": "json",
+      "nullable": true,
+      "description": "Array of prerequisite subject IDs"
+    },
+    "units_override": {
+      "type": "decimal(3,1)",
+      "nullable": true,
+      "description": "Override units if different from subject"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "curriculum_program_subject_unique": ["program_id", "subject_id"],
+    "curriculum_program_year_semester_index": ["program_id", "year_level", "semester_type"]
+  },
+  "foreign_keys": {
+    "curriculum_program_id_foreign": {
+      "column": "program_id",
+      "references": "programs.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "curriculum_subject_id_foreign": {
+      "column": "subject_id",
+      "references": "subjects.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### sections Table
+
+#### Purpose
+Manage class sections for each semester and program.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| section_code | varchar(20) | NO | - | Section code (e.g., "BSED-1A") |
+| program_id | bigint unsigned | NO | - | Foreign key to programs |
+| semester_id | bigint unsigned | NO | - | Foreign key to semesters |
+| year_level | int unsigned | NO | 1 | Year level |
+| max_students | int unsigned | NO | 40 | Maximum student capacity |
+| current_students | int unsigned | NO | 0 | Current enrolled students |
+| adviser_id | bigint unsigned | YES | NULL | Foreign key to teachers (section adviser) |
+| is_active | boolean | NO | true | Whether section is active |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "sections",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "section_code": {
+      "type": "varchar(20)",
+      "nullable": false,
+      "description": "Section code"
+    },
+    "program_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to programs"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to semesters"
+    },
+    "year_level": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 1,
+      "description": "Year level"
+    },
+    "max_students": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 40,
+      "description": "Maximum student capacity"
+    },
+    "current_students": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Current enrolled students"
+    },
+    "adviser_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to teachers (section adviser)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether section is active"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "sections_section_code_unique": ["section_code"],
+    "sections_program_semester_index": ["program_id", "semester_id"],
+    "sections_adviser_id_index": ["adviser_id"],
+    "sections_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {
+    "sections_program_id_foreign": {
+      "column": "program_id",
+      "references": "programs.id",
+      "on_delete": "RESTRICT",
+      "on_update": "CASCADE"
+    },
+    "sections_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "RESTRICT",
+      "on_update": "CASCADE"
+    },
+    "sections_adviser_id_foreign": {
+      "column": "adviser_id",
+      "references": "teachers.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### holidays Table
+
+#### Purpose
+Manage non-teaching days and holidays for academic calendar planning.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| name | varchar(255) | NO | - | Holiday name |
+| date | date | NO | - | Holiday date |
+| type | enum | NO | 'regular' | Holiday type (regular, special, suspension) |
+| description | text | YES | NULL | Holiday description |
+| affects_schedules | boolean | NO | true | Whether classes are suspended |
+| academic_year | varchar(20) | YES | NULL | Academic year (if applicable) |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "holidays",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "name": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Holiday name"
+    },
+    "date": {
+      "type": "date",
+      "nullable": false,
+      "description": "Holiday date"
+    },
+    "type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "regular",
+      "values": ["regular", "special", "suspension"],
+      "description": "Holiday type"
+    },
+    "description": {
+      "type": "text",
+      "nullable": true,
+      "description": "Holiday description"
+    },
+    "affects_schedules": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether classes are suspended"
+    },
+    "academic_year": {
+      "type": "varchar(20)",
+      "nullable": true,
+      "description": "Academic year (if applicable)"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "holidays_date_unique": ["date"],
+    "holidays_academic_year_index": ["academic_year"],
+    "holidays_type_index": ["type"]
+  },
+  "foreign_keys": {}
+}
+```
+
+#### workload_rules Table
+
+#### Purpose
+Define maximum teaching hours and workload policies for faculty.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| employment_type | enum | NO | 'full_time' | Employment type this rule applies to |
+| max_teaching_hours | decimal(4,1) | NO | 24.0 | Maximum teaching hours per week |
+| max_units | decimal(5,1) | NO | 24.0 | Maximum units per semester |
+| min_units | decimal(5,1) | YES | NULL | Minimum units per semester |
+| max_preparation_hours | decimal(4,1) | YES | NULL | Maximum preparation hours |
+| overtime_rate | decimal(5,2) | YES | NULL | Overtime pay rate multiplier |
+| description | text | YES | NULL | Rule description |
+| is_active | boolean | NO | true | Whether rule is currently active |
+| effective_date | date | NO | - | Date rule becomes effective |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "workload_rules",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "employment_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "full_time",
+      "values": ["full_time", "part_time", "casual"],
+      "description": "Employment type this rule applies to"
+    },
+    "max_teaching_hours": {
+      "type": "decimal(4,1)",
+      "nullable": false,
+      "default": 24.0,
+      "description": "Maximum teaching hours per week"
+    },
+    "max_units": {
+      "type": "decimal(5,1)",
+      "nullable": false,
+      "default": 24.0,
+      "description": "Maximum units per semester"
+    },
+    "min_units": {
+      "type": "decimal(5,1)",
+      "nullable": true,
+      "description": "Minimum units per semester"
+    },
+    "max_preparation_hours": {
+      "type": "decimal(4,1)",
+      "nullable": true,
+      "description": "Maximum preparation hours"
+    },
+    "overtime_rate": {
+      "type": "decimal(5,2)",
+      "nullable": true,
+      "description": "Overtime pay rate multiplier"
+    },
+    "description": {
+      "type": "text",
+      "nullable": true,
+      "description": "Rule description"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether rule is currently active"
+    },
+    "effective_date": {
+      "type": "date",
+      "nullable": false,
+      "description": "Date rule becomes effective"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "workload_rules_employment_type_index": ["employment_type"],
+    "workload_rules_is_active_index": ["is_active"],
+    "workload_rules_effective_date_index": ["effective_date"]
+  },
+  "foreign_keys": {}
+}
+```
+
+### Scheduling Module Extensions
+
+#### schedule_conflicts Table
+
+#### Purpose
+Track and manage schedule conflicts between teachers, rooms, and time slots.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| conflict_type | enum | NO | 'teacher_overlap' | Conflict type (teacher_overlap, room_double_book, time_slot_conflict) |
+| primary_schedule_id | bigint unsigned | YES | NULL | Primary schedule involved in conflict |
+| secondary_schedule_id | bigint unsigned | YES | NULL | Secondary schedule involved in conflict |
+| teacher_id | bigint unsigned | YES | NULL | Teacher involved in conflict |
+| classroom_id | bigint unsigned | YES | NULL | Classroom involved in conflict |
+| time_slot_id | bigint unsigned | YES | NULL | Time slot involved in conflict |
+| day_of_week | enum | YES | NULL | Day of conflict (monday, tuesday, etc.) |
+| semester_id | bigint unsigned | NO | - | Semester where conflict occurs |
+| severity | enum | NO | 'medium' | Conflict severity (low, medium, high, critical) |
+| status | enum | NO | 'pending' | Resolution status (pending, resolved, ignored) |
+| resolved_by | bigint unsigned | YES | NULL | User who resolved the conflict |
+| resolution_notes | text | YES | NULL | Notes on how conflict was resolved |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "schedule_conflicts",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "conflict_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "teacher_overlap",
+      "values": ["teacher_overlap", "room_double_book", "time_slot_conflict"],
+      "description": "Conflict type"
+    },
+    "primary_schedule_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Primary schedule involved in conflict"
+    },
+    "secondary_schedule_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Secondary schedule involved in conflict"
+    },
+    "teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Teacher involved in conflict"
+    },
+    "classroom_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Classroom involved in conflict"
+    },
+    "time_slot_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Time slot involved in conflict"
+    },
+    "day_of_week": {
+      "type": "enum",
+      "nullable": true,
+      "values": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "description": "Day of conflict"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Semester where conflict occurs"
+    },
+    "severity": {
+      "type": "enum",
+      "nullable": false,
+      "default": "medium",
+      "values": ["low", "medium", "high", "critical"],
+      "description": "Conflict severity"
+    },
+    "status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "pending",
+      "values": ["pending", "resolved", "ignored"],
+      "description": "Resolution status"
+    },
+    "resolved_by": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "User who resolved the conflict"
+    },
+    "resolution_notes": {
+      "type": "text",
+      "nullable": true,
+      "description": "Notes on how conflict was resolved"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "schedule_conflicts_semester_status_index": ["semester_id", "status"],
+    "schedule_conflicts_teacher_index": ["teacher_id"],
+    "schedule_conflicts_classroom_index": ["classroom_id"],
+    "schedule_conflicts_type_index": ["conflict_type"]
+  },
+  "foreign_keys": {
+    "schedule_conflicts_primary_schedule_id_foreign": {
+      "column": "primary_schedule_id",
+      "references": "schedules.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "schedule_conflicts_secondary_schedule_id_foreign": {
+      "column": "secondary_schedule_id",
+      "references": "schedules.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "schedule_conflicts_teacher_id_foreign": {
+      "column": "teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "schedule_conflicts_classroom_id_foreign": {
+      "column": "classroom_id",
+      "references": "classrooms.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "schedule_conflicts_time_slot_id_foreign": {
+      "column": "time_slot_id",
+      "references": "time_slots.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "schedule_conflicts_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "schedule_conflicts_resolved_by_foreign": {
+      "column": "resolved_by",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### schedule_analytics Table
+
+#### Purpose
+Store pre-calculated analytics data for schedule utilization and reporting.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| metric_type | enum | NO | 'room_utilization' | Metric type (room_utilization, teacher_load, subject_distribution, time_slot_usage) |
+| entity_id | bigint unsigned | YES | NULL | ID of related entity (room, teacher, subject, etc.) |
+| entity_type | varchar(50) | YES | NULL | Type of entity (classroom, teacher, subject, time_slot) |
+| semester_id | bigint unsigned | NO | - | Semester for this metric |
+| metric_value | decimal(10,2) | NO | 0.00 | Calculated metric value |
+| metric_unit | varchar(20) | YES | NULL | Unit of measurement (percentage, hours, count) |
+| additional_data | json | YES | NULL | Additional metric details |
+| calculated_at | timestamp | NO | CURRENT_TIMESTAMP | When metric was calculated |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "schedule_analytics",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "metric_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "room_utilization",
+      "values": ["room_utilization", "teacher_load", "subject_distribution", "time_slot_usage"],
+      "description": "Metric type"
+    },
+    "entity_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "ID of related entity"
+    },
+    "entity_type": {
+      "type": "varchar(50)",
+      "nullable": true,
+      "description": "Type of entity"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Semester for this metric"
+    },
+    "metric_value": {
+      "type": "decimal(10,2)",
+      "nullable": false,
+      "default": 0.00,
+      "description": "Calculated metric value"
+    },
+    "metric_unit": {
+      "type": "varchar(20)",
+      "nullable": true,
+      "description": "Unit of measurement"
+    },
+    "additional_data": {
+      "type": "json",
+      "nullable": true,
+      "description": "Additional metric details"
+    },
+    "calculated_at": {
+      "type": "timestamp",
+      "nullable": false,
+      "description": "When metric was calculated"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "schedule_analytics_semester_metric_index": ["semester_id", "metric_type"],
+    "schedule_analytics_entity_index": ["entity_type", "entity_id"],
+    "schedule_analytics_calculated_at_index": ["calculated_at"]
+  },
+  "foreign_keys": {
+    "schedule_analytics_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### room_schedules Table
+
+#### Purpose
+Link schedules to specific classrooms for room occupancy tracking.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| schedule_id | bigint unsigned | NO | - | Foreign key to schedules |
+| classroom_id | bigint unsigned | NO | - | Foreign key to classrooms |
+| semester_id | bigint unsigned | NO | - | Foreign key to semesters |
+| is_active | boolean | NO | true | Whether room assignment is active |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "room_schedules",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "schedule_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to schedules"
+    },
+    "classroom_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to classrooms"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to semesters"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether room assignment is active"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "room_schedules_schedule_classroom_unique": ["schedule_id", "classroom_id"],
+    "room_schedules_classroom_semester_index": ["classroom_id", "semester_id"],
+    "room_schedules_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {
+    "room_schedules_schedule_id_foreign": {
+      "column": "schedule_id",
+      "references": "schedules.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "room_schedules_classroom_id_foreign": {
+      "column": "classroom_id",
+      "references": "classrooms.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "room_schedules_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### teacher_load_balance Table
+
+#### Purpose
+Track teacher workload distribution and balance across departments and programs.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| teacher_id | bigint unsigned | NO | - | Foreign key to teachers |
+| semester_id | bigint unsigned | NO | - | Foreign key to semesters |
+| total_units | decimal(5,1) | NO | 0.0 | Total assigned units |
+| total_hours | decimal(5,1) | NO | 0.0 | Total teaching hours |
+| preparation_hours | decimal(5,1) | YES | NULL | Estimated preparation hours |
+| overload_units | decimal(5,1) | NO | 0.0 | Units beyond standard load |
+| overload_hours | decimal(5,1) | NO | 0.0 | Hours beyond standard load |
+| balance_score | decimal(5,2) | YES | NULL | Workload balance score (0-100) |
+| department_preference | json | YES | NULL | Preferred department assignments |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "teacher_load_balance",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teachers"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to semesters"
+    },
+    "total_units": {
+      "type": "decimal(5,1)",
+      "nullable": false,
+      "default": 0.0,
+      "description": "Total assigned units"
+    },
+    "total_hours": {
+      "type": "decimal(5,1)",
+      "nullable": false,
+      "default": 0.0,
+      "description": "Total teaching hours"
+    },
+    "preparation_hours": {
+      "type": "decimal(5,1)",
+      "nullable": true,
+      "description": "Estimated preparation hours"
+    },
+    "overload_units": {
+      "type": "decimal(5,1)",
+      "nullable": false,
+      "default": 0.0,
+      "description": "Units beyond standard load"
+    },
+    "overload_hours": {
+      "type": "decimal(5,1)",
+      "nullable": false,
+      "default": 0.0,
+      "description": "Hours beyond standard load"
+    },
+    "balance_score": {
+      "type": "decimal(5,2)",
+      "nullable": true,
+      "description": "Workload balance score (0-100)"
+    },
+    "department_preference": {
+      "type": "json",
+      "nullable": true,
+      "description": "Preferred department assignments"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "teacher_load_balance_teacher_semester_unique": ["teacher_id", "semester_id"],
+    "teacher_load_balance_balance_score_index": ["balance_score"],
+    "teacher_load_balance_overload_units_index": ["overload_units"]
+  },
+  "foreign_keys": {
+    "teacher_load_balance_teacher_id_foreign": {
+      "column": "teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "teacher_load_balance_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### schedule_import_jobs Table
+
+#### Purpose
+Track bulk schedule import operations and their status.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| user_id | bigint unsigned | NO | - | Foreign key to users who initiated import |
+| file_name | varchar(255) | NO | - | Original uploaded file name |
+| file_path | varchar(500) | NO | - | Path to uploaded file |
+| file_type | enum | NO | 'csv' | File type (csv, excel, json) |
+| total_records | int unsigned | YES | NULL | Total records in file |
+| processed_records | int unsigned | NO | 0 | Number of records processed |
+| successful_records | int unsigned | NO | 0 | Number of successfully imported records |
+| failed_records | int unsigned | NO | 0 | Number of failed records |
+| status | enum | NO | 'pending' | Import status (pending, processing, completed, failed, cancelled) |
+| error_log | longtext | YES | NULL | Detailed error information |
+| import_options | json | YES | NULL | Import configuration options |
+| started_at | timestamp | YES | NULL | When import processing started |
+| completed_at | timestamp | YES | NULL | When import processing completed |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "schedule_import_jobs",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "user_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to users who initiated import"
+    },
+    "file_name": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Original uploaded file name"
+    },
+    "file_path": {
+      "type": "varchar(500)",
+      "nullable": false,
+      "description": "Path to uploaded file"
+    },
+    "file_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "csv",
+      "values": ["csv", "excel", "json"],
+      "description": "File type"
+    },
+    "total_records": {
+      "type": "int unsigned",
+      "nullable": true,
+      "description": "Total records in file"
+    },
+    "processed_records": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Number of records processed"
+    },
+    "successful_records": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Number of successfully imported records"
+    },
+    "failed_records": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Number of failed records"
+    },
+    "status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "pending",
+      "values": ["pending", "processing", "completed", "failed", "cancelled"],
+      "description": "Import status"
+    },
+    "error_log": {
+      "type": "longtext",
+      "nullable": true,
+      "description": "Detailed error information"
+    },
+    "import_options": {
+      "type": "json",
+      "nullable": true,
+      "description": "Import configuration options"
+    },
+    "started_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When import processing started"
+    },
+    "completed_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When import processing completed"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "schedule_import_jobs_user_id_index": ["user_id"],
+    "schedule_import_jobs_status_index": ["status"],
+    "schedule_import_jobs_created_at_index": ["created_at"]
+  },
+  "foreign_keys": {
+    "schedule_import_jobs_user_id_foreign": {
+      "column": "user_id",
+      "references": "users.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+### Teacher Module Extensions
+
+#### teacher_availability Table
+
+#### Purpose
+Manage teacher availability and preferred time slots for scheduling.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| teacher_id | bigint unsigned | NO | - | Foreign key to teachers |
+| day_of_week | enum | NO | 'monday' | Day of week (monday, tuesday, etc.) |
+| time_slot_id | bigint unsigned | NO | - | Foreign key to time_slots |
+| availability_status | enum | NO | 'available' | Availability status (available, preferred, unavailable) |
+| reason | varchar(255) | YES | NULL | Reason for unavailability |
+| is_recurring | boolean | NO | true | Whether this availability repeats weekly |
+| effective_start_date | date | YES | NULL | Start date for this availability |
+| effective_end_date | date | YES | NULL | End date for this availability |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "teacher_availability",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teachers"
+    },
+    "day_of_week": {
+      "type": "enum",
+      "nullable": false,
+      "default": "monday",
+      "values": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "description": "Day of week"
+    },
+    "time_slot_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to time_slots"
+    },
+    "availability_status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "available",
+      "values": ["available", "preferred", "unavailable"],
+      "description": "Availability status"
+    },
+    "reason": {
+      "type": "varchar(255)",
+      "nullable": true,
+      "description": "Reason for unavailability"
+    },
+    "is_recurring": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether this availability repeats weekly"
+    },
+    "effective_start_date": {
+      "type": "date",
+      "nullable": true,
+      "description": "Start date for this availability"
+    },
+    "effective_end_date": {
+      "type": "date",
+      "nullable": true,
+      "description": "End date for this availability"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "teacher_availability_teacher_day_slot_unique": ["teacher_id", "day_of_week", "time_slot_id"],
+    "teacher_availability_status_index": ["availability_status"],
+    "teacher_availability_effective_dates_index": ["effective_start_date", "effective_end_date"]
+  },
+  "foreign_keys": {
+    "teacher_availability_teacher_id_foreign": {
+      "column": "teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "teacher_availability_time_slot_id_foreign": {
+      "column": "time_slot_id",
+      "references": "time_slots.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### teaching_history Table
+
+#### Purpose
+Archive historical teaching assignments for teachers across semesters.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| teacher_id | bigint unsigned | NO | - | Foreign key to teachers |
+| semester_id | bigint unsigned | NO | - | Foreign key to semesters |
+| subject_id | bigint unsigned | NO | - | Foreign key to subjects |
+| section_id | bigint unsigned | YES | NULL | Foreign key to sections |
+| classroom_id | bigint unsigned | YES | NULL | Foreign key to classrooms |
+| time_slot_id | bigint unsigned | NO | - | Foreign key to time_slots |
+| day_of_week | enum | NO | 'monday' | Day of week |
+| units | decimal(3,1) | NO | 0.0 | Units for this assignment |
+| student_count | int unsigned | YES | NULL | Number of students enrolled |
+| performance_rating | decimal(3,2) | YES | NULL | Teacher performance rating (1.00-5.00) |
+| notes | text | YES | NULL | Additional notes about the assignment |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "teaching_history",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teachers"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to semesters"
+    },
+    "subject_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to subjects"
+    },
+    "section_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to sections"
+    },
+    "classroom_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to classrooms"
+    },
+    "time_slot_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to time_slots"
+    },
+    "day_of_week": {
+      "type": "enum",
+      "nullable": false,
+      "default": "monday",
+      "values": ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+      "description": "Day of week"
+    },
+    "units": {
+      "type": "decimal(3,1)",
+      "nullable": false,
+      "default": 0.0,
+      "description": "Units for this assignment"
+    },
+    "student_count": {
+      "type": "int unsigned",
+      "nullable": true,
+      "description": "Number of students enrolled"
+    },
+    "performance_rating": {
+      "type": "decimal(3,2)",
+      "nullable": true,
+      "description": "Teacher performance rating (1.00-5.00)"
+    },
+    "notes": {
+      "type": "text",
+      "nullable": true,
+      "description": "Additional notes about the assignment"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "teaching_history_teacher_semester_index": ["teacher_id", "semester_id"],
+    "teaching_history_subject_index": ["subject_id"],
+    "teaching_history_semester_index": ["semester_id"]
+  },
+  "foreign_keys": {
+    "teaching_history_teacher_id_foreign": {
+      "column": "teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "teaching_history_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "teaching_history_subject_id_foreign": {
+      "column": "subject_id",
+      "references": "subjects.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "teaching_history_section_id_foreign": {
+      "column": "section_id",
+      "references": "sections.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    },
+    "teaching_history_classroom_id_foreign": {
+      "column": "classroom_id",
+      "references": "classrooms.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    },
+    "teaching_history_time_slot_id_foreign": {
+      "column": "time_slot_id",
+      "references": "time_slots.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### substitute_requests Table
+
+#### Purpose
+Manage substitute teacher requests and assignments.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| requesting_teacher_id | bigint unsigned | NO | - | Foreign key to teachers (who needs substitute) |
+| substitute_teacher_id | bigint unsigned | YES | NULL | Foreign key to teachers (substitute assigned) |
+| teacher_assignment_id | bigint unsigned | NO | - | Foreign key to teacher_assignments |
+| request_date | date | NO | - | Date substitute is needed |
+| time_slot_id | bigint unsigned | NO | - | Foreign key to time_slots |
+| subject_id | bigint unsigned | NO | - | Foreign key to subjects |
+| reason | text | YES | NULL | Reason for substitute request |
+| status | enum | NO | 'pending' | Request status (pending, approved, rejected, completed) |
+| approved_by | bigint unsigned | YES | NULL | Foreign key to users who approved |
+| approved_at | timestamp | YES | NULL | When request was approved |
+| substitute_notes | text | YES | NULL | Notes from substitute teacher |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "substitute_requests",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "requesting_teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teachers (who needs substitute)"
+    },
+    "substitute_teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to teachers (substitute assigned)"
+    },
+    "teacher_assignment_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teacher_assignments"
+    },
+    "request_date": {
+      "type": "date",
+      "nullable": false,
+      "description": "Date substitute is needed"
+    },
+    "time_slot_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to time_slots"
+    },
+    "subject_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to subjects"
+    },
+    "reason": {
+      "type": "text",
+      "nullable": true,
+      "description": "Reason for substitute request"
+    },
+    "status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "pending",
+      "values": ["pending", "approved", "rejected", "completed"],
+      "description": "Request status"
+    },
+    "approved_by": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users who approved"
+    },
+    "approved_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When request was approved"
+    },
+    "substitute_notes": {
+      "type": "text",
+      "nullable": true,
+      "description": "Notes from substitute teacher"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "substitute_requests_requesting_teacher_index": ["requesting_teacher_id"],
+    "substitute_requests_substitute_teacher_index": ["substitute_teacher_id"],
+    "substitute_requests_status_index": ["status"],
+    "substitute_requests_request_date_index": ["request_date"]
+  },
+  "foreign_keys": {
+    "substitute_requests_requesting_teacher_id_foreign": {
+      "column": "requesting_teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "substitute_requests_substitute_teacher_id_foreign": {
+      "column": "substitute_teacher_id",
+      "references": "teachers.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    },
+    "substitute_requests_teacher_assignment_id_foreign": {
+      "column": "teacher_assignment_id",
+      "references": "teacher_assignments.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "substitute_requests_time_slot_id_foreign": {
+      "column": "time_slot_id",
+      "references": "time_slots.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "substitute_requests_subject_id_foreign": {
+      "column": "subject_id",
+      "references": "subjects.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "substitute_requests_approved_by_foreign": {
+      "column": "approved_by",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### leave_requests Table
+
+#### Purpose
+Manage teacher leave requests and approval workflow.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| teacher_id | bigint unsigned | NO | - | Foreign key to teachers |
+| leave_type | enum | NO | 'sick' | Leave type (sick, personal, emergency, professional) |
+| start_date | date | NO | - | Leave start date |
+| end_date | date | NO | - | Leave end date |
+| total_days | int unsigned | NO | 1 | Total number of leave days |
+| reason | text | YES | NULL | Reason for leave request |
+| status | enum | NO | 'pending' | Request status (pending, approved, rejected, cancelled) |
+| approved_by | bigint unsigned | YES | NULL | Foreign key to users who approved/rejected |
+| approved_at | timestamp | YES | NULL | When request was processed |
+| rejection_reason | text | YES | NULL | Reason for rejection |
+| affects_schedules | boolean | NO | true | Whether leave affects teaching schedules |
+| affected_assignments | json | YES | NULL | List of affected teacher assignments |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "leave_requests",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teachers"
+    },
+    "leave_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "sick",
+      "values": ["sick", "personal", "emergency", "professional"],
+      "description": "Leave type"
+    },
+    "start_date": {
+      "type": "date",
+      "nullable": false,
+      "description": "Leave start date"
+    },
+    "end_date": {
+      "type": "date",
+      "nullable": false,
+      "description": "Leave end date"
+    },
+    "total_days": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 1,
+      "description": "Total number of leave days"
+    },
+    "reason": {
+      "type": "text",
+      "nullable": true,
+      "description": "Reason for leave request"
+    },
+    "status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "pending",
+      "values": ["pending", "approved", "rejected", "cancelled"],
+      "description": "Request status"
+    },
+    "approved_by": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users who approved/rejected"
+    },
+    "approved_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When request was processed"
+    },
+    "rejection_reason": {
+      "type": "text",
+      "nullable": true,
+      "description": "Reason for rejection"
+    },
+    "affects_schedules": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether leave affects teaching schedules"
+    },
+    "affected_assignments": {
+      "type": "json",
+      "nullable": true,
+      "description": "List of affected teacher assignments"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "leave_requests_teacher_index": ["teacher_id"],
+    "leave_requests_status_index": ["status"],
+    "leave_requests_date_range_index": ["start_date", "end_date"],
+    "leave_requests_approved_by_index": ["approved_by"]
+  },
+  "foreign_keys": {
+    "leave_requests_teacher_id_foreign": {
+      "column": "teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "leave_requests_approved_by_foreign": {
+      "column": "approved_by",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### schedule_preferences Table
+
+#### Purpose
+Store teacher preferences for subjects, time slots, and other scheduling factors.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| teacher_id | bigint unsigned | NO | - | Foreign key to teachers |
+| preference_type | enum | NO | 'subject' | Preference type (subject, time_slot, classroom, department) |
+| preference_value | bigint unsigned | YES | NULL | ID of preferred entity (subject_id, time_slot_id, etc.) |
+| preference_level | enum | NO | 'neutral' | Preference level (avoid, neutral, prefer, strong_prefer) |
+| priority | int unsigned | NO | 1 | Priority (1=high, 5=low) |
+| reason | varchar(255) | YES | NULL | Reason for this preference |
+| is_active | boolean | NO | true | Whether preference is currently active |
+| effective_start_date | date | YES | NULL | Start date for this preference |
+| effective_end_date | date | YES | NULL | End date for this preference |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "schedule_preferences",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teachers"
+    },
+    "preference_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "subject",
+      "values": ["subject", "time_slot", "classroom", "department"],
+      "description": "Preference type"
+    },
+    "preference_value": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "ID of preferred entity"
+    },
+    "preference_level": {
+      "type": "enum",
+      "nullable": false,
+      "default": "neutral",
+      "values": ["avoid", "neutral", "prefer", "strong_prefer"],
+      "description": "Preference level"
+    },
+    "priority": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 1,
+      "description": "Priority (1=high, 5=low)"
+    },
+    "reason": {
+      "type": "varchar(255)",
+      "nullable": true,
+      "description": "Reason for this preference"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether preference is currently active"
+    },
+    "effective_start_date": {
+      "type": "date",
+      "nullable": true,
+      "description": "Start date for this preference"
+    },
+    "effective_end_date": {
+      "type": "date",
+      "nullable": true,
+      "description": "End date for this preference"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "schedule_preferences_teacher_type_value_unique": ["teacher_id", "preference_type", "preference_value"],
+    "schedule_preferences_level_index": ["preference_level"],
+    "schedule_preferences_priority_index": ["priority"],
+    "schedule_preferences_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {
+    "schedule_preferences_teacher_id_foreign": {
+      "column": "teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+### Dean/Department Head Module Extensions
+
+#### department_schedules Table
+
+#### Purpose
+Provide department-level oversight and aggregation of all schedules within a department.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| department_id | bigint unsigned | NO | - | Foreign key to departments |
+| semester_id | bigint unsigned | NO | - | Foreign key to semesters |
+| total_teachers | int unsigned | NO | 0 | Total teachers in department |
+| total_units | decimal(6,1) | NO | 0.0 | Total units assigned |
+| total_classes | int unsigned | NO | 0 | Total class sections |
+| average_load | decimal(5,1) | YES | NULL | Average units per teacher |
+| utilization_rate | decimal(5,2) | YES | NULL | Department resource utilization percentage |
+| conflict_count | int unsigned | NO | 0 | Number of unresolved conflicts |
+| last_updated | timestamp | NO | CURRENT_TIMESTAMP | Last time statistics were calculated |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "department_schedules",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "department_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to departments"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to semesters"
+    },
+    "total_teachers": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Total teachers in department"
+    },
+    "total_units": {
+      "type": "decimal(6,1)",
+      "nullable": false,
+      "default": 0.0,
+      "description": "Total units assigned"
+    },
+    "total_classes": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Total class sections"
+    },
+    "average_load": {
+      "type": "decimal(5,1)",
+      "nullable": true,
+      "description": "Average units per teacher"
+    },
+    "utilization_rate": {
+      "type": "decimal(5,2)",
+      "nullable": true,
+      "description": "Department resource utilization percentage"
+    },
+    "conflict_count": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Number of unresolved conflicts"
+    },
+    "last_updated": {
+      "type": "timestamp",
+      "nullable": false,
+      "description": "Last time statistics were calculated"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "department_schedules_department_semester_unique": ["department_id", "semester_id"],
+    "department_schedules_utilization_rate_index": ["utilization_rate"],
+    "department_schedules_conflict_count_index": ["conflict_count"]
+  },
+  "foreign_keys": {
+    "department_schedules_department_id_foreign": {
+      "column": "department_id",
+      "references": "departments.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "department_schedules_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### approval_queue Table
+
+#### Purpose
+Manage dean-level approval workflows for various scheduling and administrative requests.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| request_type | enum | NO | 'draft_schedule' | Request type (draft_schedule, leave_request, substitute_request, curriculum_change) |
+| request_id | bigint unsigned | NO | - | ID of the related request record |
+| requester_id | bigint unsigned | NO | - | Foreign key to users who made the request |
+| approver_id | bigint unsigned | YES | NULL | Foreign key to users (dean/department head) |
+| department_id | bigint unsigned | YES | NULL | Foreign key to departments (for department-level approvals) |
+| status | enum | NO | 'pending' | Approval status (pending, approved, rejected, returned) |
+| priority | enum | NO | 'normal' | Priority level (low, normal, high, urgent) |
+| submitted_at | timestamp | NO | CURRENT_TIMESTAMP | When request was submitted for approval |
+| reviewed_at | timestamp | YES | NULL | When request was reviewed |
+| approval_notes | text | YES | NULL | Notes from approver |
+| rejection_reason | text | YES | NULL | Reason for rejection |
+| return_reason | text | YES | NULL | Reason for returning to requester |
+| escalation_level | int unsigned | NO | 1 | Current escalation level (1=department head, 2=dean) |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "approval_queue",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "request_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "draft_schedule",
+      "values": ["draft_schedule", "leave_request", "substitute_request", "curriculum_change"],
+      "description": "Request type"
+    },
+    "request_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "ID of the related request record"
+    },
+    "requester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to users who made the request"
+    },
+    "approver_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users (dean/department head)"
+    },
+    "department_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to departments (for department-level approvals)"
+    },
+    "status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "pending",
+      "values": ["pending", "approved", "rejected", "returned"],
+      "description": "Approval status"
+    },
+    "priority": {
+      "type": "enum",
+      "nullable": false,
+      "default": "normal",
+      "values": ["low", "normal", "high", "urgent"],
+      "description": "Priority level"
+    },
+    "submitted_at": {
+      "type": "timestamp",
+      "nullable": false,
+      "description": "When request was submitted for approval"
+    },
+    "reviewed_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When request was reviewed"
+    },
+    "approval_notes": {
+      "type": "text",
+      "nullable": true,
+      "description": "Notes from approver"
+    },
+    "rejection_reason": {
+      "type": "text",
+      "nullable": true,
+      "description": "Reason for rejection"
+    },
+    "return_reason": {
+      "type": "text",
+      "nullable": true,
+      "description": "Reason for returning to requester"
+    },
+    "escalation_level": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 1,
+      "description": "Current escalation level (1=department head, 2=dean)"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "approval_queue_request_type_id_unique": ["request_type", "request_id"],
+    "approval_queue_approver_status_index": ["approver_id", "status"],
+    "approval_queue_department_index": ["department_id"],
+    "approval_queue_priority_index": ["priority"],
+    "approval_queue_submitted_at_index": ["submitted_at"]
+  },
+  "foreign_keys": {
+    "approval_queue_requester_id_foreign": {
+      "column": "requester_id",
+      "references": "users.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "approval_queue_approver_id_foreign": {
+      "column": "approver_id",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    },
+    "approval_queue_department_id_foreign": {
+      "column": "department_id",
+      "references": "departments.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### department_faculty Table
+
+#### Purpose
+Link teachers to departments for department head management and reporting.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| teacher_id | bigint unsigned | NO | - | Foreign key to teachers |
+| department_id | bigint unsigned | NO | - | Foreign key to departments |
+| role | enum | NO | 'member' | Faculty role in department (member, coordinator, assistant_head, head) |
+| join_date | date | NO | - | Date teacher joined department |
+| leave_date | date | YES | NULL | Date teacher left department |
+| is_active | boolean | NO | true | Whether faculty member is currently active in department |
+| reporting_line | json | YES | NULL | Reporting hierarchy within department |
+| specializations | json | YES | NULL | Faculty specializations within department |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "department_faculty",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to teachers"
+    },
+    "department_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to departments"
+    },
+    "role": {
+      "type": "enum",
+      "nullable": false,
+      "default": "member",
+      "values": ["member", "coordinator", "assistant_head", "head"],
+      "description": "Faculty role in department"
+    },
+    "join_date": {
+      "type": "date",
+      "nullable": false,
+      "description": "Date teacher joined department"
+    },
+    "leave_date": {
+      "type": "date",
+      "nullable": true,
+      "description": "Date teacher left department"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether faculty member is currently active in department"
+    },
+    "reporting_line": {
+      "type": "json",
+      "nullable": true,
+      "description": "Reporting hierarchy within department"
+    },
+    "specializations": {
+      "type": "json",
+      "nullable": true,
+      "description": "Faculty specializations within department"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "department_faculty_teacher_department_unique": ["teacher_id", "department_id"],
+    "department_faculty_department_role_index": ["department_id", "role"],
+    "department_faculty_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {
+    "department_faculty_teacher_id_foreign": {
+      "column": "teacher_id",
+      "references": "teachers.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "department_faculty_department_id_foreign": {
+      "column": "department_id",
+      "references": "departments.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### section_schedules Table
+
+#### Purpose
+Department head view of all sections and their scheduling status within the department.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| section_id | bigint unsigned | NO | - | Foreign key to sections |
+| department_id | bigint unsigned | NO | - | Foreign key to departments |
+| semester_id | bigint unsigned | NO | - | Foreign key to semesters |
+| assigned_teacher_id | bigint unsigned | YES | NULL | Foreign key to teachers |
+| classroom_id | bigint unsigned | YES | NULL | Foreign key to classrooms |
+| schedule_status | enum | NO | 'unscheduled' | Scheduling status (unscheduled, scheduled, conflict, incomplete) |
+| enrollment_count | int unsigned | NO | 0 | Current student enrollment |
+| capacity | int unsigned | NO | 40 | Maximum student capacity |
+| fill_rate | decimal(5,2) | YES | NULL | Enrollment fill rate percentage |
+| schedule_conflicts | int unsigned | NO | 0 | Number of scheduling conflicts |
+| last_updated | timestamp | NO | CURRENT_TIMESTAMP | Last time record was updated |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "section_schedules",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "section_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to sections"
+    },
+    "department_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to departments"
+    },
+    "semester_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to semesters"
+    },
+    "assigned_teacher_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to teachers"
+    },
+    "classroom_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to classrooms"
+    },
+    "schedule_status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "unscheduled",
+      "values": ["unscheduled", "scheduled", "conflict", "incomplete"],
+      "description": "Scheduling status"
+    },
+    "enrollment_count": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Current student enrollment"
+    },
+    "capacity": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 40,
+      "description": "Maximum student capacity"
+    },
+    "fill_rate": {
+      "type": "decimal(5,2)",
+      "nullable": true,
+      "description": "Enrollment fill rate percentage"
+    },
+    "schedule_conflicts": {
+      "type": "int unsigned",
+      "nullable": false,
+      "default": 0,
+      "description": "Number of scheduling conflicts"
+    },
+    "last_updated": {
+      "type": "timestamp",
+      "nullable": false,
+      "description": "Last time record was updated"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "section_schedules_section_semester_unique": ["section_id", "semester_id"],
+    "section_schedules_department_index": ["department_id"],
+    "section_schedules_status_index": ["schedule_status"],
+    "section_schedules_assigned_teacher_index": ["assigned_teacher_id"]
+  },
+  "foreign_keys": {
+    "section_schedules_section_id_foreign": {
+      "column": "section_id",
+      "references": "sections.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "section_schedules_department_id_foreign": {
+      "column": "department_id",
+      "references": "departments.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "section_schedules_semester_id_foreign": {
+      "column": "semester_id",
+      "references": "semesters.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    },
+    "section_schedules_assigned_teacher_id_foreign": {
+      "column": "assigned_teacher_id",
+      "references": "teachers.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    },
+    "section_schedules_classroom_id_foreign": {
+      "column": "classroom_id",
+      "references": "classrooms.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+### System Module Extensions
+
+#### system_settings Table
+
+#### Purpose
+Store global application configuration and system-wide settings.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| key | varchar(100) | NO | - | Setting key (unique identifier) |
+| value | longtext | YES | NULL | Setting value (JSON, string, number, etc.) |
+| type | enum | NO | 'string' | Value type (string, number, boolean, json) |
+| description | text | YES | NULL | Setting description |
+| category | varchar(50) | NO | 'general' | Setting category (general, email, backup, etc.) |
+| is_public | boolean | NO | false | Whether setting is publicly accessible |
+| validation_rules | json | YES | NULL | Validation rules for the setting |
+| updated_by | bigint unsigned | YES | NULL | Foreign key to users who last updated |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "system_settings",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "key": {
+      "type": "varchar(100)",
+      "nullable": false,
+      "description": "Setting key (unique identifier)"
+    },
+    "value": {
+      "type": "longtext",
+      "nullable": true,
+      "description": "Setting value (JSON, string, number, etc.)"
+    },
+    "type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "string",
+      "values": ["string", "number", "boolean", "json"],
+      "description": "Value type"
+    },
+    "description": {
+      "type": "text",
+      "nullable": true,
+      "description": "Setting description"
+    },
+    "category": {
+      "type": "varchar(50)",
+      "nullable": false,
+      "default": "general",
+      "description": "Setting category"
+    },
+    "is_public": {
+      "type": "boolean",
+      "nullable": false,
+      "default": false,
+      "description": "Whether setting is publicly accessible"
+    },
+    "validation_rules": {
+      "type": "json",
+      "nullable": true,
+      "description": "Validation rules for the setting"
+    },
+    "updated_by": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users who last updated"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "system_settings_key_unique": ["key"],
+    "system_settings_category_index": ["category"],
+    "system_settings_is_public_index": ["is_public"]
+  },
+  "foreign_keys": {
+    "system_settings_updated_by_foreign": {
+      "column": "updated_by",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### backup_jobs Table
+
+#### Purpose
+Track database backup operations and their status.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| backup_type | enum | NO | 'full' | Backup type (full, incremental, differential) |
+| initiated_by | bigint unsigned | YES | NULL | Foreign key to users who initiated backup |
+| file_path | varchar(500) | YES | NULL | Path to backup file |
+| file_size | bigint unsigned | YES | NULL | Backup file size in bytes |
+| status | enum | NO | 'pending' | Backup status (pending, running, completed, failed, cancelled) |
+| started_at | timestamp | YES | NULL | When backup process started |
+| completed_at | timestamp | YES | NULL | When backup process completed |
+| duration_seconds | int unsigned | YES | NULL | Total backup duration |
+| error_message | text | YES | NULL | Error message if backup failed |
+| tables_count | int unsigned | YES | NULL | Number of tables backed up |
+| records_count | bigint unsigned | YES | NULL | Total records backed up |
+| compression_ratio | decimal(5,2) | YES | NULL | Compression ratio achieved |
+| is_automatic | boolean | NO | false | Whether backup was automatic |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "backup_jobs",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "backup_type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "full",
+      "values": ["full", "incremental", "differential"],
+      "description": "Backup type"
+    },
+    "initiated_by": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users who initiated backup"
+    },
+    "file_path": {
+      "type": "varchar(500)",
+      "nullable": true,
+      "description": "Path to backup file"
+    },
+    "file_size": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Backup file size in bytes"
+    },
+    "status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "pending",
+      "values": ["pending", "running", "completed", "failed", "cancelled"],
+      "description": "Backup status"
+    },
+    "started_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When backup process started"
+    },
+    "completed_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When backup process completed"
+    },
+    "duration_seconds": {
+      "type": "int unsigned",
+      "nullable": true,
+      "description": "Total backup duration"
+    },
+    "error_message": {
+      "type": "text",
+      "nullable": true,
+      "description": "Error message if backup failed"
+    },
+    "tables_count": {
+      "type": "int unsigned",
+      "nullable": true,
+      "description": "Number of tables backed up"
+    },
+    "records_count": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Total records backed up"
+    },
+    "compression_ratio": {
+      "type": "decimal(5,2)",
+      "nullable": true,
+      "description": "Compression ratio achieved"
+    },
+    "is_automatic": {
+      "type": "boolean",
+      "nullable": false,
+      "default": false,
+      "description": "Whether backup was automatic"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "backup_jobs_status_index": ["status"],
+    "backup_jobs_initiated_by_index": ["initiated_by"],
+    "backup_jobs_created_at_index": ["created_at"],
+    "backup_jobs_is_automatic_index": ["is_automatic"]
+  },
+  "foreign_keys": {
+    "backup_jobs_initiated_by_foreign": {
+      "column": "initiated_by",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### notifications Table
+
+#### Purpose
+Manage system notifications and user alerts.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| user_id | bigint unsigned | YES | NULL | Foreign key to users (NULL for system-wide) |
+| title | varchar(255) | NO | - | Notification title |
+| message | text | NO | - | Notification message |
+| type | enum | NO | 'info' | Notification type (info, success, warning, error) |
+| category | varchar(50) | YES | NULL | Notification category (schedule, system, deadline, etc.) |
+| is_read | boolean | NO | false | Whether notification has been read |
+| read_at | timestamp | YES | NULL | When notification was read |
+| action_url | varchar(500) | YES | NULL | URL for notification action |
+| action_text | varchar(100) | YES | NULL | Text for action button |
+| expires_at | timestamp | YES | NULL | When notification expires |
+| priority | enum | NO | 'normal' | Priority level (low, normal, high, urgent) |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "notifications",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "user_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users (NULL for system-wide)"
+    },
+    "title": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Notification title"
+    },
+    "message": {
+      "type": "text",
+      "nullable": false,
+      "description": "Notification message"
+    },
+    "type": {
+      "type": "enum",
+      "nullable": false,
+      "default": "info",
+      "values": ["info", "success", "warning", "error"],
+      "description": "Notification type"
+    },
+    "category": {
+      "type": "varchar(50)",
+      "nullable": true,
+      "description": "Notification category"
+    },
+    "is_read": {
+      "type": "boolean",
+      "nullable": false,
+      "default": false,
+      "description": "Whether notification has been read"
+    },
+    "read_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When notification was read"
+    },
+    "action_url": {
+      "type": "varchar(500)",
+      "nullable": true,
+      "description": "URL for notification action"
+    },
+    "action_text": {
+      "type": "varchar(100)",
+      "nullable": true,
+      "description": "Text for action button"
+    },
+    "expires_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When notification expires"
+    },
+    "priority": {
+      "type": "enum",
+      "nullable": false,
+      "default": "normal",
+      "values": ["low", "normal", "high", "urgent"],
+      "description": "Priority level"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "notifications_user_id_index": ["user_id"],
+    "notifications_is_read_index": ["is_read"],
+    "notifications_type_index": ["type"],
+    "notifications_priority_index": ["priority"],
+    "notifications_expires_at_index": ["expires_at"]
+  },
+  "foreign_keys": {
+    "notifications_user_id_foreign": {
+      "column": "user_id",
+      "references": "users.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### audit_trail Table
+
+#### Purpose
+Track all data changes for audit and compliance purposes.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| user_id | bigint unsigned | YES | NULL | Foreign key to users who made the change |
+| table_name | varchar(100) | NO | - | Name of the affected table |
+| record_id | bigint unsigned | NO | - | ID of the affected record |
+| action | enum | NO | 'create' | Action performed (create, update, delete) |
+| old_values | json | YES | NULL | Previous values (for update/delete) |
+| new_values | json | YES | NULL | New values (for create/update) |
+| changed_fields | json | YES | NULL | List of changed field names |
+| ip_address | varchar(45) | YES | NULL | IP address of the request |
+| user_agent | text | YES | NULL | User agent string |
+| created_at | timestamp | NO | CURRENT_TIMESTAMP | When the change was made |
+
+#### JSON Structure
+```json
+{
+  "table": "audit_trail",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "user_id": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users who made the change"
+    },
+    "table_name": {
+      "type": "varchar(100)",
+      "nullable": false,
+      "description": "Name of the affected table"
+    },
+    "record_id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "ID of the affected record"
+    },
+    "action": {
+      "type": "enum",
+      "nullable": false,
+      "default": "create",
+      "values": ["create", "update", "delete"],
+      "description": "Action performed"
+    },
+    "old_values": {
+      "type": "json",
+      "nullable": true,
+      "description": "Previous values (for update/delete)"
+    },
+    "new_values": {
+      "type": "json",
+      "nullable": true,
+      "description": "New values (for create/update)"
+    },
+    "changed_fields": {
+      "type": "json",
+      "nullable": true,
+      "description": "List of changed field names"
+    },
+    "ip_address": {
+      "type": "varchar(45)",
+      "nullable": true,
+      "description": "IP address of the request"
+    },
+    "user_agent": {
+      "type": "text",
+      "nullable": true,
+      "description": "User agent string"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": false,
+      "description": "When the change was made"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "audit_trail_user_id_index": ["user_id"],
+    "audit_trail_table_record_index": ["table_name", "record_id"],
+    "audit_trail_action_index": ["action"],
+    "audit_trail_created_at_index": ["created_at"]
+  },
+  "foreign_keys": {
+    "audit_trail_user_id_foreign": {
+      "column": "user_id",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### api_keys Table
+
+#### Purpose
+Manage API keys for third-party integrations.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| name | varchar(255) | NO | - | API key name/description |
+| key_hash | varchar(255) | NO | - | Hashed API key |
+| key_prefix | varchar(20) | NO | - | First few characters of key for identification |
+| permissions | json | NO | - | Array of allowed permissions/endpoints |
+| rate_limit | int unsigned | YES | NULL | Requests per minute limit |
+| last_used_at | timestamp | YES | NULL | When key was last used |
+| expires_at | timestamp | YES | NULL | When key expires |
+| is_active | boolean | NO | true | Whether key is currently active |
+| created_by | bigint unsigned | NO | - | Foreign key to users who created key |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "api_keys",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "name": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "API key name/description"
+    },
+    "key_hash": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Hashed API key"
+    },
+    "key_prefix": {
+      "type": "varchar(20)",
+      "nullable": false,
+      "description": "First few characters of key for identification"
+    },
+    "permissions": {
+      "type": "json",
+      "nullable": false,
+      "description": "Array of allowed permissions/endpoints"
+    },
+    "rate_limit": {
+      "type": "int unsigned",
+      "nullable": true,
+      "description": "Requests per minute limit"
+    },
+    "last_used_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When key was last used"
+    },
+    "expires_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "When key expires"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether key is currently active"
+    },
+    "created_by": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "description": "Foreign key to users who created key"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "api_keys_key_hash_unique": ["key_hash"],
+    "api_keys_prefix_unique": ["key_prefix"],
+    "api_keys_is_active_index": ["is_active"],
+    "api_keys_expires_at_index": ["expires_at"]
+  },
+  "foreign_keys": {
+    "api_keys_created_by_foreign": {
+      "column": "created_by",
+      "references": "users.id",
+      "on_delete": "CASCADE",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### email_templates Table
+
+#### Purpose
+Store customizable email templates for system notifications.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| name | varchar(100) | NO | - | Template name (unique identifier) |
+| subject | varchar(255) | NO | - | Email subject line |
+| html_content | longtext | NO | - | HTML email content |
+| text_content | longtext | YES | NULL | Plain text email content |
+| variables | json | YES | NULL | Available template variables |
+| category | varchar(50) | NO | 'general' | Template category |
+| is_active | boolean | NO | true | Whether template is currently active |
+| created_by | bigint unsigned | YES | NULL | Foreign key to users who created template |
+| updated_by | bigint unsigned | YES | NULL | Foreign key to users who last updated |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "email_templates",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "name": {
+      "type": "varchar(100)",
+      "nullable": false,
+      "description": "Template name (unique identifier)"
+    },
+    "subject": {
+      "type": "varchar(255)",
+      "nullable": false,
+      "description": "Email subject line"
+    },
+    "html_content": {
+      "type": "longtext",
+      "nullable": false,
+      "description": "HTML email content"
+    },
+    "text_content": {
+      "type": "longtext",
+      "nullable": true,
+      "description": "Plain text email content"
+    },
+    "variables": {
+      "type": "json",
+      "nullable": true,
+      "description": "Available template variables"
+    },
+    "category": {
+      "type": "varchar(50)",
+      "nullable": false,
+      "default": "general",
+      "description": "Template category"
+    },
+    "is_active": {
+      "type": "boolean",
+      "nullable": false,
+      "default": true,
+      "description": "Whether template is currently active"
+    },
+    "created_by": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users who created template"
+    },
+    "updated_by": {
+      "type": "bigint unsigned",
+      "nullable": true,
+      "description": "Foreign key to users who last updated"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true",
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "email_templates_name_unique": ["name"],
+    "email_templates_category_index": ["category"],
+    "email_templates_is_active_index": ["is_active"]
+  },
+  "foreign_keys": {
+    "email_templates_created_by_foreign": {
+      "column": "created_by",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    },
+    "email_templates_updated_by_foreign": {
+      "column": "updated_by",
+      "references": "users.id",
+      "on_delete": "SET_NULL",
+      "on_update": "CASCADE"
+    }
+  }
+}
+```
+
+#### system_health Table
+
+#### Purpose
+Monitor system health and performance metrics.
+
+#### Columns
+| Column | Type | Nullable | Default | Description |
+|--------|------|----------|---------|-------------|
+| id | bigint unsigned | NO | AUTO_INCREMENT | Primary key |
+| metric_name | varchar(100) | NO | - | Health metric name |
+| metric_value | decimal(10,2) | YES | NULL | Metric value |
+| status | enum | NO | 'healthy' | Health status (healthy, warning, critical) |
+| threshold_min | decimal(10,2) | YES | NULL | Minimum acceptable value |
+| threshold_max | decimal(10,2) | YES | NULL | Maximum acceptable value |
+| unit | varchar(20) | YES | NULL | Unit of measurement |
+| description | text | YES | NULL | Metric description |
+| checked_at | timestamp | NO | CURRENT_TIMESTAMP | When metric was checked |
+| created_at | timestamp | YES | NULL | Record creation timestamp |
+| updated_at | timestamp | YES | NULL | Record update timestamp |
+
+#### JSON Structure
+```json
+{
+  "table": "system_health",
+  "engine": "InnoDB",
+  "charset": "utf8mb4",
+  "collation": "utf8mb4_unicode_ci",
+  "columns": {
+    "id": {
+      "type": "bigint unsigned",
+      "nullable": false,
+      "auto_increment": true,
+      "description": "Primary key"
+    },
+    "metric_name": {
+      "type": "varchar(100)",
+      "nullable": false,
+      "description": "Health metric name"
+    },
+    "metric_value": {
+      "type": "decimal(10,2)",
+      "nullable": true,
+      "description": "Metric value"
+    },
+    "status": {
+      "type": "enum",
+      "nullable": false,
+      "default": "healthy",
+      "values": ["healthy", "warning", "critical"],
+      "description": "Health status"
+    },
+    "threshold_min": {
+      "type": "decimal(10,2)",
+      "nullable": true,
+      "description": "Minimum acceptable value"
+    },
+    "threshold_max": {
+      "type": "decimal(10,2)",
+      "nullable": true,
+      "description": "Maximum acceptable value"
+    },
+    "unit": {
+      "type": "varchar(20)",
+      "nullable": true,
+      "description": "Unit of measurement"
+    },
+    "description": {
+      "type": "text",
+      "nullable": true,
+      "description": "Metric description"
+    },
+    "checked_at": {
+      "type": "timestamp",
+      "nullable": false,
+      "description": "When metric was checked"
+    },
+    "created_at": {
+      "type": "timestamp",
+      "nullable": true,
+      "description": "Record creation timestamp"
+    },
+    "updated_at": {
+      "type": "timestamp",
+      "nullable": true",
+      "description": "Record update timestamp"
+    }
+  },
+  "indexes": {
+    "primary": ["id"],
+    "system_health_metric_name_index": ["metric_name"],
+    "system_health_status_index": ["status"],
+    "system_health_checked_at_index": ["checked_at"]
+  },
+  "foreign_keys": {}
+}
+```
 
 ## Data Entities Identified
 
