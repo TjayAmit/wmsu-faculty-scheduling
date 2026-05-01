@@ -10,6 +10,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeacherScheduleController;
 use App\Http\Controllers\TimeSlotController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -29,6 +30,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Staff Routes (Faculty Staff Management)
+    Route::get('staff', [StaffController::class, 'index'])->name('staff.index');
+    Route::get('staff/create', [StaffController::class, 'create'])->name('staff.create');
+    Route::post('staff', [StaffController::class, 'store'])->name('staff.store');
+    Route::get('staff/{user}', [StaffController::class, 'show'])->name('staff.show');
+    Route::get('staff/{user}/edit', [StaffController::class, 'edit'])->name('staff.edit');
+    Route::put('staff/{user}', [StaffController::class, 'update'])->name('staff.update');
+    Route::delete('staff/{user}', [StaffController::class, 'destroy'])->name('staff.destroy');
 
     // Teachers Routes
     Route::get('teachers', [TeacherController::class, 'index'])->name('teachers.index');
@@ -137,5 +147,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('assign-schedules/{draftSchedule}', [AssignScheduleController::class, 'show'])->name('assign-schedules.show');
     Route::delete('assign-schedules/{draftSchedule}', [AssignScheduleController::class, 'destroy'])->name('assign-schedules.destroy');
 });
+
+if (app()->environment('local')) {
+    Route::middleware('auth')
+        ->post('/dev/switch-user/{user}', [\App\Http\Controllers\Dev\SwitchUserController::class, '__invoke'])
+        ->name('dev.switch-user');
+}
 
 require __DIR__.'/settings.php';

@@ -40,8 +40,19 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
+                'roles' => $request->user()?->getRoleNames() ?? collect(),
+                'permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? collect(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'devUsers' => app()->environment('local')
+                ? \App\Models\User::with('roles')->get(['id', 'name', 'email'])
+                    ->map(fn ($u) => [
+                        'id' => $u->id,
+                        'name' => $u->name,
+                        'email' => $u->email,
+                        'roles' => $u->getRoleNames()->values(),
+                    ])
+                : null,
         ];
     }
 }

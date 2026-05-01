@@ -11,6 +11,10 @@ export type NavItem = {
     href: NonNullable<InertiaLinkProps['href']>;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    /** User must have at least one of these permissions to see this item. */
+    permissions?: string[];
+    /** User must have at least one of these roles to see this item. */
+    roles?: string[];
 };
 
 export type NavGroup = {
