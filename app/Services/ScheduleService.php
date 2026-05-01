@@ -129,4 +129,21 @@ class ScheduleService
             ->withProperties($properties)
             ->log("{$action} " . class_basename($model));
     }
+
+    private function validateTimeSlots(array $timeSlots): void
+    {
+        if (empty($timeSlots)) {
+            throw new \InvalidArgumentException('At least one time slot is required.');
+        }
+
+        if (count($timeSlots) > 3) {
+            throw new \InvalidArgumentException('Maximum of 3 time slots allowed.');
+        }
+
+        foreach ($timeSlots as $slot) {
+            if (!isset($slot['day']) || !isset($slot['time_slot_id'])) {
+                throw new \InvalidArgumentException('Each time slot must have a day and time_slot_id.');
+            }
+        }
+    }
 }

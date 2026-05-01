@@ -18,11 +18,11 @@ readonly class SubjectData
     public static function fromRequest(Request $request): self
     {
         return new self(
-            code: $request->validated('code'),
-            title: $request->validated('title'),
-            units: $request->validated('units'),
-            description: $request->validated('description'),
-            is_active: $request->validated('is_active', true),
+            code: $request->input('code'),
+            title: $request->input('title'),
+            units: $request->input('units'),
+            description: $request->input('description'),
+            is_active: $request->input('is_active', true),
         );
     }
 

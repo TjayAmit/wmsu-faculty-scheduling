@@ -91,15 +91,19 @@ export default function Show({ schedule }: SchedulesShowProps) {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="grid gap-1">
-                                <p className="text-sm font-medium text-muted-foreground">Day of Week</p>
-                                <p>{dayLabels[schedule.day_of_week]}</p>
-                            </div>
-                            <div className="grid gap-1">
-                                <p className="text-sm font-medium text-muted-foreground">Time Slot</p>
-                                <p>{schedule.time_slot.name}</p>
-                            </div>
+                        <div className="grid gap-1">
+                            <p className="text-sm font-medium text-muted-foreground">Time Slots</p>
+                            {schedule.time_slots && schedule.time_slots.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {schedule.time_slots.map((slot, index) => (
+                                        <Badge key={index} variant="outline" className="text-sm">
+                                            {dayLabels[slot.day]}
+                                        </Badge>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-muted-foreground italic">No time slots assigned</p>
+                            )}
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">

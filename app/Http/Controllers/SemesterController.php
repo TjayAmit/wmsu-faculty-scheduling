@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\SemesterType;
+use App\Http\Requests\SemesterRequest;
 use App\Models\Semester;
 use App\Services\SemesterService;
 use Illuminate\Http\Request;
@@ -40,19 +41,10 @@ class SemesterController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(SemesterRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'academic_year' => 'required|string|max:20',
-            'semester_type' => 'required|in:first,second,summer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'is_current' => 'boolean',
-        ]);
-
         // If setting as current, unset other current semesters
-        if ($validated['is_current'] ?? false) {
+        if ($request->validated('is_current', false)) {
             Semester::where('is_current', true)->update(['is_current' => false]);
         }
 
@@ -81,19 +73,10 @@ class SemesterController extends Controller
         ]);
     }
 
-    public function update(Request $request, Semester $semester)
+    public function update(SemesterRequest $request, Semester $semester)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'academic_year' => 'required|string|max:20',
-            'semester_type' => 'required|in:first,second,summer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'is_current' => 'boolean',
-        ]);
-
         // If setting as current, unset other current semesters
-        if (($validated['is_current'] ?? false) && !$semester->is_current) {
+        if (($request->validated('is_current', false)) && !$semester->is_current) {
             Semester::where('is_current', true)->update(['is_current' => false]);
         }
 

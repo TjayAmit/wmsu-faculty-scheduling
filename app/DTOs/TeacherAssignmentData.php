@@ -18,11 +18,11 @@ readonly class TeacherAssignmentData
     public static function fromRequest(Request $request): self
     {
         return new self(
-            teacher_id: $request->validated('teacher_id'),
-            schedule_id: $request->validated('schedule_id'),
-            assigned_at: $request->validated('assigned_at'),
-            assigned_by: $request->validated('assigned_by'),
-            is_active: $request->validated('is_active', true),
+            teacher_id: $request->input('teacher_id'),
+            schedule_id: $request->input('schedule_id'),
+            assigned_at: $request->input('assigned_at'),
+            assigned_by: $request->input('assigned_by'),
+            is_active: $request->input('is_active', true),
         );
     }
 

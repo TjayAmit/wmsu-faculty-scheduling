@@ -23,15 +23,15 @@ readonly class TeacherData
     public static function fromRequest(Request $request): self
     {
         return new self(
-            user_id: $request->validated('user_id'),
-            employee_id: $request->validated('employee_id'),
-            department: $request->validated('department'),
-            rank: $request->validated('rank'),
-            employment_type: $request->validated('employment_type'),
-            date_hired: $request->validated('date_hired'),
-            phone: $request->validated('phone'),
-            address: $request->validated('address'),
-            is_active: $request->validated('is_active', true),
+            user_id: $request->input('user_id'),
+            employee_id: $request->input('employee_id'),
+            department: $request->input('department'),
+            rank: $request->input('rank'),
+            employment_type: $request->input('employment_type'),
+            date_hired: $request->input('date_hired'),
+            phone: $request->input('phone'),
+            address: $request->input('address'),
+            is_active: $request->input('is_active', true),
         );
     }
 

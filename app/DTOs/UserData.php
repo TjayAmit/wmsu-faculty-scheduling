@@ -18,11 +18,11 @@ readonly class UserData
     public static function fromRequest(Request $request): self
     {
         return new self(
-            name: $request->validated('name'),
-            email: $request->validated('email'),
-            password: $request->validated('password'),
-            email_verified_at: $request->validated('email_verified_at'),
-            two_factor_confirmed_at: $request->validated('two_factor_confirmed_at'),
+            name: $request->input('name'),
+            email: $request->input('email'),
+            password: $request->input('password'),
+            email_verified_at: $request->input('email_verified_at'),
+            two_factor_confirmed_at: $request->input('two_factor_confirmed_at'),
         );
     }
 
