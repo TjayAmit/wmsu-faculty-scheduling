@@ -10,11 +10,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['user_id', 'employee_id', 'department', 'rank', 'employment_type', 'date_hired', 'phone', 'address', 'is_active'])]
 class Teacher extends Model
 {
-    /** @use HasFactory<TeacherFactory> */
+    /** @use HasFa, SoftDeletesctory<TeacherFactory> */
     use HasFactory;
 
     #[Cast(type: EmploymentType::class)]

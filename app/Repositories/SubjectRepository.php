@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Subject;
 
-interface SubjectRepositoryInterface
+interface SubjectRepository
 {
     public function all(): iterable;
 

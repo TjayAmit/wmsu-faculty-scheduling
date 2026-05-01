@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\TimeSlot;
 
-interface TimeSlotRepositoryInterface
+interface TimeSlotRepository
 {
     public function all(): iterable;
 

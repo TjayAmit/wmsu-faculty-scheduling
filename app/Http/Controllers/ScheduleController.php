@@ -7,11 +7,16 @@ use App\Models\Schedule;
 use App\Models\Subject;
 use App\Models\Semester;
 use App\Models\TimeSlot;
+use App\Services\ScheduleService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ScheduleController extends Controller
 {
+    public function __construct(
+        protected ScheduleService $service
+    ) {}
+
     public function index(Request $request)
     {
         $query = Schedule::query()
@@ -39,7 +44,10 @@ class ScheduleController extends Controller
             'subjects' => Subject::active()->select('id', 'code', 'title')->get(),
             'semesters' => Semester::select('id', 'name', 'academic_year', 'is_current')->get(),
             'timeSlots' => TimeSlot::active()->select('id', 'name', 'start_time', 'end_time')->get(),
-            'daysOfWeek' => DayOfWeek::cases(),
+            'daysOfWeek' => collect(DayOfWeek::cases())->map(fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->getLabel(),
+            ])->values(),
         ]);
     }
 
@@ -55,7 +63,7 @@ class ScheduleController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        Schedule::create($validated);
+        $this->service->createFromRequest($request);
 
         return redirect()->route('schedules.index')->with('success', 'Schedule created successfully');
     }
@@ -94,14 +102,14 @@ class ScheduleController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $schedule->update($validated);
+        $this->service->updateFromRequest($schedule->id, $request);
 
         return redirect()->route('schedules.index')->with('success', 'Schedule updated successfully');
     }
 
     public function destroy(Schedule $schedule)
     {
-        $schedule->delete();
+        $this->service->delete($schedule->id);
 
         return redirect()->route('schedules.index')->with('success', 'Schedule deleted successfully');
     }

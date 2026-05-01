@@ -22,11 +22,13 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->foreignId('recorded_by')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('teacher_assignment_id');
             $table->index('date');
             $table->index('status');
             $table->unique(['teacher_assignment_id', 'date']);
+            $table->index('deleted_at');
         });
     }
 

@@ -7,3 +7,5 @@ export type * from './subjects';
 export type * from './schedules';
 export type * from './semesters';
 export type * from './timeSlots';
+export type * from './activityLogs';
+export type * from './roles';
