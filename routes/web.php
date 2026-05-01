@@ -77,6 +77,45 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('roles/{role}/edit', [App\Http\Controllers\RoleController::class, 'edit'])->name('roles.edit');
     Route::put('roles/{role}', [App\Http\Controllers\RoleController::class, 'update'])->name('roles.update');
     Route::delete('roles/{role}', [App\Http\Controllers\RoleController::class, 'destroy'])->name('roles.destroy');
+
+    // Draft Schedules Routes
+    Route::get('draft-schedules', [App\Http\Controllers\DraftScheduleController::class, 'index'])->name('draft-schedules.index');
+    Route::get('draft-schedules/create', [App\Http\Controllers\DraftScheduleController::class, 'create'])->name('draft-schedules.create');
+    Route::post('draft-schedules', [App\Http\Controllers\DraftScheduleController::class, 'store'])->name('draft-schedules.store');
+    Route::get('draft-schedules/{draftSchedule}', [App\Http\Controllers\DraftScheduleController::class, 'show'])->name('draft-schedules.show');
+    Route::get('draft-schedules/{draftSchedule}/edit', [App\Http\Controllers\DraftScheduleController::class, 'edit'])->name('draft-schedules.edit');
+    Route::put('draft-schedules/{draftSchedule}', [App\Http\Controllers\DraftScheduleController::class, 'update'])->name('draft-schedules.update');
+    Route::delete('draft-schedules/{draftSchedule}', [App\Http\Controllers\DraftScheduleController::class, 'destroy'])->name('draft-schedules.destroy');
+    Route::post('draft-schedules/{draftSchedule}/submit', [App\Http\Controllers\DraftScheduleController::class, 'submit'])->name('draft-schedules.submit');
+    Route::post('draft-schedules/{draftSchedule}/approve', [App\Http\Controllers\DraftScheduleController::class, 'approve'])->name('draft-schedules.approve');
+    Route::post('draft-schedules/{draftSchedule}/reject', [App\Http\Controllers\DraftScheduleController::class, 'reject'])->name('draft-schedules.reject');
+    Route::get('my-drafts', [App\Http\Controllers\DraftScheduleController::class, 'myDrafts'])->name('draft-schedules.my-drafts');
+
+    // Faculty Draft Schedules Routes (for faculty/admin review)
+    Route::get('faculty-draft-schedules', [App\Http\Controllers\DraftScheduleController::class, 'facultyIndex'])->name('faculty-draft-schedules.index');
+    Route::get('faculty-draft-schedules/{draftSchedule}', [App\Http\Controllers\DraftScheduleController::class, 'show'])->name('faculty-draft-schedules.show');
+    Route::post('faculty-draft-schedules/{draftSchedule}/approve', [App\Http\Controllers\DraftScheduleController::class, 'approve'])->name('faculty-draft-schedules.approve');
+    Route::post('faculty-draft-schedules/{draftSchedule}/reject', [App\Http\Controllers\DraftScheduleController::class, 'reject'])->name('faculty-draft-schedules.reject');
+
+    // Teacher Schedules Routes
+    Route::get('teacher-schedules', [App\Http\Controllers\TeacherScheduleController::class, 'index'])->name('teacher-schedules.index');
+    Route::get('teacher-schedules/create', [App\Http\Controllers\TeacherScheduleController::class, 'create'])->name('teacher-schedules.create');
+    Route::post('teacher-schedules', [App\Http\Controllers\TeacherScheduleController::class, 'store'])->name('teacher-schedules.store');
+    Route::get('teacher-schedules/{teacherSchedule}', [App\Http\Controllers\TeacherScheduleController::class, 'show'])->name('teacher-schedules.show');
+    Route::get('teacher-schedules/{teacherSchedule}/edit', [App\Http\Controllers\TeacherScheduleController::class, 'edit'])->name('teacher-schedules.edit');
+    Route::put('teacher-schedules/{teacherSchedule}', [App\Http\Controllers\TeacherScheduleController::class, 'update'])->name('teacher-schedules.update');
+    Route::delete('teacher-schedules/{teacherSchedule}', [App\Http\Controllers\TeacherScheduleController::class, 'destroy'])->name('teacher-schedules.destroy');
+    Route::post('teacher-schedules/{teacherSchedule}/cancel', [App\Http\Controllers\TeacherScheduleController::class, 'cancel'])->name('teacher-schedules.cancel');
+    Route::post('teacher-schedules/{teacherSchedule}/complete', [App\Http\Controllers\TeacherScheduleController::class, 'complete'])->name('teacher-schedules.complete');
+    Route::post('teacher-schedules/regenerate/{draftScheduleId}', [App\Http\Controllers\TeacherScheduleController::class, 'regenerateFromDraft'])->name('teacher-schedules.regenerate');
+    Route::get('teacher-schedules/teacher/{teacherId}/semester/{semesterId}', [App\Http\Controllers\TeacherScheduleController::class, 'teacherSemesterSchedules'])->name('teacher-schedules.teacher-semester');
+
+    // Assign Schedules Routes (Admin direct assignment with auto-approval)
+    Route::get('assign-schedules', [App\Http\Controllers\AssignScheduleController::class, 'index'])->name('assign-schedules.index');
+    Route::get('assign-schedules/create', [App\Http\Controllers\AssignScheduleController::class, 'create'])->name('assign-schedules.create');
+    Route::post('assign-schedules', [App\Http\Controllers\AssignScheduleController::class, 'store'])->name('assign-schedules.store');
+    Route::get('assign-schedules/{draftSchedule}', [App\Http\Controllers\AssignScheduleController::class, 'show'])->name('assign-schedules.show');
+    Route::delete('assign-schedules/{draftSchedule}', [App\Http\Controllers\AssignScheduleController::class, 'destroy'])->name('assign-schedules.destroy');
 });
 
 require __DIR__.'/settings.php';

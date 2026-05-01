@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\DayOfWeek;
-use Database\Factories\ScheduleFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,14 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['subject_id', 'semester_id', 'time_slot_id', 'day_of_week', 'room', 'section', 'is_active'])]
+#[Fillable(['subject_id', 'semester_id', 'time_slots', 'room', 'section', 'is_active'])]
 class Schedule extends Model
 {
-    /** @use HasFa, SoftDeletesctory<ScheduleFactory> */
+    /** @use HasFactory<ScheduleFactory> */
     use HasFactory;
-
-    #[Cast(type: DayOfWeek::class)]
-    protected DayOfWeek|string $day_of_week;
 
     #[Cast(type: 'boolean')]
     protected $is_active;
@@ -38,14 +33,6 @@ class Schedule extends Model
     public function semester(): BelongsTo
     {
         return $this->belongsTo(Semester::class);
-    }
-
-    /**
-     * Get the time slot for the schedule.
-     */
-    public function timeSlot(): BelongsTo
-    {
-        return $this->belongsTo(TimeSlot::class);
     }
 
     /**
@@ -73,21 +60,51 @@ class Schedule extends Model
     }
 
     /**
-     * Scope a query to filter by day of week.
-     */
-    public function scopeForDay($query, $dayOfWeek)
-    {
-        return $query->where('day_of_week', $dayOfWeek);
-    }
-
-    /**
      * Get the attributes that should be cast.
      */
     protected function casts(): array
     {
         return [
-            'day_of_week' => DayOfWeek::class,
+            'time_slots' => 'array',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * Get the list of time slots as a formatted string.
+     */
+    public function getTimeSlotsListAttribute(): string
+    {
+        if (empty($this->time_slots)) {
+            return '';
+        }
+
+        return collect($this->time_slots)
+            ->map(fn ($slot) => ucfirst($slot['day']))
+            ->implode(', ');
+    }
+
+    /**
+     * Get the count of time slots.
+     */
+    public function getTimeSlotCountAttribute(): int
+    {
+        return is_array($this->time_slots) ? count($this->time_slots) : 0;
+    }
+
+    /**
+     * Get unique days from time slots.
+     */
+    public function getDaysAttribute(): array
+    {
+        if (empty($this->time_slots)) {
+            return [];
+        }
+
+        return collect($this->time_slots)
+            ->pluck('day')
+            ->unique()
+            ->values()
+            ->toArray();
     }
 }

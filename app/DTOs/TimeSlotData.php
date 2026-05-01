@@ -17,10 +17,10 @@ readonly class TimeSlotData
     public static function fromRequest(Request $request): self
     {
         return new self(
-            name: $request->validated('name'),
-            start_time: $request->validated('start_time'),
-            end_time: $request->validated('end_time'),
-            is_active: $request->validated('is_active', true),
+            name: $request->input('name'),
+            start_time: $request->input('start_time'),
+            end_time: $request->input('end_time'),
+            is_active: $request->input('is_active', true),
         );
     }
 

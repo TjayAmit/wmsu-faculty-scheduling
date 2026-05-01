@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Plus, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,21 +13,63 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 import InputError from '@/components/input-error';
 import { index as schedules, store as schedulesStore } from '@/routes/schedules';
 import type { SchedulesFormProps } from '@/types';
 import AppLayout from '@/layouts/app-layout';
 
+interface TimeSlot {
+    day: string;
+    time_slot_id: string;
+}
+
 export default function Create({ subjects, semesters, timeSlots, daysOfWeek }: SchedulesFormProps) {
+    const [timeSlotsForm, setTimeSlotsForm] = useState<TimeSlot[]>([]);
+    const [newDay, setNewDay] = useState('');
+    const [newTimeSlotId, setNewTimeSlotId] = useState('');
+
     const { data, setData, post, processing, errors } = useForm({
         subject_id: '',
         semester_id: '',
-        time_slot_id: '',
-        day_of_week: '',
+        time_slots: [] as TimeSlot[],
         room: '',
         section: '',
         is_active: true,
     });
+
+    const addTimeSlot = () => {
+        if (!newDay || !newTimeSlotId) return;
+        if (timeSlotsForm.length >= 3) return;
+        
+        const duplicate = timeSlotsForm.some(
+            slot => slot.day === newDay && slot.time_slot_id === newTimeSlotId
+        );
+        if (duplicate) return;
+
+        const newSlot: TimeSlot = { day: newDay, time_slot_id: newTimeSlotId };
+        const updated = [...timeSlotsForm, newSlot];
+        setTimeSlotsForm(updated);
+        setData('time_slots', updated);
+        setNewDay('');
+        setNewTimeSlotId('');
+    };
+
+    const removeTimeSlot = (index: number) => {
+        const updated = timeSlotsForm.filter((_, i) => i !== index);
+        setTimeSlotsForm(updated);
+        setData('time_slots', updated);
+    };
+
+    const getDayLabel = (day: string) => {
+        const dayObj = daysOfWeek.find(d => d.value === day);
+        return dayObj?.label || day;
+    };
+
+    const getTimeSlotLabel = (timeSlotId: string) => {
+        const slot = timeSlots.find(t => t.id.toString() === timeSlotId);
+        return slot?.name || timeSlotId;
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,46 +137,95 @@ export default function Create({ subjects, semesters, timeSlots, daysOfWeek }: S
                                 <InputError message={errors.semester_id} />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="day_of_week">Day of Week</Label>
-                                    <Select
-                                        value={data.day_of_week}
-                                        onValueChange={(value) => setData('day_of_week', value)}
+                            <div className="space-y-4">
+                                <div>
+                                    <Label>Time Slots (1-3)</Label>
+                                    <p className="text-xs text-muted-foreground mb-3">
+                                        Add up to 3 day and time slot combinations
+                                    </p>
+                                    
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="new_day" className="text-sm">Day</Label>
+                                            <Select
+                                                value={newDay}
+                                                onValueChange={setNewDay}
+                                                disabled={timeSlotsForm.length >= 3}
+                                            >
+                                                <SelectTrigger id="new_day">
+                                                    <SelectValue placeholder="Select day" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {daysOfWeek.map((day) => (
+                                                        <SelectItem key={day.value} value={day.value}>
+                                                            {day.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="new_time_slot_id" className="text-sm">Time Slot</Label>
+                                            <Select
+                                                value={newTimeSlotId}
+                                                onValueChange={setNewTimeSlotId}
+                                                disabled={timeSlotsForm.length >= 3}
+                                            >
+                                                <SelectTrigger id="new_time_slot_id">
+                                                    <SelectValue placeholder="Select time" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {timeSlots.map((slot) => (
+                                                        <SelectItem key={slot.id} value={slot.id.toString()}>
+                                                            {slot.name}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={addTimeSlot}
+                                        disabled={!newDay || !newTimeSlotId || timeSlotsForm.length >= 3}
+                                        className="mt-3"
                                     >
-                                        <SelectTrigger id="day_of_week">
-                                            <SelectValue placeholder="Select day" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {daysOfWeek.map((day) => (
-                                                <SelectItem key={day.value} value={day.value}>
-                                                    {day.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.day_of_week} />
+                                        <Plus className="mr-2 h-4 w-4" />
+                                        Add Time Slot ({timeSlotsForm.length}/3)
+                                    </Button>
+
+                                    <InputError message={errors.time_slots} />
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="time_slot_id">Time Slot</Label>
-                                    <Select
-                                        value={data.time_slot_id}
-                                        onValueChange={(value) => setData('time_slot_id', value)}
-                                    >
-                                        <SelectTrigger id="time_slot_id">
-                                            <SelectValue placeholder="Select time slot" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {timeSlots.map((slot) => (
-                                                <SelectItem key={slot.id} value={slot.id.toString()}>
-                                                    {slot.name}
-                                                </SelectItem>
+                                {timeSlotsForm.length > 0 && (
+                                    <div className="space-y-2">
+                                        <Label className="text-sm">Selected Time Slots</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {timeSlotsForm.map((slot, index) => (
+                                                <Badge
+                                                    key={index}
+                                                    variant="secondary"
+                                                    className="flex items-center gap-2 px-3 py-1.5"
+                                                >
+                                                    <span>
+                                                        {getDayLabel(slot.day)} - {getTimeSlotLabel(slot.time_slot_id)}
+                                                    </span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeTimeSlot(index)}
+                                                        className="ml-1 hover:text-destructive"
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </button>
+                                                </Badge>
                                             ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.time_slot_id} />
-                                </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">

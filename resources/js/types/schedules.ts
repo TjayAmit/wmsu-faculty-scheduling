@@ -39,12 +39,16 @@ export interface TeacherAssignment {
     teacher: ScheduleTeacher;
 }
 
+export interface ScheduleTimeSlot {
+    day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+    time_slot_id: number;
+}
+
 export interface Schedule {
     id: number;
     subject_id: number;
     semester_id: number;
-    time_slot_id: number;
-    day_of_week: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
+    time_slots: ScheduleTimeSlot[];
     room: string;
     section: string;
     is_active: boolean;
@@ -52,7 +56,6 @@ export interface Schedule {
     updated_at: string;
     subject: Subject;
     semester: Semester;
-    time_slot: TimeSlot;
     teacher_assignment: TeacherAssignment | null;
 }
 
@@ -92,7 +95,6 @@ export interface SchedulesFormProps {
         end_time: string;
     }[];
     daysOfWeek: {
-        name: string;
         value: string;
         label: string;
     }[];

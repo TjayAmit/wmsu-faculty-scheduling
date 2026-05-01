@@ -37,8 +37,8 @@ import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters, logNames, events }: ActivityLogsIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
-    const [logName, setLogName] = useState(filters.log_name || '');
-    const [event, setEvent] = useState(filters.event || '');
+    const [logName, setLogName] = useState(filters.log_name || '_all');
+    const [event, setEvent] = useState(filters.event || '_all');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -62,12 +62,12 @@ export default function Index({ data, filters, logNames, events }: ActivityLogsI
 
     const handleLogNameChange = (value: string) => {
         setLogName(value);
-        navigate({ log_name: value, page: 1 });
+        navigate({ log_name: value === '_all' ? '' : value, page: 1 });
     };
 
     const handleEventChange = (value: string) => {
         setEvent(value);
-        navigate({ event: value, page: 1 });
+        navigate({ event: value === '_all' ? '' : value, page: 1 });
     };
 
     const handlePerPageChange = (value: number) => {
@@ -119,12 +119,12 @@ export default function Index({ data, filters, logNames, events }: ActivityLogsI
                                 className="h-9 w-[200px]"
                             />
                             {logNames.length > 0 && (
-                                <Select value={logName} onValueChange={handleLogNameChange}>
+                                <Select value={logName || '_all'} onValueChange={handleLogNameChange}>
                                     <SelectTrigger className="h-9 w-[150px]">
                                         <SelectValue placeholder="Log name" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All logs</SelectItem>
+                                        <SelectItem value="_all">All logs</SelectItem>
                                         {logNames.map((name) => (
                                             <SelectItem key={name} value={name}>
                                                 {name}
@@ -134,12 +134,12 @@ export default function Index({ data, filters, logNames, events }: ActivityLogsI
                                 </Select>
                             )}
                             {events.length > 0 && (
-                                <Select value={event} onValueChange={handleEventChange}>
+                                <Select value={event || '_all'} onValueChange={handleEventChange}>
                                     <SelectTrigger className="h-9 w-[130px]">
                                         <SelectValue placeholder="Event" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="">All events</SelectItem>
+                                        <SelectItem value="_all">All events</SelectItem>
                                         {events.map((evt) => (
                                             <SelectItem key={evt} value={evt}>
                                                 {evt}
