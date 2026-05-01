@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\TimeSlot;
+use App\Services\TimeSlotService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class TimeSlotController extends Controller
 {
+    public function __construct(
+        protected TimeSlotService $service
+    ) {}
+
     public function index(Request $request)
     {
         $query = TimeSlot::query();
@@ -37,7 +42,7 @@ class TimeSlotController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        TimeSlot::create($validated);
+        $this->service->createFromRequest($request);
 
         return redirect()->route('timeSlots.index')->with('success', 'Time slot created successfully');
     }
@@ -67,14 +72,14 @@ class TimeSlotController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $timeSlot->update($validated);
+        $this->service->updateFromRequest($timeSlot->id, $request);
 
         return redirect()->route('timeSlots.index')->with('success', 'Time slot updated successfully');
     }
 
     public function destroy(TimeSlot $timeSlot)
     {
-        $timeSlot->delete();
+        $this->service->delete($timeSlot->id);
 
         return redirect()->route('timeSlots.index')->with('success', 'Time slot deleted successfully');
     }

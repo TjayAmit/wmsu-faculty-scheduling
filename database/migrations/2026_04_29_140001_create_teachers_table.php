@@ -24,9 +24,11 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique('user_id');
             $table->index('is_active');
+            $table->index('deleted_at');
         });
     }
 

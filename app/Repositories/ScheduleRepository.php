@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Schedule;
 
-interface ScheduleRepositoryInterface
+interface ScheduleRepository
 {
     public function all(): iterable;
 

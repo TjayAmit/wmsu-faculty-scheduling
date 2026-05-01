@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['name', 'academic_year', 'semester_type', 'start_date', 'end_date', 'is_current'])]
 class Semester extends Model
 {
     /** @use HasFactory<SemesterFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     #[Cast(type: SemesterType::class)]
     protected SemesterType|string $semester_type;

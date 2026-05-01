@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Enums\EmploymentType;
 use App\Models\Teacher;
 use App\Models\User;
+use App\Services\TeacherService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class TeacherController extends Controller
 {
+    public function __construct(
+        protected TeacherService $service
+    ) {}
+
     public function index(Request $request)
     {
         $query = Teacher::with('user');
@@ -35,7 +40,10 @@ class TeacherController extends Controller
 
         return Inertia::render('teachers/create', [
             'users' => $users,
-            'employmentTypes' => EmploymentType::cases(),
+            'employmentTypes' => collect(EmploymentType::cases())->map(fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->getLabel(),
+            ])->values(),
         ]);
     }
 
@@ -53,7 +61,7 @@ class TeacherController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        Teacher::create($validated);
+        $this->service->createFromRequest($request);
 
         return redirect()->route('teachers.index')->with('success', 'Teacher created successfully');
     }
@@ -95,14 +103,14 @@ class TeacherController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $teacher->update($validated);
+        $this->service->updateFromRequest($teacher->id, $request);
 
         return redirect()->route('teachers.index')->with('success', 'Teacher updated successfully');
     }
 
     public function destroy(Teacher $teacher)
     {
-        $teacher->delete();
+        $this->service->delete($teacher->id);
 
         return redirect()->route('teachers.index')->with('success', 'Teacher deleted successfully');
     }

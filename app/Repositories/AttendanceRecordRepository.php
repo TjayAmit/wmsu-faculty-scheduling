@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\AttendanceRecord;
 
-interface AttendanceRecordRepositoryInterface
+interface AttendanceRecordRepository
 {
     public function all(): iterable;
 

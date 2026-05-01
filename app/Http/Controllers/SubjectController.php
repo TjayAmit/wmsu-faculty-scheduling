@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subject;
+use App\Services\SubjectService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SubjectController extends Controller
 {
+    public function __construct(
+        protected SubjectService $service
+    ) {}
+
     public function index(Request $request)
     {
         $query = Subject::query();
@@ -40,7 +45,7 @@ class SubjectController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        Subject::create($validated);
+        $this->service->createFromRequest($request);
 
         return redirect()->route('subjects.index')->with('success', 'Subject created successfully');
     }
@@ -71,14 +76,14 @@ class SubjectController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $subject->update($validated);
+        $this->service->updateFromRequest($subject->id, $request);
 
         return redirect()->route('subjects.index')->with('success', 'Subject updated successfully');
     }
 
     public function destroy(Subject $subject)
     {
-        $subject->delete();
+        $this->service->delete($subject->id);
 
         return redirect()->route('subjects.index')->with('success', 'Subject deleted successfully');
     }

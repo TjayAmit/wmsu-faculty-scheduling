@@ -4,48 +4,70 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
+use App\Repositories\{
+    AttendanceRecordRepository,
+    SemesterRepository,
+    ScheduleRepository,
+    SubjectRepository,
+    TeacherAssignmentRepository,
+    TeacherRepository,
+    TimeSlotRepository,
+    UserRepository,
+};
+
+use App\Repositories\Eloquent\{
+    EloquentAttendanceRecordRepository,
+    EloquentSemesterRepository,
+    EloquentScheduleRepository,
+    EloquentSubjectRepository,
+    EloquentTeacherAssignmentRepository,
+    EloquentTeacherRepository,
+    EloquentTimeSlotRepository,
+    EloquentUserRepository,
+};
+
 class RepositoryServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->bind(
-            \App\Repositories\UserRepository::class,
-            \App\Repositories\Eloquent\EloquentUserRepository::class
+            UserRepository::class,
+            EloquentUserRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\TeacherRepository::class,
-            \App\Repositories\Eloquent\EloquentTeacherRepository::class
+            TeacherRepository::class,
+            EloquentTeacherRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\SubjectRepository::class,
-            \App\Repositories\Eloquent\EloquentSubjectRepository::class
+            SubjectRepository::class,
+            EloquentSubjectRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\SemesterRepository::class,
-            \App\Repositories\Eloquent\EloquentSemesterRepository::class
+            SemesterRepository::class,
+            EloquentSemesterRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\TimeSlotRepository::class,
-            \App\Repositories\Eloquent\EloquentTimeSlotRepository::class
+            TimeSlotRepository::class,
+            EloquentTimeSlotRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\ScheduleRepository::class,
-            \App\Repositories\Eloquent\EloquentScheduleRepository::class
+            ScheduleRepository::class,
+            EloquentScheduleRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\TeacherAssignmentRepository::class,
-            \App\Repositories\Eloquent\EloquentTeacherAssignmentRepository::class
+            TeacherAssignmentRepository::class,
+            EloquentTeacherAssignmentRepository::class
         );
 
         $this->app->bind(
-            \App\Repositories\AttendanceRecordRepository::class,
-            \App\Repositories\Eloquent\EloquentAttendanceRecordRepository::class
+            AttendanceRecordRepository::class,
+            EloquentAttendanceRecordRepository::class
         );
     }
 }

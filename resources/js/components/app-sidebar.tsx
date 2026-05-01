@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock } from 'lucide-react';
+import { BookOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -20,6 +20,8 @@ import { index as subjects } from '@/routes/subjects';
 import { index as schedules } from '@/routes/schedules';
 import { index as semesters } from '@/routes/semesters';
 import { index as timeSlots } from '@/routes/timeSlots';
+import { index as activityLogs } from '@/routes/activityLogs';
+import { index as roles } from '@/routes/roles';
 import type { NavGroup } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
@@ -38,7 +40,7 @@ const navGroups: NavGroup[] = [
         ],
     },
     {
-        title: 'Scheduling',
+        title: 'Scheduling Management',
         items: [
             {
                 title: 'Schedules',
@@ -58,7 +60,7 @@ const navGroups: NavGroup[] = [
         ],
     },
     {
-        title: 'Profiling',
+        title: 'Teacher Profiles',
         items: [
             {
                 title: 'Teachers',
@@ -79,7 +81,17 @@ const navGroups: NavGroup[] = [
                 title: 'Users',
                 href: users(),
                 icon: Users,
-            }
+            },
+            {
+                title: 'Activity Logs',
+                href: activityLogs(),
+                icon: Activity,
+            },
+            {
+                title: 'Roles',
+                href: roles(),
+                icon: Shield,
+            },
         ],
     },
 ];

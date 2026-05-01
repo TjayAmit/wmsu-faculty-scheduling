@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Semester;
 
-interface SemesterRepositoryInterface
+interface SemesterRepository
 {
     public function all(): iterable;
 

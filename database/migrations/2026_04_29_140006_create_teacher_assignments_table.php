@@ -19,9 +19,11 @@ return new class extends Migration
             $table->foreignId('assigned_by')->nullable()->constrained('users')->onDelete('set null')->onUpdate('cascade');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('teacher_id');
             $table->index('is_active');
+            $table->index('deleted_at');
         });
     }
 

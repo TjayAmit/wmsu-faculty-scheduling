@@ -4,11 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Enums\SemesterType;
 use App\Models\Semester;
+use App\Services\SemesterService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class SemesterController extends Controller
 {
+    public function __construct(
+        protected SemesterService $service
+    ) {}
+
     public function index(Request $request)
     {
         $query = Semester::query();
@@ -28,7 +33,10 @@ class SemesterController extends Controller
     public function create()
     {
         return Inertia::render('semesters/create', [
-            'semesterTypes' => SemesterType::cases(),
+            'semesterTypes' => collect(SemesterType::cases())->map(fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->getLabel(),
+            ])->values(),
         ]);
     }
 
@@ -48,7 +56,7 @@ class SemesterController extends Controller
             Semester::where('is_current', true)->update(['is_current' => false]);
         }
 
-        Semester::create($validated);
+        $this->service->createFromRequest($request);
 
         return redirect()->route('semesters.index')->with('success', 'Semester created successfully');
     }
@@ -66,7 +74,10 @@ class SemesterController extends Controller
     {
         return Inertia::render('semesters/edit', [
             'semester' => $semester,
-            'semesterTypes' => SemesterType::cases(),
+            'semesterTypes' => collect(SemesterType::cases())->map(fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->getLabel(),
+            ])->values(),
         ]);
     }
 
@@ -86,14 +97,14 @@ class SemesterController extends Controller
             Semester::where('is_current', true)->update(['is_current' => false]);
         }
 
-        $semester->update($validated);
+        $this->service->updateFromRequest($semester->id, $request);
 
         return redirect()->route('semesters.index')->with('success', 'Semester updated successfully');
     }
 
     public function destroy(Semester $semester)
     {
-        $semester->delete();
+        $this->service->delete($semester->id);
 
         return redirect()->route('semesters.index')->with('success', 'Semester deleted successfully');
     }

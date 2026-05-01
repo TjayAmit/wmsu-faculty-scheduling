@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Teacher;
 
-interface TeacherRepositoryInterface
+interface TeacherRepository
 {
     public function all(): iterable;
 
