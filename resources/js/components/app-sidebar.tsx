@@ -25,6 +25,7 @@ import { index as roles } from '@/routes/roles';
 import { index as draftSchedules } from '@/routes/draft-schedules';
 import { index as teacherSchedules } from '@/routes/teacher-schedules';
 import { index as facultyDraftSchedules } from '@/routes/faculty-draft-schedules';
+import { index as assignSchedules } from '@/routes/assign-schedules';
 import type { NavGroup } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
@@ -45,6 +46,11 @@ const navGroups: NavGroup[] = [
     {
         title: 'Request Management',
         items: [
+            {
+                title: 'Assign Schedules',
+                href: assignSchedules(),
+                icon: CalendarDays,
+            },
             {
                 title: 'Draft Schedules',
                 href: facultyDraftSchedules(),

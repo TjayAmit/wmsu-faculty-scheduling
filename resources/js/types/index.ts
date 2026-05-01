@@ -12,3 +12,4 @@ export type * from './roles';
 export type * from './draftSchedules';
 export type * from './teacherSchedules';
 export type * from './facultyDraftSchedules';
+export type * from './assignSchedules';
