@@ -21,13 +21,13 @@ readonly class AttendanceRecordData
     public static function fromRequest(Request $request): self
     {
         return new self(
-            teacher_assignment_id: $request->validated('teacher_assignment_id'),
-            date: $request->validated('date'),
-            status: $request->validated('status'),
-            timestamp_in: $request->validated('timestamp_in'),
-            timestamp_out: $request->validated('timestamp_out'),
-            notes: $request->validated('notes'),
-            recorded_by: $request->validated('recorded_by'),
+            teacher_assignment_id: $request->input('teacher_assignment_id'),
+            date: $request->input('date'),
+            status: $request->input('status'),
+            timestamp_in: $request->input('timestamp_in'),
+            timestamp_out: $request->input('timestamp_out'),
+            notes: $request->input('notes'),
+            recorded_by: $request->input('recorded_by'),
         );
     }
 

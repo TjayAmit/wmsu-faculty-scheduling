@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SubjectRequest;
 use App\Models\Subject;
 use App\Services\SubjectService;
 use Illuminate\Http\Request;
@@ -35,16 +36,8 @@ class SubjectController extends Controller
         return Inertia::render('subjects/create');
     }
 
-    public function store(Request $request)
+    public function store(SubjectRequest $request)
     {
-        $validated = $request->validate([
-            'code' => 'required|string|max:20|unique:subjects,code',
-            'title' => 'required|string|max:255',
-            'units' => 'required|numeric|min:0|max:20',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-        ]);
-
         $this->service->createFromRequest($request);
 
         return redirect()->route('subjects.index')->with('success', 'Subject created successfully');
@@ -66,16 +59,8 @@ class SubjectController extends Controller
         ]);
     }
 
-    public function update(Request $request, Subject $subject)
+    public function update(SubjectRequest $request, Subject $subject)
     {
-        $validated = $request->validate([
-            'code' => 'required|string|max:20|unique:subjects,code,' . $subject->id,
-            'title' => 'required|string|max:255',
-            'units' => 'required|numeric|min:0|max:20',
-            'description' => 'nullable|string',
-            'is_active' => 'boolean',
-        ]);
-
         $this->service->updateFromRequest($subject->id, $request);
 
         return redirect()->route('subjects.index')->with('success', 'Subject updated successfully');

@@ -6,22 +6,26 @@ use Illuminate\Support\ServiceProvider;
 
 use App\Repositories\{
     AttendanceRecordRepository,
+    DraftScheduleRepository,
     SemesterRepository,
     ScheduleRepository,
     SubjectRepository,
     TeacherAssignmentRepository,
     TeacherRepository,
+    TeacherScheduleRepository,
     TimeSlotRepository,
     UserRepository,
 };
 
 use App\Repositories\Eloquent\{
     EloquentAttendanceRecordRepository,
+    EloquentDraftScheduleRepository,
     EloquentSemesterRepository,
     EloquentScheduleRepository,
     EloquentSubjectRepository,
     EloquentTeacherAssignmentRepository,
     EloquentTeacherRepository,
+    EloquentTeacherScheduleRepository,
     EloquentTimeSlotRepository,
     EloquentUserRepository,
 };
@@ -68,6 +72,16 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             AttendanceRecordRepository::class,
             EloquentAttendanceRecordRepository::class
+        );
+
+        $this->app->bind(
+            DraftScheduleRepository::class,
+            EloquentDraftScheduleRepository::class
+        );
+
+        $this->app->bind(
+            TeacherScheduleRepository::class,
+            EloquentTeacherScheduleRepository::class
         );
     }
 }

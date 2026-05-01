@@ -40,12 +40,45 @@ const dayLabels: Record<string, string> = {
     saturday: 'Sat',
 };
 
+const formatTimeSlots = (timeSlots: any[], allTimeSlots: any[]) => {
+    if (!timeSlots || timeSlots.length === 0) return '-';
+    
+    return timeSlots
+        .map((slot: any) => {
+            const dayLabel = dayLabels[slot.day] || slot.day;
+            const timeSlot = allTimeSlots.find(t => t.id === slot.time_slot_id);
+            const timeLabel = timeSlot ? timeSlot.name : slot.time_slot_id;
+            return `${dayLabel} ${timeLabel}`;
+        })
+        .join(', ');
+};
+
 export default function Index({ data, filters }: SchedulesIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    // Get all unique time slots from the data for lookup
+    const allTimeSlots = data.data.flatMap((item: any) => 
+        item.time_slots ? item.time_slots.map((s: any) => s.time_slot_id) : []
+    ).filter((id: any, index: number, self: any[]) => self.indexOf(id) === index);
+    
+    // Fetch time slot details (this would normally come from the backend)
+    // For now, we'll use the data that's already loaded
+    const timeSlotMap = new Map();
+    data.data.forEach((item: any) => {
+        if (item.time_slots) {
+            item.time_slots.forEach((slot: any) => {
+                if (!timeSlotMap.has(slot.time_slot_id)) {
+                    // We'll need to fetch this from backend or include in the response
+                    // For now, just store the ID
+                    timeSlotMap.set(slot.time_slot_id, { id: slot.time_slot_id, name: `Slot ${slot.time_slot_id}` });
+                }
+            });
+        }
+    });
 
     const navigate = (params: Record<string, unknown> = {}) => {
         router.get(
@@ -179,13 +212,17 @@ export default function Index({ data, filters }: SchedulesIndexProps) {
                                             </TableCell>
 
                                             <TableCell className="px-4 py-3.5">
-                                                <div className="flex flex-col">
+                                                <div className="flex flex-col gap-1">
                                                     <span className="text-sm font-medium text-foreground">
-                                                        {dayLabels[item.day_of_week]}
+                                                        {item.time_slots && item.time_slots.length > 0
+                                                            ? item.time_slots.map((slot: any) => dayLabels[slot.day]).join(', ')
+                                                            : '-'}
                                                     </span>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {item.time_slot.name}
-                                                    </span>
+                                                    {item.time_slots && item.time_slots.length > 1 && (
+                                                        <Badge variant="outline" className="w-fit text-xs">
+                                                            {item.time_slots.length} time slots
+                                                        </Badge>
+                                                    )}
                                                 </div>
                                             </TableCell>
 
@@ -228,6 +265,11 @@ export default function Index({ data, filters }: SchedulesIndexProps) {
                                                     <Badge variant={assignmentStatus.variant} className="text-xs">
                                                         {assignmentStatus.label}
                                                     </Badge>
+                                                    {item.time_slots && item.time_slots.length > 1 && (
+                                                        <Badge variant="outline" className="text-xs">
+                                                            {item.time_slots.length} slots
+                                                        </Badge>
+                                                    )}
                                                 </div>
                                             </TableCell>
 

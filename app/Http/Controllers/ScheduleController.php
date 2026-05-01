@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\DayOfWeek;
+use App\Http\Requests\ScheduleRequest;
 use App\Models\Schedule;
 use App\Models\Subject;
 use App\Models\Semester;
@@ -20,7 +20,7 @@ class ScheduleController extends Controller
     public function index(Request $request)
     {
         $query = Schedule::query()
-            ->with(['subject', 'semester', 'timeSlot', 'teacherAssignment.teacher.user']);
+            ->with(['subject', 'semester', 'teacherAssignment.teacher.user']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -44,25 +44,19 @@ class ScheduleController extends Controller
             'subjects' => Subject::active()->select('id', 'code', 'title')->get(),
             'semesters' => Semester::select('id', 'name', 'academic_year', 'is_current')->get(),
             'timeSlots' => TimeSlot::active()->select('id', 'name', 'start_time', 'end_time')->get(),
-            'daysOfWeek' => collect(DayOfWeek::cases())->map(fn ($case) => [
-                'value' => $case->value,
-                'label' => $case->getLabel(),
-            ])->values(),
+            'daysOfWeek' => [
+                ['value' => 'monday', 'label' => 'Monday'],
+                ['value' => 'tuesday', 'label' => 'Tuesday'],
+                ['value' => 'wednesday', 'label' => 'Wednesday'],
+                ['value' => 'thursday', 'label' => 'Thursday'],
+                ['value' => 'friday', 'label' => 'Friday'],
+                ['value' => 'saturday', 'label' => 'Saturday'],
+            ],
         ]);
     }
 
-    public function store(Request $request)
+    public function store(ScheduleRequest $request)
     {
-        $validated = $request->validate([
-            'subject_id' => 'required|exists:subjects,id',
-            'semester_id' => 'required|exists:semesters,id',
-            'time_slot_id' => 'required|exists:time_slots,id',
-            'day_of_week' => 'required|in:monday,tuesday,wednesday,thursday,friday,saturday',
-            'room' => 'required|string|max:50',
-            'section' => 'required|string|max:20',
-            'is_active' => 'boolean',
-        ]);
-
         $this->service->createFromRequest($request);
 
         return redirect()->route('schedules.index')->with('success', 'Schedule created successfully');
@@ -70,7 +64,7 @@ class ScheduleController extends Controller
 
     public function show(Schedule $schedule)
     {
-        $schedule->load(['subject', 'semester', 'timeSlot', 'teacherAssignment.teacher.user']);
+        $schedule->load(['subject', 'semester', 'teacherAssignment.teacher.user']);
 
         return Inertia::render('schedules/show', [
             'schedule' => $schedule,
@@ -79,29 +73,26 @@ class ScheduleController extends Controller
 
     public function edit(Schedule $schedule)
     {
-        $schedule->load(['subject', 'semester', 'timeSlot']);
+        $schedule->load(['subject', 'semester']);
 
         return Inertia::render('schedules/edit', [
             'schedule' => $schedule,
             'subjects' => Subject::active()->select('id', 'code', 'title')->get(),
             'semesters' => Semester::select('id', 'name', 'academic_year', 'is_current')->get(),
             'timeSlots' => TimeSlot::active()->select('id', 'name', 'start_time', 'end_time')->get(),
-            'daysOfWeek' => DayOfWeek::cases(),
+            'daysOfWeek' => [
+                ['value' => 'monday', 'label' => 'Monday'],
+                ['value' => 'tuesday', 'label' => 'Tuesday'],
+                ['value' => 'wednesday', 'label' => 'Wednesday'],
+                ['value' => 'thursday', 'label' => 'Thursday'],
+                ['value' => 'friday', 'label' => 'Friday'],
+                ['value' => 'saturday', 'label' => 'Saturday'],
+            ],
         ]);
     }
 
-    public function update(Request $request, Schedule $schedule)
+    public function update(ScheduleRequest $request, Schedule $schedule)
     {
-        $validated = $request->validate([
-            'subject_id' => 'required|exists:subjects,id',
-            'semester_id' => 'required|exists:semesters,id',
-            'time_slot_id' => 'required|exists:time_slots,id',
-            'day_of_week' => 'required|in:monday,tuesday,wednesday,thursday,friday,saturday',
-            'room' => 'required|string|max:50',
-            'section' => 'required|string|max:20',
-            'is_active' => 'boolean',
-        ]);
-
         $this->service->updateFromRequest($schedule->id, $request);
 
         return redirect()->route('schedules.index')->with('success', 'Schedule updated successfully');
