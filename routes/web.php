@@ -6,6 +6,7 @@ use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DraftScheduleController;
+use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\RoleController;
@@ -242,6 +243,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('sections/{section}', [SectionController::class, 'destroy'])->name('sections.destroy');
     Route::post('sections/{section}/toggle-status', [SectionController::class, 'toggleStatus'])->name('sections.toggle-status');
     Route::post('sections/{section}/assign-adviser', [SectionController::class, 'assignAdviser'])->name('sections.assign-adviser');
+
+    // Feature Flags Routes
+    Route::get('feature-flags', [FeatureFlagController::class, 'index'])->name('feature-flags.index');
+    Route::get('feature-flags/create', [FeatureFlagController::class, 'create'])->name('feature-flags.create');
+    Route::post('feature-flags', [FeatureFlagController::class, 'store'])->name('feature-flags.store');
+    Route::get('feature-flags/{feature_flag}', [FeatureFlagController::class, 'show'])->name('feature-flags.show');
+    Route::get('feature-flags/{feature_flag}/edit', [FeatureFlagController::class, 'edit'])->name('feature-flags.edit');
+    Route::put('feature-flags/{feature_flag}', [FeatureFlagController::class, 'update'])->name('feature-flags.update');
+    Route::delete('feature-flags/{feature_flag}', [FeatureFlagController::class, 'destroy'])->name('feature-flags.destroy');
+    Route::post('feature-flags/{feature_flag}/enable', [FeatureFlagController::class, 'enable'])->name('feature-flags.enable');
+    Route::post('feature-flags/{feature_flag}/disable', [FeatureFlagController::class, 'disable'])->name('feature-flags.disable');
+    Route::post('feature-flags/{feature_flag}/toggle', [FeatureFlagController::class, 'toggle'])->name('feature-flags.toggle');
 
     // Assign Schedules Routes (Admin direct assignment with auto-approval)
     Route::get('assign-schedules', [AssignScheduleController::class, 'index'])->name('assign-schedules.index');

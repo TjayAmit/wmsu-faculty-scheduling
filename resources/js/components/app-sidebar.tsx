@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, DoorOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck } from 'lucide-react';
+import { BookOpen, Building2, DoorOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck, Flag } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -33,6 +33,7 @@ import { index as roomSchedules } from '@/routes/room-schedules';
 import { index as teachingHistories } from '@/routes/teaching-histories';
 import { index as substituteRequests } from '@/routes/substitute-requests';
 import { index as leaveRequests } from '@/routes/leave-requests';
+import { index as featureFlags } from '@/routes/feature-flags';
 import { index as sections } from '@/routes/sections';
 import { index as curricula } from '@/routes/curricula';
 import { index as departments } from '@/routes/departments';
@@ -58,7 +59,8 @@ const navGroups: NavGroup[] = [
         ],
     },
     {
-        title: 'Faculty Admin',
+        title: 'Faculty',
+        roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
         items: [
             {
                 title: 'Teachers',
@@ -66,6 +68,19 @@ const navGroups: NavGroup[] = [
                 icon: GraduationCap,
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
+            {
+                title: 'Faculty Staff',
+                href: staff(),
+                icon: Users,
+                roles: ['Admin', 'Faculty Admin'],
+            },
+            // Note: Teacher Load Balance - would need: Hours distribution overview
+        ],
+    },
+    {
+        title: 'Academic',
+        roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+        items: [
             {
                 title: 'Semesters',
                 href: semesters(),
@@ -83,12 +98,6 @@ const navGroups: NavGroup[] = [
                 href: subjects(),
                 icon: Library,
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Faculty Staff',
-                href: staff(),
-                icon: Users,
-                roles: ['Admin', 'Faculty Admin'],
             },
             {
                 title: 'Classrooms',
@@ -126,6 +135,7 @@ const navGroups: NavGroup[] = [
     },
     {
         title: 'Scheduling',
+        roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
         items: [
             {
                 title: 'Schedules',
@@ -151,22 +161,21 @@ const navGroups: NavGroup[] = [
                 icon: CalendarDays,
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
+            {
+                title: 'Substitute Requests',
+                href: substituteRequests(),
+                icon: Users,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
             // Note: Conflicts - would need: Schedule overlap detection view
             // Note: Schedule Analytics - would need: Utilization reports
             // Note: Mass Schedule Import - would need: Bulk CSV/Excel upload
-            // Note: Teacher Load Balance - would need: Hours distribution overview
-            // Note: Schedule Conflicts Resolution - would need: Override/reassign conflicts
         ],
     },
     {
-        title: 'My Schedule',
+        title: 'Schedule',
+        roles: ['Teacher'],
         items: [
-            {
-                title: 'Request Schedule',
-                href: draftSchedules(),
-                icon: FileText,
-                roles: ['Teacher'],
-            },
             {
                 title: 'My Schedule',
                 href: teacherSchedules(),
@@ -174,11 +183,17 @@ const navGroups: NavGroup[] = [
                 roles: ['Teacher'],
             },
             {
-                title: 'Teaching History',
-                href: teachingHistories(),
-                icon: BookOpen,
+                title: 'Request Schedule',
+                href: draftSchedules(),
+                icon: FileText,
                 roles: ['Teacher'],
             },
+        ],
+    },
+    {
+        title: 'Requests',
+        roles: ['Teacher'],
+        items: [
             {
                 title: 'Substitute Requests',
                 href: substituteRequests(),
@@ -191,8 +206,20 @@ const navGroups: NavGroup[] = [
                 icon: Calendar,
                 roles: ['Teacher'],
             },
+        ],
+    },
+    {
+        title: 'History',
+        roles: ['Teacher'],
+        items: [
+            {
+                title: 'Teaching History',
+                href: teachingHistories(),
+                icon: BookOpen,
+                roles: ['Teacher'],
+            },
             // Note: Availability - would need: Set preferred/unavailable time slots
-            // Note: Workload Report - would need: Hours summary by semester // Dashboard for teacher
+            // Note: Workload Report - would need: Hours summary by semester
         ],
     },
     // Note: Dean role has no nav items - would need: Department Schedules, Approval Queue
@@ -217,6 +244,12 @@ const navGroups: NavGroup[] = [
                 href: activityLogs(),
                 icon: Activity,
                 permissions: ['activity_logs.view'],
+            },
+            {
+                title: 'Feature Flags',
+                href: featureFlags(),
+                icon: Flag,
+                roles: ['Admin'],
             },
             // Note: System Settings - would need: Global app configuration
             // Note: Backup/Restore - would need: Database backup management
@@ -243,9 +276,10 @@ const footerNavItems = [
 ];
 
 export function AppSidebar() {
-    const { canAccess } = usePermission();
+    const { canAccess, hasRole } = usePermission();
 
     const filteredGroups = navGroups
+        .filter((group) => !group.roles || hasRole(group.roles))
         .map((group) => ({
             ...group,
             items: group.items.filter(canAccess),

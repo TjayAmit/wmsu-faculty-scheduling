@@ -22,3 +22,4 @@ export type * from './roomSchedules';
 export type * from './teachingHistories';
 export type * from './sections';
 export type * from './leaveRequests';
+export type * from './featureFlags';
