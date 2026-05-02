@@ -2,31 +2,54 @@
 
 namespace App\Providers;
 
-use App\Repositories\AttendanceRecordRepository;
-use App\Repositories\ClassroomRepository;
-use App\Repositories\CurriculumRepository;
-use App\Repositories\DraftScheduleRepository;
-use App\Repositories\Eloquent\EloquentAttendanceRecordRepository;
-use App\Repositories\Eloquent\EloquentClassroomRepository;
-use App\Repositories\Eloquent\EloquentCurriculumRepository;
-use App\Repositories\Eloquent\EloquentDraftScheduleRepository;
-use App\Repositories\Eloquent\EloquentScheduleRepository;
-use App\Repositories\Eloquent\EloquentSemesterRepository;
-use App\Repositories\Eloquent\EloquentSubjectRepository;
-use App\Repositories\Eloquent\EloquentTeacherAssignmentRepository;
-use App\Repositories\Eloquent\EloquentTeacherRepository;
-use App\Repositories\Eloquent\EloquentTeacherScheduleRepository;
-use App\Repositories\Eloquent\EloquentTimeSlotRepository;
-use App\Repositories\Eloquent\EloquentUserRepository;
-use App\Repositories\ScheduleRepository;
-use App\Repositories\SemesterRepository;
-use App\Repositories\SubjectRepository;
-use App\Repositories\TeacherAssignmentRepository;
-use App\Repositories\TeacherRepository;
-use App\Repositories\TeacherScheduleRepository;
-use App\Repositories\TimeSlotRepository;
-use App\Repositories\UserRepository;
+use App\Repositories\Eloquent\{
+    EloquentAttendanceRecordRepository,
+    EloquentClassroomRepository,
+    EloquentCurriculumRepository,
+    EloquentDepartmentRepository,
+    EloquentDraftScheduleRepository,
+    EloquentLeaveRequestRepository,
+    EloquentScheduleRepository,
+    EloquentSectionRepository,
+    EloquentSemesterRepository,
+    EloquentSubjectRepository,
+    EloquentSubstituteRequestRepository,
+    EloquentTeacherAssignmentRepository,
+    EloquentTeacherRepository,
+    EloquentTeacherScheduleRepository,
+    EloquentTimeSlotRepository,
+    EloquentUserRepository,
+    EloquentProgramRepository,
+    EloquentRoomScheduleRepository,
+    EloquentTeachingHistoryRepository,
+    EloquentTeacherHistoryRepository,
+};
+
+use App\Repositories\{
+    AttendanceRecordRepository,
+    ClassroomRepository,
+    CurriculumRepository,
+    DepartmentRepository,
+    DraftScheduleRepository,
+    LeaveRequestRepository,
+    ScheduleRepository,
+    SectionRepository,
+    SemesterRepository,
+    SubjectRepository,
+    SubstituteRequestRepository,
+    TeacherAssignmentRepository,
+    TeacherRepository,
+    TeacherScheduleRepository,
+    TimeSlotRepository,
+    UserRepository,
+    ProgramRepository,
+    RoomScheduleRepository,
+    TeachingHistoryRepository,
+    TeacherHistoryRepository,
+};
+
 use Illuminate\Support\ServiceProvider;
+    
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -90,6 +113,46 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             CurriculumRepository::class,
             EloquentCurriculumRepository::class
+        );
+
+        $this->app->bind(
+            DepartmentRepository::class,
+            EloquentDepartmentRepository::class
+        );
+
+        $this->app->bind(
+            ProgramRepository::class,
+            EloquentProgramRepository::class
+        );
+        
+        $this->app->bind(
+            RoomScheduleRepository::class,
+            EloquentRoomScheduleRepository::class
+        );
+        
+        $this->app->bind(
+            TeachingHistoryRepository::class,
+            EloquentTeachingHistoryRepository::class
+        );
+        
+        $this->app->bind(
+            SubstituteRequestRepository::class,
+            EloquentSubstituteRequestRepository::class
+        );
+        
+        $this->app->bind(
+            LeaveRequestRepository::class,
+            EloquentLeaveRequestRepository::class
+        );
+        
+        $this->app->bind(
+            SectionRepository::class,
+            EloquentSectionRepository::class
+        );
+        
+        $this->app->bind(
+            TeacherHistoryRepository::class,
+            EloquentTeacherHistoryRepository::class
         );
     }
 }

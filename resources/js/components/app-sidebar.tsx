@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, DoorOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck } from 'lucide-react';
+import { BookOpen, Building2, DoorOpen, FolderGit2, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -29,7 +29,14 @@ import { index as facultyDraftSchedules } from '@/routes/faculty-draft-schedules
 import { index as assignSchedules } from '@/routes/assign-schedules';
 import { index as staff } from '@/routes/staff';
 import { index as classrooms } from '@/routes/classrooms';
+import { index as roomSchedules } from '@/routes/room-schedules';
+import { index as teachingHistories } from '@/routes/teaching-histories';
+import { index as substituteRequests } from '@/routes/substitute-requests';
+import { index as leaveRequests } from '@/routes/leave-requests';
+import { index as sections } from '@/routes/sections';
 import { index as curricula } from '@/routes/curricula';
+import { index as departments } from '@/routes/departments';
+import { index as programs } from '@/routes/programs';
 import type { NavGroup } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
@@ -95,9 +102,24 @@ const navGroups: NavGroup[] = [
                 icon: BookOpen,
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
-            // Note: Departments - would need: Department configuration
-            // Note: Programs - would need: Degree program management
-            // Note: Sections - would need: Class sections per semester
+            {
+                title: 'Departments',
+                href: departments(),
+                icon: Building2,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Programs',
+                href: programs(),
+                icon: GraduationCap,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Sections',
+                href: sections(),
+                icon: Users,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
             // Note: Holidays - would need: Non-teaching days configuration
             // Note: Workload Rules - would need: Max hours per faculty settings
         ],
@@ -121,12 +143,17 @@ const navGroups: NavGroup[] = [
                 title: 'Assign Schedules',
                 href: assignSchedules(),
                 icon: CalendarDays,
-                permissions: ['teacher_assignments.view'],
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Room Schedules',
+                href: roomSchedules(),
+                icon: CalendarDays,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
             // Note: Conflicts - would need: Schedule overlap detection view
             // Note: Schedule Analytics - would need: Utilization reports
             // Note: Mass Schedule Import - would need: Bulk CSV/Excel upload
-            // Note: Room Schedules - would need: Room occupancy calendar
             // Note: Teacher Load Balance - would need: Hours distribution overview
             // Note: Schedule Conflicts Resolution - would need: Override/reassign conflicts
         ],
@@ -146,12 +173,26 @@ const navGroups: NavGroup[] = [
                 icon: CalendarCheck,
                 roles: ['Teacher'],
             },
+            {
+                title: 'Teaching History',
+                href: teachingHistories(),
+                icon: BookOpen,
+                roles: ['Teacher'],
+            },
+            {
+                title: 'Substitute Requests',
+                href: substituteRequests(),
+                icon: Users,
+                roles: ['Teacher'],
+            },
+            {
+                title: 'Leave Requests',
+                href: leaveRequests(),
+                icon: Calendar,
+                roles: ['Teacher'],
+            },
             // Note: Availability - would need: Set preferred/unavailable time slots
-            // Note: Teaching History - would need: Past semester schedules archive
-            // Note: Workload Report - would need: Hours summary by semester
-            // Note: Substitute Requests - would need: Request/find substitute teachers
-            // Note: Leave Requests - would need: File for absence/time off
-            // Note: Schedule Preferences - would need: Preferred subjects/times settings
+            // Note: Workload Report - would need: Hours summary by semester // Dashboard for teacher
         ],
     },
     // Note: Dean role has no nav items - would need: Department Schedules, Approval Queue

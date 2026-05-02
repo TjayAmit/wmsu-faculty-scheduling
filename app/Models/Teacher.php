@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['user_id', 'email', 'first_name', 'last_name', 'employee_id', 'department', 'rank', 'employment_type', 'date_hired', 'phone', 'address', 'is_active'])]
+#[Fillable(['user_id', 'email', 'first_name', 'middle_name', 'last_name', 'employee_id', 'department', 'rank', 'employment_type', 'date_hired', 'phone', 'address', 'is_active'])]
 class Teacher extends Model
 {
     /** @use HasFactory<TeacherFactory> */

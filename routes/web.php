@@ -4,12 +4,19 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AssignScheduleController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\CurriculumController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DraftScheduleController;
+use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\RoomScheduleController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\SubstituteRequestController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\TeachingHistoryController;
 use App\Http\Controllers\TeacherScheduleController;
 use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\StaffController;
@@ -51,6 +58,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('classrooms/{classroom}', [ClassroomController::class, 'update'])->name('classrooms.update');
     Route::delete('classrooms/{classroom}', [ClassroomController::class, 'destroy'])->name('classrooms.destroy');
 
+    // Room Schedules Routes
+    Route::get('room-schedules', [RoomScheduleController::class, 'index'])->name('room-schedules.index');
+    Route::get('room-schedules/create', [RoomScheduleController::class, 'create'])->name('room-schedules.create');
+    Route::post('room-schedules', [RoomScheduleController::class, 'store'])->name('room-schedules.store');
+    Route::get('room-schedules/{room_schedule}', [RoomScheduleController::class, 'show'])->name('room-schedules.show');
+    Route::get('room-schedules/{room_schedule}/edit', [RoomScheduleController::class, 'edit'])->name('room-schedules.edit');
+    Route::put('room-schedules/{room_schedule}', [RoomScheduleController::class, 'update'])->name('room-schedules.update');
+    Route::delete('room-schedules/{room_schedule}', [RoomScheduleController::class, 'destroy'])->name('room-schedules.destroy');
+    Route::get('room-schedules/calendar', [RoomScheduleController::class, 'calendar'])->name('room-schedules.calendar');
+
     // Curriculum Routes
     Route::get('curricula', [CurriculumController::class, 'index'])->name('curricula.index');
     Route::get('curricula/create', [CurriculumController::class, 'create'])->name('curricula.create');
@@ -59,6 +76,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('curricula/{curriculum}/edit', [CurriculumController::class, 'edit'])->name('curricula.edit');
     Route::put('curricula/{curriculum}', [CurriculumController::class, 'update'])->name('curricula.update');
     Route::delete('curricula/{curriculum}', [CurriculumController::class, 'destroy'])->name('curricula.destroy');
+
+    // Departments Routes
+    Route::get('departments', [DepartmentController::class, 'index'])->name('departments.index');
+    Route::get('departments/create', [DepartmentController::class, 'create'])->name('departments.create');
+    Route::post('departments', [DepartmentController::class, 'store'])->name('departments.store');
+    Route::get('departments/{department}', [DepartmentController::class, 'show'])->name('departments.show');
+    Route::get('departments/{department}/edit', [DepartmentController::class, 'edit'])->name('departments.edit');
+    Route::put('departments/{department}', [DepartmentController::class, 'update'])->name('departments.update');
+    Route::delete('departments/{department}', [DepartmentController::class, 'destroy'])->name('departments.destroy');
+
+    // Programs Routes
+    Route::get('programs', [ProgramController::class, 'index'])->name('programs.index');
+    Route::get('programs/create', [ProgramController::class, 'create'])->name('programs.create');
+    Route::post('programs', [ProgramController::class, 'store'])->name('programs.store');
+    Route::get('programs/{program}', [ProgramController::class, 'show'])->name('programs.show');
+    Route::get('programs/{program}/edit', [ProgramController::class, 'edit'])->name('programs.edit');
+    Route::put('programs/{program}', [ProgramController::class, 'update'])->name('programs.update');
+    Route::delete('programs/{program}', [ProgramController::class, 'destroy'])->name('programs.destroy');
 
     // Teachers Routes
     Route::get('teachers', [TeacherController::class, 'index'])->name('teachers.index');
@@ -159,6 +194,54 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('teacher-schedules/{teacherSchedule}/complete', [TeacherScheduleController::class, 'complete'])->name('teacher-schedules.complete');
     Route::post('teacher-schedules/regenerate/{draftScheduleId}', [TeacherScheduleController::class, 'regenerateFromDraft'])->name('teacher-schedules.regenerate');
     Route::get('teacher-schedules/teacher/{teacherId}/semester/{semesterId}', [TeacherScheduleController::class, 'teacherSemesterSchedules'])->name('teacher-schedules.teacher-semester');
+
+    // Teaching Histories Routes
+    Route::get('teaching-histories', [TeachingHistoryController::class, 'index'])->name('teaching-histories.index');
+    Route::get('teaching-histories/create', [TeachingHistoryController::class, 'create'])->name('teaching-histories.create');
+    Route::post('teaching-histories', [TeachingHistoryController::class, 'store'])->name('teaching-histories.store');
+    Route::get('teaching-histories/{teaching_history}', [TeachingHistoryController::class, 'show'])->name('teaching-histories.show');
+    Route::get('teaching-histories/{teaching_history}/edit', [TeachingHistoryController::class, 'edit'])->name('teaching-histories.edit');
+    Route::put('teaching-histories/{teaching_history}', [TeachingHistoryController::class, 'update'])->name('teaching-histories.update');
+    Route::delete('teaching-histories/{teaching_history}', [TeachingHistoryController::class, 'destroy'])->name('teaching-histories.destroy');
+    Route::post('teaching-histories/{teaching_history}/archive', [TeachingHistoryController::class, 'archive'])->name('teaching-histories.archive');
+    Route::get('teaching-histories/teacher/{teacherId}', [TeachingHistoryController::class, 'teacherHistory'])->name('teaching-histories.teacher-history');
+
+    // Substitute Requests Routes
+    Route::get('substitute-requests', [SubstituteRequestController::class, 'index'])->name('substitute-requests.index');
+    Route::get('substitute-requests/create', [SubstituteRequestController::class, 'create'])->name('substitute-requests.create');
+    Route::post('substitute-requests', [SubstituteRequestController::class, 'store'])->name('substitute-requests.store');
+    Route::get('substitute-requests/{substitute_request}', [SubstituteRequestController::class, 'show'])->name('substitute-requests.show');
+    Route::get('substitute-requests/{substitute_request}/edit', [SubstituteRequestController::class, 'edit'])->name('substitute-requests.edit');
+    Route::put('substitute-requests/{substitute_request}', [SubstituteRequestController::class, 'update'])->name('substitute-requests.update');
+    Route::delete('substitute-requests/{substitute_request}', [SubstituteRequestController::class, 'destroy'])->name('substitute-requests.destroy');
+    Route::post('substitute-requests/{substitute_request}/approve', [SubstituteRequestController::class, 'approve'])->name('substitute-requests.approve');
+    Route::post('substitute-requests/{substitute_request}/reject', [SubstituteRequestController::class, 'reject'])->name('substitute-requests.reject');
+    Route::post('substitute-requests/{substitute_request}/cancel', [SubstituteRequestController::class, 'cancel'])->name('substitute-requests.cancel');
+    Route::get('substitute-requests/my-requests', [SubstituteRequestController::class, 'myRequests'])->name('substitute-requests.my-requests');
+
+    // Leave Requests Routes
+    Route::get('leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
+    Route::get('leave-requests/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
+    Route::post('leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
+    Route::get('leave-requests/{leave_request}', [LeaveRequestController::class, 'show'])->name('leave-requests.show');
+    Route::get('leave-requests/{leave_request}/edit', [LeaveRequestController::class, 'edit'])->name('leave-requests.edit');
+    Route::put('leave-requests/{leave_request}', [LeaveRequestController::class, 'update'])->name('leave-requests.update');
+    Route::delete('leave-requests/{leave_request}', [LeaveRequestController::class, 'destroy'])->name('leave-requests.destroy');
+    Route::post('leave-requests/{leave_request}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
+    Route::post('leave-requests/{leave_request}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
+    Route::post('leave-requests/{leave_request}/cancel', [LeaveRequestController::class, 'cancel'])->name('leave-requests.cancel');
+    Route::get('leave-requests/my-requests', [LeaveRequestController::class, 'myRequests'])->name('leave-requests.my-requests');
+
+    // Sections Routes
+    Route::get('sections', [SectionController::class, 'index'])->name('sections.index');
+    Route::get('sections/create', [SectionController::class, 'create'])->name('sections.create');
+    Route::post('sections', [SectionController::class, 'store'])->name('sections.store');
+    Route::get('sections/{section}', [SectionController::class, 'show'])->name('sections.show');
+    Route::get('sections/{section}/edit', [SectionController::class, 'edit'])->name('sections.edit');
+    Route::put('sections/{section}', [SectionController::class, 'update'])->name('sections.update');
+    Route::delete('sections/{section}', [SectionController::class, 'destroy'])->name('sections.destroy');
+    Route::post('sections/{section}/toggle-status', [SectionController::class, 'toggleStatus'])->name('sections.toggle-status');
+    Route::post('sections/{section}/assign-adviser', [SectionController::class, 'assignAdviser'])->name('sections.assign-adviser');
 
     // Assign Schedules Routes (Admin direct assignment with auto-approval)
     Route::get('assign-schedules', [AssignScheduleController::class, 'index'])->name('assign-schedules.index');
