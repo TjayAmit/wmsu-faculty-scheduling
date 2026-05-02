@@ -39,7 +39,10 @@ class ProgramController extends Controller
     {
         return Inertia::render('programs/create', [
             'departments' => Department::select('id', 'code', 'name')->active()->get(),
-            'degreeLevels' => DegreeLevel::cases(),
+            'degreeLevels' => collect(DegreeLevel::cases())->map(fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->getLabel(),
+            ])->values(),
         ]);
     }
 

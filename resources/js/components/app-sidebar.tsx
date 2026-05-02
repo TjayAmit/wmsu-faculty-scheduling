@@ -77,40 +77,11 @@ const navGroups: NavGroup[] = [
             // Note: Teacher Load Balance - would need: Hours distribution overview
         ],
     },
+    // Step 2: Fill reference data libraries (configure in order: Departments → Programs → Subjects → Curriculum → Classrooms)
     {
-        title: 'Academic',
+        title: 'Libraries',
         roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
         items: [
-            {
-                title: 'Semesters',
-                href: semesters(),
-                icon: Calendar,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Time Slots',
-                href: timeSlots(),
-                icon: Clock,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Subjects',
-                href: subjects(),
-                icon: Library,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Classrooms',
-                href: classrooms(),
-                icon: DoorOpen,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Curriculum',
-                href: curricula(),
-                icon: BookOpen,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
             {
                 title: 'Departments',
                 href: departments(),
@@ -124,13 +95,48 @@ const navGroups: NavGroup[] = [
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
             {
+                title: 'Subjects',
+                href: subjects(),
+                icon: Library,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Curriculum',
+                href: curricula(),
+                icon: BookOpen,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Classrooms',
+                href: classrooms(),
+                icon: DoorOpen,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+        ],
+    },
+    // Step 3: Create student groupings (requires Programs to be set up first)
+    {
+        title: 'Academic',
+        roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+        items: [
+            {
                 title: 'Sections',
                 href: sections(),
                 icon: Users,
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
-            // Note: Holidays - would need: Non-teaching days configuration
-            // Note: Workload Rules - would need: Max hours per faculty settings
+            {
+                title: 'Semesters',
+                href: semesters(),
+                icon: Calendar,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Time Slots',
+                href: timeSlots(),
+                icon: Clock,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
         ],
     },
     {
