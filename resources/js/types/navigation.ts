@@ -20,4 +20,6 @@ export type NavItem = {
 export type NavGroup = {
     title: string;
     items: NavItem[];
+    /** User must have at least one of these roles to see this group. */
+    roles?: string[];
 };

@@ -8,6 +8,7 @@ use App\Repositories\Eloquent\{
     EloquentCurriculumRepository,
     EloquentDepartmentRepository,
     EloquentDraftScheduleRepository,
+    EloquentFeatureFlagRepository,
     EloquentLeaveRequestRepository,
     EloquentScheduleRepository,
     EloquentSectionRepository,
@@ -15,14 +16,14 @@ use App\Repositories\Eloquent\{
     EloquentSubjectRepository,
     EloquentSubstituteRequestRepository,
     EloquentTeacherAssignmentRepository,
+    EloquentTeacherHistoryRepository,
     EloquentTeacherRepository,
     EloquentTeacherScheduleRepository,
     EloquentTimeSlotRepository,
     EloquentUserRepository,
     EloquentProgramRepository,
     EloquentRoomScheduleRepository,
-    EloquentTeachingHistoryRepository,
-    EloquentTeacherHistoryRepository,
+    EloquentTeachingHistoryRepository
 };
 
 use App\Repositories\{
@@ -31,6 +32,7 @@ use App\Repositories\{
     CurriculumRepository,
     DepartmentRepository,
     DraftScheduleRepository,
+    FeatureFlagRepository,
     LeaveRequestRepository,
     ScheduleRepository,
     SectionRepository,
@@ -38,6 +40,7 @@ use App\Repositories\{
     SubjectRepository,
     SubstituteRequestRepository,
     TeacherAssignmentRepository,
+    TeacherHistoryRepository,
     TeacherRepository,
     TeacherScheduleRepository,
     TimeSlotRepository,
@@ -45,7 +48,6 @@ use App\Repositories\{
     ProgramRepository,
     RoomScheduleRepository,
     TeachingHistoryRepository,
-    TeacherHistoryRepository,
 };
 
 use Illuminate\Support\ServiceProvider;
@@ -153,6 +155,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             TeacherHistoryRepository::class,
             EloquentTeacherHistoryRepository::class
+        );
+        
+        $this->app->bind(
+            FeatureFlagRepository::class,
+            EloquentFeatureFlagRepository::class
         );
     }
 }
