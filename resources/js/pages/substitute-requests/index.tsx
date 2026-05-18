@@ -1,7 +1,18 @@
 import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, Users, CheckCircle, XCircle, Ban, Clock } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -19,17 +30,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import { TablePageHeader } from '@/components/table-page-header';
-import { TablePagination } from '@/components/table-pagination';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as substituteRequests,
     create as substituteRequestsCreate,
@@ -41,7 +42,6 @@ import {
     cancel as substituteRequestsCancel,
 } from '@/routes/substitute-requests';
 import type { SubstituteRequestsIndexProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters, teachers }: SubstituteRequestsIndexProps) {
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
@@ -79,7 +79,10 @@ export default function Index({ data, filters, teachers }: SubstituteRequestsInd
     };
 
     const handleDelete = () => {
-        if (!deleteId) return;
+        if (!deleteId) {
+return;
+}
+
         setIsDeleting(true);
         router.delete(substituteRequestsDestroy(deleteId), {
             onFinish: () => {
@@ -114,6 +117,7 @@ export default function Index({ data, filters, teachers }: SubstituteRequestsInd
             rejected: <XCircle className="mr-1 h-3 w-3" />,
             cancelled: <Ban className="mr-1 h-3 w-3" />,
         };
+
         return (
             <Badge variant={variants[status] || 'secondary'} className="flex items-center">
                 {icons[status]}

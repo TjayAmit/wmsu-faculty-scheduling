@@ -1,11 +1,13 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { useState } from 'react';
 import { ArrowLeft, Plus, X } from 'lucide-react';
+import { useState } from 'react';
+import InputError from '@/components/input-error';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Select,
     SelectContent,
@@ -13,11 +15,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 import { index as schedules, store as schedulesStore } from '@/routes/schedules';
 import type { SchedulesFormProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 interface TimeSlot {
     day: string;
@@ -39,13 +39,21 @@ export default function Create({ subjects, semesters, timeSlots, daysOfWeek }: S
     });
 
     const addTimeSlot = () => {
-        if (!newDay || !newTimeSlotId) return;
-        if (timeSlotsForm.length >= 3) return;
+        if (!newDay || !newTimeSlotId) {
+return;
+}
+
+        if (timeSlotsForm.length >= 3) {
+return;
+}
         
         const duplicate = timeSlotsForm.some(
             slot => slot.day === newDay && slot.time_slot_id === newTimeSlotId
         );
-        if (duplicate) return;
+
+        if (duplicate) {
+return;
+}
 
         const newSlot: TimeSlot = { day: newDay, time_slot_id: newTimeSlotId };
         const updated = [...timeSlotsForm, newSlot];
@@ -63,11 +71,13 @@ export default function Create({ subjects, semesters, timeSlots, daysOfWeek }: S
 
     const getDayLabel = (day: string) => {
         const dayObj = daysOfWeek.find(d => d.value === day);
+
         return dayObj?.label || day;
     };
 
     const getTimeSlotLabel = (timeSlotId: string) => {
         const slot = timeSlots.find(t => t.id.toString() === timeSlotId);
+
         return slot?.name || timeSlotId;
     };
 

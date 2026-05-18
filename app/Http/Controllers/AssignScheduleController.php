@@ -43,7 +43,7 @@ class AssignScheduleController extends Controller
             'filters' => $filters,
             'teachers' => Teacher::with('user')->get()->map(fn ($t) => [
                 'id' => $t->id,
-                'name' => $t->user->name,
+                'name' => $t->user?->name ?? $t->full_name,
             ]),
             'availableSchedules' => Schedule::with(['subject', 'semester'])
                 ->where('is_active', true)
@@ -63,7 +63,7 @@ class AssignScheduleController extends Controller
         return Inertia::render('assign-schedules/create', [
             'teachers' => Teacher::with('user')->get()->map(fn ($t) => [
                 'id' => $t->id,
-                'name' => $t->user->name,
+                'name' => $t->user?->name ?? $t->full_name,
             ]),
             'schedules' => Schedule::with(['subject', 'semester'])
                 ->where('is_active', true)

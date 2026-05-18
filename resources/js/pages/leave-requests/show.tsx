@@ -1,9 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, Pencil, Trash2, CheckCircle, XCircle, Ban, Calendar } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -12,10 +13,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import AppLayout from '@/layouts/app-layout';
 import { index as leaveRequests, edit as leaveRequestsEdit, destroy as leaveRequestsDestroy, approve as leaveRequestsApprove, reject as leaveRequestsReject, cancel as leaveRequestsCancel } from '@/routes/leave-requests';
 import type { LeaveRequestsShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { router } from '@inertiajs/react';
 
 export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
     const [showDelete, setShowDelete] = useState(false);
@@ -50,6 +50,7 @@ export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
             rejected: 'destructive',
             cancelled: 'outline',
         };
+
         return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
     };
 
@@ -63,6 +64,7 @@ export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
             paternity: 'Paternity Leave',
             other: 'Other',
         };
+
         return labels[type] || type;
     };
 
@@ -80,6 +82,7 @@ export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
         const end = new Date(leaveRequest.end_date);
         const diffTime = Math.abs(end.getTime() - start.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
         return diffDays;
     };
 

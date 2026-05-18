@@ -1,21 +1,22 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Shield, Check } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import type { FormEvent} from 'react';
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { ChevronDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
 import { index as roles, store as rolesStore } from '@/routes/roles';
 import type { RolesFormProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Create({ permissions }: RolesFormProps) {
     const { data, setData, post, processing, errors } = useForm({
@@ -49,8 +50,13 @@ export default function Create({ permissions }: RolesFormProps) {
     // Group permissions by module (assuming format: "module.action")
     const groupedPermissions = permissions.reduce((acc, permission) => {
         const module = permission.name.split('.')[0] || 'other';
-        if (!acc[module]) acc[module] = [];
+
+        if (!acc[module]) {
+acc[module] = [];
+}
+
         acc[module].push(permission);
+
         return acc;
     }, {} as Record<string, typeof permissions>);
 

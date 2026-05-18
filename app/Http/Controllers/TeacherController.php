@@ -79,7 +79,10 @@ class TeacherController extends Controller
         return Inertia::render('teachers/edit', [
             'teacher' => $teacher,
             'users' => $users,
-            'employmentTypes' => EmploymentType::cases(),
+            'employmentTypes' => collect(EmploymentType::cases())->map(fn ($case) => [
+                'value' => $case->value,
+                'label' => $case->getLabel(),
+            ])->values(),
         ]);
     }
 

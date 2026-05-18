@@ -1,9 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, Pencil, Trash2, CheckCircle, XCircle, Send } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -12,7 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { router } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as draftSchedules,
     edit as draftSchedulesEdit,
@@ -21,12 +22,11 @@ import {
     approve as draftSchedulesApprove,
     reject as draftSchedulesReject,
 } from '@/routes/draft-schedules';
+import type { DraftSchedulesShowProps } from '@/types';
 import {
     getDraftScheduleStatusVariant,
     getDraftScheduleStatusLabel,
 } from '@/types/draftSchedules';
-import type { DraftSchedulesShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Show({ draftSchedule }: DraftSchedulesShowProps) {
     const [showDelete, setShowDelete] = useState(false);

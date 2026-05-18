@@ -1,9 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, Pencil, Trash2, CheckCircle, XCircle, Ban } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -12,10 +13,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import AppLayout from '@/layouts/app-layout';
 import { index as substituteRequests, edit as substituteRequestsEdit, destroy as substituteRequestsDestroy, approve as substituteRequestsApprove, reject as substituteRequestsReject, cancel as substituteRequestsCancel } from '@/routes/substitute-requests';
 import type { SubstituteRequestsShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { router } from '@inertiajs/react';
 
 export default function Show({ substituteRequest }: SubstituteRequestsShowProps) {
     const [showDelete, setShowDelete] = useState(false);
@@ -50,6 +50,7 @@ export default function Show({ substituteRequest }: SubstituteRequestsShowProps)
             rejected: 'destructive',
             cancelled: 'outline',
         };
+
         return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
     };
 

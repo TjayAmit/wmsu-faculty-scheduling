@@ -1,9 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, Pencil, Trash2, BookOpen } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -12,10 +13,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import AppLayout from '@/layouts/app-layout';
 import { index as curricula, edit as curriculaEdit, destroy as curriculaDestroy } from '@/routes/curricula';
 import type { CurriculaShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { router } from '@inertiajs/react';
 
 export default function Show({ curriculum }: CurriculaShowProps) {
     const [showDelete, setShowDelete] = useState(false);
@@ -34,6 +34,7 @@ export default function Show({ curriculum }: CurriculaShowProps) {
     const getYearLevelLabel = (yearLevel: number): string => {
         const suffixes = ['th', 'st', 'nd', 'rd'];
         const suffix = yearLevel <= 3 ? suffixes[yearLevel] : suffixes[0];
+
         return `${yearLevel}${suffix} Year`;
     };
 
@@ -179,6 +180,7 @@ export default function Show({ curriculum }: CurriculaShowProps) {
 
 Show.layout = (page: React.ReactNode) => {
     const { curriculum } = (page as { props: CurriculaShowProps }).props;
+
     return (
         <AppLayout
             breadcrumbs={[

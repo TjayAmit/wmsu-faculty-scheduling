@@ -1,11 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
 import {
     Select,
     SelectContent,
@@ -13,10 +13,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import InputError from '@/components/input-error';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
 import { index as roomSchedules, show as roomSchedulesShow, update as roomSchedulesUpdate } from '@/routes/room-schedules';
 import type { RoomSchedulesFormProps, ClassroomOption } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Edit({ roomSchedule, classrooms }: RoomSchedulesFormProps) {
     const { data, setData, put, processing, errors } = useForm({
@@ -31,6 +31,7 @@ export default function Edit({ roomSchedule, classrooms }: RoomSchedulesFormProp
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (roomSchedule) {
             put(roomSchedulesUpdate.url(roomSchedule.id));
         }

@@ -1,11 +1,11 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Pencil, Trash2, UserPlus, UserX, Mail, Phone, MapPin, Calendar, Briefcase } from 'lucide-react';
 import { useState } from 'react';
+import CreateUserAccountForm from '@/components/teachers/CreateUserAccountForm';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
     Dialog,
     DialogContent,
@@ -15,10 +15,10 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Separator } from '@/components/ui/separator';
+import AppLayout from '@/layouts/app-layout';
 import { index as teachers, edit as teachersEdit, destroy as teachersDestroy } from '@/routes/teachers';
 import type { TeachersShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import CreateUserAccountForm from '@/components/teachers/CreateUserAccountForm';
 
 export default function Show({ teacher, availableRoles, availableUsers }: TeachersShowProps) {
     const [showDelete, setShowDelete] = useState(false);
@@ -65,6 +65,7 @@ export default function Show({ teacher, availableRoles, availableUsers }: Teache
             part_time: 'Part Time',
             casual: 'Casual',
         };
+
         return <Badge variant={variants[type] || 'default'}>{labels[type] || type}</Badge>;
     };
 

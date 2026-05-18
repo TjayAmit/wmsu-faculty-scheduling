@@ -22,7 +22,10 @@ class FeatureFlagSeeder extends Seeder
         ];
 
         foreach ($featureFlags as $featureFlag) {
-            FeatureFlag::create($featureFlag);
+            FeatureFlag::firstOrCreate(
+                ['key' => $featureFlag['key']],
+                $featureFlag
+            );
         }
     }
 }

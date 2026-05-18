@@ -1,7 +1,18 @@
 import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, BookOpen } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
     Table,
     TableBody,
@@ -10,17 +21,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import { TablePageHeader } from '@/components/table-page-header';
-import { TablePagination } from '@/components/table-pagination';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as curricula,
     create as curriculaCreate,
@@ -29,7 +30,6 @@ import {
     destroy as curriculaDestroy,
 } from '@/routes/curricula';
 import type { CurriculaIndexProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters }: CurriculaIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
@@ -60,7 +60,10 @@ export default function Index({ data, filters }: CurriculaIndexProps) {
     };
 
     const handleDelete = () => {
-        if (!deleteId) return;
+        if (!deleteId) {
+return;
+}
+
         setIsDeleting(true);
         router.delete(curriculaDestroy(deleteId), {
             onFinish: () => {
@@ -73,6 +76,7 @@ export default function Index({ data, filters }: CurriculaIndexProps) {
     const getYearLevelLabel = (yearLevel: number): string => {
         const suffixes = ['th', 'st', 'nd', 'rd'];
         const suffix = yearLevel <= 3 ? suffixes[yearLevel] : suffixes[0];
+
         return `${yearLevel}${suffix} Year`;
     };
 

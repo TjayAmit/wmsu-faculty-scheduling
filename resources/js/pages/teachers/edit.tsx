@@ -1,20 +1,20 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { ArrowLeft, UserPlus, UserX } from 'lucide-react';
 import { useState } from 'react';
+import InputError from '@/components/input-error';
+import CreateUserAccountForm from '@/components/teachers/CreateUserAccountForm';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 import { index as teachers, show as teachersShow, update as teachersUpdate } from '@/routes/teachers';
 import type { TeachersFormProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import CreateUserAccountForm from '@/components/teachers/CreateUserAccountForm';
 
 export default function Edit({ teacher, users, employmentTypes, availableRoles, availableUsers }: TeachersFormProps) {
     const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
@@ -36,6 +36,7 @@ export default function Edit({ teacher, users, employmentTypes, availableRoles, 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (teacher) {
             put(teachersUpdate.url(teacher.id));
         }

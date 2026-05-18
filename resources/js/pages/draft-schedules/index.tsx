@@ -1,15 +1,11 @@
 import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, FileText, CheckCircle, XCircle, Send } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -24,10 +20,15 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import { TablePageHeader } from '@/components/table-page-header';
-import { TablePagination } from '@/components/table-pagination';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as draftSchedules,
     create as draftSchedulesCreate,
@@ -38,13 +39,12 @@ import {
     approve as draftSchedulesApprove,
     reject as draftSchedulesReject,
 } from '@/routes/draft-schedules';
+import type { DraftSchedulesIndexProps, DraftSchedule } from '@/types';
 import {
     draftScheduleStatusOptions,
     getDraftScheduleStatusVariant,
     getDraftScheduleStatusLabel,
 } from '@/types/draftSchedules';
-import type { DraftSchedulesIndexProps, DraftSchedule } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters }: DraftSchedulesIndexProps) {
     const [status, setStatus] = useState(filters.status || '_all');
@@ -72,7 +72,10 @@ export default function Index({ data, filters }: DraftSchedulesIndexProps) {
     };
 
     const handleDelete = () => {
-        if (!deleteId) return;
+        if (!deleteId) {
+return;
+}
+
         setIsDeleting(true);
         router.delete(draftSchedulesDestroy(deleteId), {
             onFinish: () => {

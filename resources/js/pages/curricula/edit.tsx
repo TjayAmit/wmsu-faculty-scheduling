@@ -1,10 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     Select,
     SelectContent,
@@ -12,10 +13,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 import { index as curricula, update as curriculaUpdate } from '@/routes/curricula';
 import type { CurriculaFormProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Edit({ curriculum, programs, subjects, semesterTypes }: CurriculaFormProps) {
     const { data, setData, put, processing, errors } = useForm({
@@ -30,6 +30,7 @@ export default function Edit({ curriculum, programs, subjects, semesterTypes }: 
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (curriculum) {
             put(curriculaUpdate(curriculum.id).url());
         }
@@ -242,6 +243,7 @@ export default function Edit({ curriculum, programs, subjects, semesterTypes }: 
 Edit.layout = (page: React.ReactNode) => {
     // Access curriculum data from page props
     const { curriculum } = (page as { props: CurriculaFormProps }).props;
+
     return (
         <AppLayout
             breadcrumbs={[

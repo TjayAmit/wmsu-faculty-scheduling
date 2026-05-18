@@ -1,15 +1,15 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 import { index as featureFlags, show as featureFlagsShow, update as featureFlagsUpdate } from '@/routes/feature-flags';
 import type { FeatureFlagsFormProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Edit({ featureFlag }: FeatureFlagsFormProps) {
     const { data, setData, put, processing, errors } = useForm({
@@ -21,6 +21,7 @@ export default function Edit({ featureFlag }: FeatureFlagsFormProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (featureFlag) {
             put(featureFlagsUpdate.url(featureFlag.id));
         }

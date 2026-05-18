@@ -1,5 +1,5 @@
-import type { Teacher } from './teachers';
 import type { Program } from './curricula';
+import type { Teacher } from './teachers';
 
 export interface Department {
     id: number;

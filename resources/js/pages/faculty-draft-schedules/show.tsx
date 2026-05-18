@@ -1,9 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, CheckCircle, XCircle, Calendar, Send } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -13,18 +14,17 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { router } from '@inertiajs/react';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as facultyDraftSchedules,
     approve as facultyDraftSchedulesApprove,
     reject as facultyDraftSchedulesReject,
 } from '@/routes/faculty-draft-schedules';
+import type { FacultyDraftSchedulesShowProps } from '@/types';
 import {
     getFacultyDraftScheduleStatusVariant,
     getFacultyDraftScheduleStatusLabel,
 } from '@/types/facultyDraftSchedules';
-import type { FacultyDraftSchedulesShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) {
     const [showReject, setShowReject] = useState(false);

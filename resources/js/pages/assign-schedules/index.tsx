@@ -1,7 +1,17 @@
 import { Head, router } from '@inertiajs/react';
 import { Eye, Plus, Trash2, User, BookOpen, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Table,
     TableBody,
@@ -10,16 +20,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { TablePagination } from '@/components/table-pagination';
-import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as assignSchedules,
     create as assignSchedulesCreate,
@@ -27,7 +28,6 @@ import {
     destroy as assignSchedulesDestroy,
 } from '@/routes/assign-schedules';
 import type { AssignSchedulesIndexProps, AssignSchedule } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters, teachers, availableSchedules }: AssignSchedulesIndexProps) {
     const [teacherId, setTeacherId] = useState(filters.teacher_id?.toString() || '_all');
@@ -65,7 +65,10 @@ export default function Index({ data, filters, teachers, availableSchedules }: A
     };
 
     const handleDelete = () => {
-        if (!deleteId) return;
+        if (!deleteId) {
+return;
+}
+
         setIsDeleting(true);
         router.delete(assignSchedulesDestroy(deleteId).url, {
             onFinish: () => {

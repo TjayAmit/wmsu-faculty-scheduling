@@ -1,7 +1,18 @@
 import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, Calendar, CheckCircle, XCircle, Clock, Ban } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -18,17 +29,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import { TablePageHeader } from '@/components/table-page-header';
-import { TablePagination } from '@/components/table-pagination';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as leaveRequests,
     create as leaveRequestsCreate,
@@ -40,7 +41,6 @@ import {
     cancel as leaveRequestsCancel,
 } from '@/routes/leave-requests';
 import type { LeaveRequestsIndexProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters, teachers }: LeaveRequestsIndexProps) {
     const [status, setStatus] = useState(filters.status || 'all');
@@ -82,7 +82,10 @@ export default function Index({ data, filters, teachers }: LeaveRequestsIndexPro
     };
 
     const handleDelete = () => {
-        if (!deleteId) return;
+        if (!deleteId) {
+return;
+}
+
         setIsDeleting(true);
         router.delete(leaveRequestsDestroy(deleteId), {
             onFinish: () => {
@@ -113,6 +116,7 @@ export default function Index({ data, filters, teachers }: LeaveRequestsIndexPro
         };
         const config = variants[status] || { variant: 'default', icon: Clock };
         const Icon = config.icon;
+
         return (
             <Badge variant={config.variant} className="gap-1">
                 <Icon className="h-3 w-3" />
@@ -131,6 +135,7 @@ export default function Index({ data, filters, teachers }: LeaveRequestsIndexPro
             paternity: 'Paternity Leave',
             other: 'Other',
         };
+
         return labels[type] || type;
     };
 

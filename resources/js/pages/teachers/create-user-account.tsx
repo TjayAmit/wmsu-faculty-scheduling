@@ -1,14 +1,14 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
-import type { Role } from '@/types';
 import AppLayout from '@/layouts/app-layout';
+import type { Role } from '@/types';
 
 interface CreateUserAccountProps {
     teacher: {

@@ -1,16 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, User, BookOpen, CheckCircle, Calendar, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { router } from '@inertiajs/react';
-import {
-    index as assignSchedules,
-    destroy as assignSchedulesDestroy,
-} from '@/routes/assign-schedules';
-import type { AssignSchedulesShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 import {
     Dialog,
     DialogContent,
@@ -19,6 +13,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import AppLayout from '@/layouts/app-layout';
+import {
+    index as assignSchedules,
+    destroy as assignSchedulesDestroy,
+} from '@/routes/assign-schedules';
+import type { AssignSchedulesShowProps } from '@/types';
 
 export default function Show({ assignment }: AssignSchedulesShowProps) {
     const [showDelete, setShowDelete] = useState(false);

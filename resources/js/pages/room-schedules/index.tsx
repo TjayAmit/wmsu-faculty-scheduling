@@ -1,7 +1,18 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, CalendarDays, Filter } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -19,17 +30,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import { TablePageHeader } from '@/components/table-page-header';
-import { TablePagination } from '@/components/table-pagination';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as roomSchedules,
     create as roomSchedulesCreate,
@@ -39,7 +40,6 @@ import {
     calendar as roomSchedulesCalendar,
 } from '@/routes/room-schedules';
 import type { RoomSchedulesIndexProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters, classrooms }: RoomSchedulesIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
@@ -84,7 +84,10 @@ export default function Index({ data, filters, classrooms }: RoomSchedulesIndexP
     };
 
     const handleDelete = () => {
-        if (!deleteId) return;
+        if (!deleteId) {
+return;
+}
+
         setIsDeleting(true);
         router.delete(roomSchedulesDestroy(deleteId), {
             onFinish: () => {

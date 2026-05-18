@@ -1,5 +1,5 @@
-import type { Teacher } from './teachers';
 import type { User } from './auth';
+import type { Teacher } from './teachers';
 
 export interface AssignScheduleSubject {
     id: number;

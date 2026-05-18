@@ -16,6 +16,16 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             UsersSeeder::class,
             FeatureFlagSeeder::class,
+
+            // WMSU institutional data (order matters for FK constraints)
+            DepartmentSeeder::class,     // no deps
+            SubjectSeeder::class,        // no deps
+            SemesterSeeder::class,       // no deps
+            ClassroomSeeder::class,      // no deps
+            WorkloadRuleSeeder::class,   // no deps
+            ProgramSeeder::class,        // depends on: departments
+            CurriculumSeeder::class,     // depends on: programs, subjects
+            SectionSeeder::class,        // depends on: programs, semesters
         ]);
     }
 }

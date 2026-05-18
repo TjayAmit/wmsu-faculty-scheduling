@@ -1,16 +1,16 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import InputError from '@/components/input-error';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 import { index as teachers, store as teachersStore } from '@/routes/teachers';
 import type { TeachersFormProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Create({ employmentTypes }: TeachersFormProps) {
     const { data, setData, post, processing, errors } = useForm({

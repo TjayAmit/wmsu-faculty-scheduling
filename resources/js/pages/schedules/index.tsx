@@ -1,7 +1,18 @@
 import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, CalendarDays } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
     Table,
     TableBody,
@@ -10,17 +21,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
-import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import { TablePageHeader } from '@/components/table-page-header';
-import { TablePagination } from '@/components/table-pagination';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as schedules,
     create as schedulesCreate,
@@ -29,7 +30,6 @@ import {
     destroy as schedulesDestroy,
 } from '@/routes/schedules';
 import type { SchedulesIndexProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 const dayLabels: Record<string, string> = {
     monday: 'Mon',
@@ -41,13 +41,16 @@ const dayLabels: Record<string, string> = {
 };
 
 const formatTimeSlots = (timeSlots: any[], allTimeSlots: any[]) => {
-    if (!timeSlots || timeSlots.length === 0) return '-';
+    if (!timeSlots || timeSlots.length === 0) {
+return '-';
+}
     
     return timeSlots
         .map((slot: any) => {
             const dayLabel = dayLabels[slot.day] || slot.day;
             const timeSlot = allTimeSlots.find(t => t.id === slot.time_slot_id);
             const timeLabel = timeSlot ? timeSlot.name : slot.time_slot_id;
+
             return `${dayLabel} ${timeLabel}`;
         })
         .join(', ');
@@ -102,7 +105,10 @@ export default function Index({ data, filters }: SchedulesIndexProps) {
     };
 
     const handleDelete = () => {
-        if (!deleteId) return;
+        if (!deleteId) {
+return;
+}
+
         setIsDeleting(true);
         router.delete(schedulesDestroy(deleteId), {
             onFinish: () => {
@@ -116,6 +122,7 @@ export default function Index({ data, filters }: SchedulesIndexProps) {
         if (schedule.teacher_assignment && schedule.teacher_assignment.is_active) {
             return { label: 'Assigned', variant: 'default' as const };
         }
+
         return { label: 'Unassigned', variant: 'secondary' as const };
     };
 
@@ -194,6 +201,7 @@ export default function Index({ data, filters }: SchedulesIndexProps) {
                             ) : (
                                 data.data.map((item) => {
                                     const assignmentStatus = getAssignmentStatus(item);
+
                                     return (
                                         <TableRow
                                             key={item.id}

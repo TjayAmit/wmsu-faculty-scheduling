@@ -1,9 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { ArrowLeft, Pencil, Trash2, Power, PowerOff, ToggleLeft, ToggleRight } from 'lucide-react';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Dialog,
     DialogContent,
@@ -12,10 +13,9 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import AppLayout from '@/layouts/app-layout';
 import { index as featureFlags, edit as featureFlagsEdit, destroy as featureFlagsDestroy, toggle as featureFlagsToggle } from '@/routes/feature-flags';
 import type { FeatureFlagsShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
-import { router } from '@inertiajs/react';
 
 export default function Show({ featureFlag }: FeatureFlagsShowProps) {
     const [showDelete, setShowDelete] = useState(false);
@@ -36,7 +36,10 @@ export default function Show({ featureFlag }: FeatureFlagsShowProps) {
     };
 
     const formatDate = (date: string | null) => {
-        if (!date) return '-';
+        if (!date) {
+return '-';
+}
+
         return new Date(date).toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',

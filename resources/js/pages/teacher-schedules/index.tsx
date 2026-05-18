@@ -1,7 +1,16 @@
 import { Head, router } from '@inertiajs/react';
 import { Eye, Calendar, Clock } from 'lucide-react';
 import { useState } from 'react';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Table,
     TableBody,
@@ -10,27 +19,18 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { TablePagination } from '@/components/table-pagination';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as teacherSchedules,
     show as teacherSchedulesShow,
 } from '@/routes/teacher-schedules';
+import type { TeacherSchedulesIndexProps, TeacherSchedule } from '@/types';
 import {
     teacherScheduleStatusOptions,
     getTeacherScheduleStatusVariant,
     getTeacherScheduleStatusLabel,
     dayLabels,
 } from '@/types/teacherSchedules';
-import type { TeacherSchedulesIndexProps, TeacherSchedule } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ schedules, filters }: TeacherSchedulesIndexProps) {
     const [status, setStatus] = useState(filters.status || '_all');

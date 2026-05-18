@@ -1,13 +1,13 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import InputError from '@/components/input-error';
-import { index as timeSlots, store as timeSlotsStore } from '@/routes/time-slots';
 import AppLayout from '@/layouts/app-layout';
+import { index as timeSlots, store as timeSlotsStore } from '@/routes/time-slots';
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({

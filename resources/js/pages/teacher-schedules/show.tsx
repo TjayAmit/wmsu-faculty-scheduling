@@ -1,18 +1,18 @@
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Clock, MapPin, BookOpen } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as teacherSchedules,
 } from '@/routes/teacher-schedules';
+import type { TeacherSchedulesShowProps } from '@/types';
 import {
     getTeacherScheduleStatusVariant,
     getTeacherScheduleStatusLabel,
     dayLabels,
 } from '@/types/teacherSchedules';
-import type { TeacherSchedulesShowProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Show({ schedule }: TeacherSchedulesShowProps) {
     const formatDate = (dateString: string) => {

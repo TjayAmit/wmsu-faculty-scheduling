@@ -12,12 +12,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as assignSchedules,
     store as assignSchedulesStore,
 } from '@/routes/assign-schedules';
 import type { AssignSchedulesCreateProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Create({ teachers, schedules }: AssignSchedulesCreateProps) {
     const [teacherId, setTeacherId] = useState('');
@@ -29,7 +29,10 @@ export default function Create({ teachers, schedules }: AssignSchedulesCreatePro
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!teacherId || !scheduleId) return;
+
+        if (!teacherId || !scheduleId) {
+return;
+}
 
         setIsSubmitting(true);
         router.post(assignSchedulesStore().url, {

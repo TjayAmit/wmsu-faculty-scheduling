@@ -1,22 +1,9 @@
 import { Head, router } from '@inertiajs/react';
 import { Eye, CheckCircle, XCircle, Send, FileText } from 'lucide-react';
 import { useState } from 'react';
+import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import {
     Dialog,
     DialogContent,
@@ -25,22 +12,35 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { TablePagination } from '@/components/table-pagination';
+import AppLayout from '@/layouts/app-layout';
 import {
     index as facultyDraftSchedules,
     show as facultyDraftSchedulesShow,
     approve as facultyDraftSchedulesApprove,
     reject as facultyDraftSchedulesReject,
 } from '@/routes/faculty-draft-schedules';
+import type { FacultyDraftSchedulesIndexProps, FacultyDraftSchedule } from '@/types';
 import {
     facultyDraftScheduleStatusOptions,
     getFacultyDraftScheduleStatusVariant,
     getFacultyDraftScheduleStatusLabel,
 } from '@/types/facultyDraftSchedules';
-import type { FacultyDraftSchedulesIndexProps, FacultyDraftSchedule } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Index({ data, filters }: FacultyDraftSchedulesIndexProps) {
     const [status, setStatus] = useState(filters.status || '_all');
@@ -82,7 +82,10 @@ export default function Index({ data, filters }: FacultyDraftSchedulesIndexProps
     };
 
     const handleReject = () => {
-        if (!rejectId) return;
+        if (!rejectId) {
+return;
+}
+
         setProcessingId(rejectId);
         router.post(facultyDraftSchedulesReject(rejectId).url, { comments: rejectComments }, {
             onFinish: () => {

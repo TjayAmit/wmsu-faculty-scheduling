@@ -15,17 +15,7 @@ import {
 } from '@/components/ui/sidebar';
 import { usePermission } from '@/hooks/use-permission';
 import { dashboard } from '@/routes';
-import { index as users } from '@/routes/users';
-import { index as teachers } from '@/routes/teachers';
-import { index as subjects } from '@/routes/subjects';
-import { index as schedules } from '@/routes/schedules';
-import { index as semesters } from '@/routes/semesters';
-import { index as timeSlots } from '@/routes/time-slots';
 import { index as activityLogs } from '@/routes/activityLogs';
-import { index as roles } from '@/routes/roles';
-import { index as draftSchedules } from '@/routes/draft-schedules';
-import { index as teacherSchedules } from '@/routes/teacher-schedules';
-import { index as facultyDraftSchedules } from '@/routes/faculty-draft-schedules';
 import { index as assignSchedules } from '@/routes/assign-schedules';
 import { index as staff } from '@/routes/staff';
 import { index as classrooms } from '@/routes/classrooms';
@@ -37,8 +27,18 @@ import { index as featureFlags } from '@/routes/feature-flags';
 import { index as sections } from '@/routes/sections';
 import { index as curricula } from '@/routes/curricula';
 import { index as departments } from '@/routes/departments';
+import { index as draftSchedules } from '@/routes/draft-schedules';
+import { index as facultyDraftSchedules } from '@/routes/faculty-draft-schedules';
 import { index as programs } from '@/routes/programs';
-import type { NavGroup } from '@/types';
+import { index as roles } from '@/routes/roles';
+import { index as schedules } from '@/routes/schedules';
+import { index as semesters } from '@/routes/semesters';
+import { index as subjects } from '@/routes/subjects';
+import { index as teacherSchedules } from '@/routes/teacher-schedules';
+import { index as teachers } from '@/routes/teachers';
+import { index as timeSlots } from '@/routes/time-slots';
+import { index as users } from '@/routes/users';
+import type { NavGroup, NavItem } from '@/types';
 
 // ── Navigation groups ──────────────────────────────────────────────────────────
 // Each item may declare `roles` and/or `permissions` guards (OR logic):
@@ -262,18 +262,7 @@ const navGroups: NavGroup[] = [
     },
 ];
 
-const footerNavItems = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const { canAccess, hasRole } = usePermission();

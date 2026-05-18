@@ -1,5 +1,5 @@
-import type { Teacher } from './teachers';
 import type { User } from './auth';
+import type { Teacher } from './teachers';
 
 export interface TeacherScheduleStatus {
     value: string;
@@ -124,6 +124,7 @@ export const getTeacherScheduleStatusVariant = (status: string): 'default' | 'se
 
 export const getTeacherScheduleStatusLabel = (status: string): string => {
     const option = teacherScheduleStatusOptions.find(opt => opt.value === status);
+
     return option?.label || status;
 };
 

@@ -29,7 +29,11 @@ class TeacherScheduleController extends Controller
 
         $query = TeacherSchedule::query()->with(['teacher.user', 'subject', 'semester']);
 
-        if (isset($filters['teacher_id'])) {
+        // If user is a teacher, automatically filter by their teacher ID
+        // unless they're explicitly viewing another teacher's schedules (admin only)
+        if (auth()->user()->isTeacher() && !auth()->user()->hasRole('admin')) {
+            $query->where('teacher_id', auth()->user()->teacher->id);
+        } elseif (isset($filters['teacher_id'])) {
             $query->where('teacher_id', $filters['teacher_id']);
         }
 
@@ -37,7 +41,7 @@ class TeacherScheduleController extends Controller
             $query->where('semester_id', $filters['semester_id']);
         }
 
-        if (isset($filters['status'])) {
+        if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 

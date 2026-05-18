@@ -1,5 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,10 +13,9 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import InputError from '@/components/input-error';
+import AppLayout from '@/layouts/app-layout';
 import { index as draftSchedules, update as draftSchedulesUpdate } from '@/routes/draft-schedules';
 import type { DraftSchedulesFormProps } from '@/types';
-import AppLayout from '@/layouts/app-layout';
 
 export default function Edit({ draftSchedule, teachers, schedules }: DraftSchedulesFormProps) {
     const { data, setData, put, processing, errors } = useForm({
@@ -26,6 +26,7 @@ export default function Edit({ draftSchedule, teachers, schedules }: DraftSchedu
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
         if (draftSchedule) {
             put(draftSchedulesUpdate(draftSchedule.id));
         }

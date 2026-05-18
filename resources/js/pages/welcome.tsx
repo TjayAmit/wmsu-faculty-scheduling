@@ -254,6 +254,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                                     </div>
                                                     {(cells as readonly string[]).map((color, i) => {
                                                         const s = color ? SUBJECT_MAP[color] : null;
+
                                                         return (
                                                             <div
                                                                 key={i}
@@ -276,6 +277,7 @@ export default function Welcome({ canRegister = true }: { canRegister?: boolean 
                                             { name: 'Ms. Garcia', color: 'emerald' },
                                         ].map(({ name, color }) => {
                                             const s = SUBJECT_MAP[color];
+
                                             return (
                                                 <span
                                                     key={name}
