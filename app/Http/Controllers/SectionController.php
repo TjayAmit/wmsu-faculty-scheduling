@@ -49,7 +49,7 @@ class SectionController extends Controller
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'program_id', 'semester_id', 'year_level', 'is_active', 'per_page']),
             'programs' => Program::all(['id', 'name']),
-            'semesters' => Semester::all(['id', 'name', 'academic_year']),
+            'semesters' => Semester::all(['id', 'name', 'year']),
         ]);
     }
 
@@ -57,7 +57,7 @@ class SectionController extends Controller
     {
         return Inertia::render('sections/create', [
             'programs' => Program::all(['id', 'name']),
-            'semesters' => Semester::all(['id', 'name', 'academic_year']),
+            'semesters' => Semester::all(['id', 'name', 'year']),
             'teachers' => Teacher::all(['id', 'first_name', 'last_name']),
         ]);
     }
@@ -85,7 +85,7 @@ class SectionController extends Controller
         return Inertia::render('sections/edit', [
             'section' => $section,
             'programs' => Program::all(['id', 'name']),
-            'semesters' => Semester::all(['id', 'name', 'academic_year']),
+            'semesters' => Semester::all(['id', 'name', 'year']),
             'teachers' => Teacher::all(['id', 'first_name', 'last_name']),
         ]);
     }
