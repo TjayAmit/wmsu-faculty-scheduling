@@ -31,6 +31,7 @@ Route::inertia('/', 'welcome', [
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
+    Route::get('admin/dashboard', \App\Http\Controllers\AdminDashboardController::class)->name('admin.dashboard');
 
     // Users Routes
     Route::get('users', [UserController::class, 'index'])->name('users.index');
@@ -223,6 +224,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Leave Requests Routes
     Route::get('leave-requests', [LeaveRequestController::class, 'index'])->name('leave-requests.index');
     Route::get('leave-requests/create', [LeaveRequestController::class, 'create'])->name('leave-requests.create');
+    Route::get('leave-requests/my-requests', [LeaveRequestController::class, 'myRequests'])->name('leave-requests.my-requests');
     Route::post('leave-requests', [LeaveRequestController::class, 'store'])->name('leave-requests.store');
     Route::get('leave-requests/{leave_request}', [LeaveRequestController::class, 'show'])->name('leave-requests.show');
     Route::get('leave-requests/{leave_request}/edit', [LeaveRequestController::class, 'edit'])->name('leave-requests.edit');
@@ -231,7 +233,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('leave-requests/{leave_request}/approve', [LeaveRequestController::class, 'approve'])->name('leave-requests.approve');
     Route::post('leave-requests/{leave_request}/reject', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject');
     Route::post('leave-requests/{leave_request}/cancel', [LeaveRequestController::class, 'cancel'])->name('leave-requests.cancel');
-    Route::get('leave-requests/my-requests', [LeaveRequestController::class, 'myRequests'])->name('leave-requests.my-requests');
 
     // Sections Routes
     Route::get('sections', [SectionController::class, 'index'])->name('sections.index');

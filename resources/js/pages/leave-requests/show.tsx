@@ -92,11 +92,9 @@ export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={leaveRequests()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
+                    <Button variant="ghost" size="sm" onClick={() => window.history.back()}>
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        Back to list
                     </Button>
                 </div>
 

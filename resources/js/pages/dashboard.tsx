@@ -71,26 +71,52 @@ function sameDay(a: Date, b: Date) {
 function getDuration(start: string, end: string) {
     const mins = Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000);
     const h = Math.floor(mins / 60), m = mins % 60;
-    if (h === 0) return `${m}m`;
-    if (m === 0) return `${h}h`;
+
+    if (h === 0) {
+return `${m}m`;
+}
+
+    if (m === 0) {
+return `${h}h`;
+}
+
     return `${h}h ${m}m`;
 }
 
 function getLive(scheduledDate: string, startTime: string, endTime: string) {
-    if (scheduledDate !== toDateStr(new Date())) return null;
+    if (scheduledDate !== toDateStr(new Date())) {
+return null;
+}
+
     const now = new Date(), start = new Date(startTime), end = new Date(endTime);
-    if (now >= start && now < end) return { text: 'Now', pulse: true, cls: 'bg-emerald-500 text-white' };
+
+    if (now >= start && now < end) {
+return { text: 'Now', pulse: true, cls: 'bg-emerald-500 text-white' };
+}
+
     const mins = Math.floor((start.getTime() - now.getTime()) / 60000);
-    if (mins > 0 && mins <= 60) return { text: `in ${mins}m`, pulse: false, cls: 'bg-primary/10 text-primary' };
+
+    if (mins > 0 && mins <= 60) {
+return { text: `in ${mins}m`, pulse: false, cls: 'bg-primary/10 text-primary' };
+}
+
     return null;
 }
 
 function getCountdown(startTime: string, endTime: string) {
     const now = new Date(), start = new Date(startTime), end = new Date(endTime);
-    if (now >= start && now < end) return { text: 'In progress', cls: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
-    if (now >= end) return { text: 'Ended', cls: 'bg-muted text-muted-foreground' };
+
+    if (now >= start && now < end) {
+return { text: 'In progress', cls: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' };
+}
+
+    if (now >= end) {
+return { text: 'Ended', cls: 'bg-muted text-muted-foreground' };
+}
+
     const mins = Math.floor((start.getTime() - now.getTime()) / 60000);
     const h = Math.floor(mins / 60), m = mins % 60;
+
     return { text: `Starts in ${h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}h`) : `${m}m`}`, cls: 'bg-primary/10 text-primary' };
 }
 
@@ -104,7 +130,9 @@ const S = {
 
 type StatusKey = keyof typeof S;
 
-function statusStyle(s: string) { return S[s as StatusKey] ?? S.scheduled; }
+function statusStyle(s: string) {
+ return S[s as StatusKey] ?? S.scheduled; 
+}
 
 // ── Month Calendar ────────────────────────────────────────────────
 function MonthCalendar({
@@ -129,7 +157,10 @@ function MonthCalendar({
         ...Array(firstDow).fill(null),
         ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
     ];
-    while (cells.length % 7 !== 0) cells.push(null);
+
+    while (cells.length % 7 !== 0) {
+cells.push(null);
+}
 
     const isCurrentCalMonth = yr === today.getFullYear() && mo === today.getMonth();
 
@@ -141,10 +172,17 @@ function MonthCalendar({
     // Map date string → unique statuses (for dots)
     const dateStatusMap = useMemo(() => {
         const map: Record<string, string[]> = {};
+
         for (const s of monthSchedules) {
-            if (!map[s.scheduled_date]) map[s.scheduled_date] = [];
-            if (!map[s.scheduled_date].includes(s.status)) map[s.scheduled_date].push(s.status);
+            if (!map[s.scheduled_date]) {
+map[s.scheduled_date] = [];
+}
+
+            if (!map[s.scheduled_date].includes(s.status)) {
+map[s.scheduled_date].push(s.status);
+}
         }
+
         return map;
     }, [monthSchedules]);
 
@@ -187,7 +225,10 @@ function MonthCalendar({
             {/* Grid */}
             <div className="grid grid-cols-7">
                 {cells.map((day, i) => {
-                    if (!day) return <div key={i} className="h-11" />;
+                    if (!day) {
+return <div key={i} className="h-11" />;
+}
+
                     const date = new Date(yr, mo, day);
                     const dateStr = toDateStr(date);
                     const isSel = sameDay(date, selected);
@@ -291,7 +332,11 @@ export default function Dashboard({ stats, today_schedules, month_schedules, cur
     // Initialise selected day: today if in viewed month, else 1st of viewed month
     const [selectedDay, setSelectedDay] = useState<Date>(() => {
         const [yr, mo] = current_month.split('-').map(Number);
-        if (today.getFullYear() === yr && today.getMonth() === mo - 1) return today;
+
+        if (today.getFullYear() === yr && today.getMonth() === mo - 1) {
+return today;
+}
+
         return new Date(yr, mo - 1, 1);
     });
 
@@ -342,21 +387,42 @@ export default function Dashboard({ stats, today_schedules, month_schedules, cur
 
                 {/* ── Stat cards ── */}
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {STATS.map(({ label, value, icon: Icon, iconCls, bgCls }) => (
-                        <Card key={label} className="gap-0 py-0">
-                            <CardContent className="px-5 py-4">
-                                <div className="flex items-start justify-between gap-2">
+                    {STATS.map(({ label, value, icon: Icon, iconCls, bgCls }, idx) =>
+                        idx === 0 ? (
+                            /* First card — primary fill with decorative rings */
+                            <Card key={label} className="relative gap-0 overflow-hidden py-0 bg-primary text-primary-foreground min-h-[120px]">
+                                {/* decorative circles */}
+                                <span className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10" />
+                                <span className="pointer-events-none absolute -right-2 -top-2 h-16 w-16 rounded-full bg-white/10" />
+                                <CardContent className="relative px-5 py-5 h-full flex flex-col justify-between">
+                                    <div className="flex items-start justify-between gap-2">
+                                        <p className="text-[11px] font-semibold uppercase tracking-wider text-primary-foreground/70">{label}</p>
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
+                                            <Icon className="h-5 w-5 text-primary-foreground" />
+                                        </div>
+                                    </div>
                                     <div>
+                                        <p className="text-4xl font-bold tracking-tight text-primary-foreground">{value}</p>
+                                        <p className="mt-1 text-xs text-primary-foreground/60">
+                                            {today.toLocaleDateString('en-US', { weekday: 'long' })}
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            <Card key={label} className="gap-0 py-0 min-h-[120px]">
+                                <CardContent className="px-5 py-5 h-full flex flex-col justify-between">
+                                    <div className="flex items-start justify-between gap-2">
                                         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-                                        <p className="mt-2 text-3xl font-bold tracking-tight">{value}</p>
+                                        <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', bgCls)}>
+                                            <Icon className={cn('h-5 w-5', iconCls)} />
+                                        </div>
                                     </div>
-                                    <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', bgCls)}>
-                                        <Icon className={cn('h-5 w-5', iconCls)} />
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+                                    <p className="text-4xl font-bold tracking-tight">{value}</p>
+                                </CardContent>
+                            </Card>
+                        )
+                    )}
                 </div>
 
                 {/* ── Main grid ── */}
@@ -453,6 +519,7 @@ export default function Dashboard({ stats, today_schedules, month_schedules, cur
                                     <div className="flex flex-col gap-4">
                                         {(() => {
                                             const c = getCountdown(nextClass.start_time, nextClass.end_time);
+
                                             return (
                                                 <span className={cn('inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold', c.cls)}>
                                                     <Clock className="h-3 w-3" />{c.text}
@@ -513,14 +580,16 @@ export default function Dashboard({ stats, today_schedules, month_schedules, cur
                                     </div>
                                 )}
                             </CardContent>
-                        </Card>
 
-                        <Button asChild variant="outline" size="sm" className="w-full">
-                            <Link href={teacherSchedulesIndex().url}>
-                                <Calendar className="mr-2 h-4 w-4" />
-                                View full schedule
-                            </Link>
-                        </Button>
+                            <div className="border-t border-border px-5 py-3">
+                                <Button asChild variant="ghost" size="sm" className="w-full justify-center gap-2 text-muted-foreground hover:text-foreground">
+                                    <Link href={teacherSchedulesIndex().url}>
+                                        <Calendar className="h-4 w-4" />
+                                        View full schedule
+                                    </Link>
+                                </Button>
+                            </div>
+                        </Card>
                     </div>
                 </div>
             </div>

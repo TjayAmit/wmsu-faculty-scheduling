@@ -1,4 +1,3 @@
-import type { User } from './auth';
 import type { Teacher } from './teachers';
 
 export interface TeacherScheduleStatus {
@@ -63,8 +62,69 @@ export interface TeacherSchedule {
     attendance_record: TeacherScheduleAttendanceRecord | null;
 }
 
+export interface SubjectSummary {
+    subject_id: number;
+    semester_id: number;
+    subject_code: string;
+    subject_title: string;
+    semester_name: string;
+    academic_year: string;
+    section: string | null;
+    room: string | null;
+    start_time: string;
+    end_time: string;
+    days: string[];
+    total: number;
+    scheduled: number;
+    completed: number;
+    cancelled: number;
+    postponed: number;
+    next_session: string | null;
+}
+
+export interface SessionSummary {
+    id: number;
+    scheduled_date: string;
+    day_of_week: string;
+    start_time: string;
+    end_time: string;
+    room: string | null;
+    section: string | null;
+    status: 'scheduled' | 'cancelled' | 'completed' | 'postponed';
+    notes: string | null;
+    is_holiday: boolean;
+    holiday_name: string | null;
+}
+
+export interface SubjectDetail {
+    id: number | null;
+    code: string;
+    title: string;
+    semester_name: string;
+    academic_year: string;
+    section: string | null;
+    room: string | null;
+    start_time: string | null;
+    end_time: string | null;
+}
+
+export interface SessionsPaginated {
+    data: SessionSummary[];
+    total: number;
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    from: number | null;
+    to: number | null;
+}
+
 export interface TeacherSchedulesIndexProps {
-    schedules: {
+    mode: 'subjects' | 'sessions';
+    subjects?: SubjectSummary[];
+    sessions?: SessionsPaginated;
+    subject?: SubjectDetail;
+    // Admin fallback props
+    schedules?: {
         data: TeacherSchedule[];
         current_page: number;
         last_page: number;
@@ -74,9 +134,10 @@ export interface TeacherSchedulesIndexProps {
         to: number;
     };
     filters: {
-        teacher_id?: number;
+        subject_id?: number;
         semester_id?: number;
         status?: string;
+        teacher_id?: number;
         start_date?: string;
         end_date?: string;
         per_page?: number;

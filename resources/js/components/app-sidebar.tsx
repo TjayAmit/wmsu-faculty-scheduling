@@ -16,26 +16,27 @@ import {
 import { usePermission } from '@/hooks/use-permission';
 import { dashboard } from '@/routes';
 import { index as activityLogs } from '@/routes/activityLogs';
+import { dashboard as adminDashboard } from '@/routes/admin';
 import { index as assignSchedules } from '@/routes/assign-schedules';
-import { index as staff } from '@/routes/staff';
 import { index as classrooms } from '@/routes/classrooms';
-import { index as roomSchedules } from '@/routes/room-schedules';
-import { index as teachingHistories } from '@/routes/teaching-histories';
-import { index as substituteRequests } from '@/routes/substitute-requests';
-import { index as leaveRequests } from '@/routes/leave-requests';
-import { index as featureFlags } from '@/routes/feature-flags';
-import { index as sections } from '@/routes/sections';
 import { index as curricula } from '@/routes/curricula';
 import { index as departments } from '@/routes/departments';
 import { index as draftSchedules } from '@/routes/draft-schedules';
 import { index as facultyDraftSchedules } from '@/routes/faculty-draft-schedules';
+import { index as featureFlags } from '@/routes/feature-flags';
+import { index as leaveRequests } from '@/routes/leave-requests';
 import { index as programs } from '@/routes/programs';
 import { index as roles } from '@/routes/roles';
+import { index as roomSchedules } from '@/routes/room-schedules';
 import { index as schedules } from '@/routes/schedules';
+import { index as sections } from '@/routes/sections';
 import { index as semesters } from '@/routes/semesters';
+import { index as staff } from '@/routes/staff';
 import { index as subjects } from '@/routes/subjects';
+import { index as substituteRequests } from '@/routes/substitute-requests';
 import { index as teacherSchedules } from '@/routes/teacher-schedules';
 import { index as teachers } from '@/routes/teachers';
+import { index as teachingHistories } from '@/routes/teaching-histories';
 import { index as timeSlots } from '@/routes/time-slots';
 import { index as users } from '@/routes/users';
 import type { NavGroup, NavItem } from '@/types';
@@ -55,6 +56,13 @@ const navGroups: NavGroup[] = [
                 title: 'Dashboard',
                 href: dashboard(),
                 icon: LayoutGrid,
+                roles: ['Teacher'],
+            },
+            {
+                title: 'Dashboard',
+                href: adminDashboard(),
+                icon: LayoutGrid,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
         ],
     },
@@ -75,6 +83,45 @@ const navGroups: NavGroup[] = [
                 roles: ['Admin', 'Faculty Admin'],
             },
             // Note: Teacher Load Balance - would need: Hours distribution overview
+        ],
+    },
+    {
+        title: 'Scheduling',
+        roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+        items: [
+            {
+                title: 'Schedules',
+                href: schedules(),
+                icon: CalendarDays,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Draft Schedules',
+                href: facultyDraftSchedules(),
+                icon: FileText,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Assign Schedules',
+                href: assignSchedules(),
+                icon: CalendarDays,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Room Schedules',
+                href: roomSchedules(),
+                icon: CalendarDays,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Substitute Requests',
+                href: substituteRequests(),
+                icon: Users,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            // Note: Conflicts - would need: Schedule overlap detection view
+            // Note: Schedule Analytics - would need: Utilization reports
+            // Note: Mass Schedule Import - would need: Bulk CSV/Excel upload
         ],
     },
     {
@@ -131,45 +178,6 @@ const navGroups: NavGroup[] = [
             },
             // Note: Holidays - would need: Non-teaching days configuration
             // Note: Workload Rules - would need: Max hours per faculty settings
-        ],
-    },
-    {
-        title: 'Scheduling',
-        roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-        items: [
-            {
-                title: 'Schedules',
-                href: schedules(),
-                icon: CalendarDays,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Draft Schedules',
-                href: facultyDraftSchedules(),
-                icon: FileText,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Assign Schedules',
-                href: assignSchedules(),
-                icon: CalendarDays,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Room Schedules',
-                href: roomSchedules(),
-                icon: CalendarDays,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Substitute Requests',
-                href: substituteRequests(),
-                icon: Users,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            // Note: Conflicts - would need: Schedule overlap detection view
-            // Note: Schedule Analytics - would need: Utilization reports
-            // Note: Mass Schedule Import - would need: Bulk CSV/Excel upload
         ],
     },
     {

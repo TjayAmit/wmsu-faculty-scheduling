@@ -25,15 +25,121 @@ class TeacherScheduleController extends Controller
      */
     public function index(Request $request): Response
     {
+        // Teacher grouped/session view
+        if (auth()->user()->isTeacher() && !auth()->user()->hasRole('admin')) {
+            $teacherId = auth()->user()->teacher?->id ?? 0;
+
+            // Mode 2: session list for a specific subject
+            if ($request->filled('subject_id')) {
+                $subjectId  = $request->subject_id;
+                $semesterId = $request->semester_id;
+
+                $query = TeacherSchedule::with(['subject', 'semester'])
+                    ->where('teacher_id', $teacherId)
+                    ->where('subject_id', $subjectId);
+
+                if ($semesterId) {
+                    $query->where('semester_id', $semesterId);
+                }
+                if ($request->filled('status')) {
+                    $query->where('status', $request->status);
+                }
+
+                $perPage  = max(5, min(50, (int) ($request->per_page ?? 15)));
+                $paginated = $query->orderBy('scheduled_date')->paginate($perPage)->withQueryString();
+                $first    = TeacherSchedule::with(['subject', 'semester'])
+                    ->where('teacher_id', $teacherId)
+                    ->where('subject_id', $subjectId)
+                    ->first();
+
+                return Inertia::render('teacher-schedules/index', [
+                    'mode'     => 'sessions',
+                    'sessions' => [
+                        'data'         => $paginated->map(fn ($s) => [
+                            'id'             => $s->id,
+                            'scheduled_date' => $s->scheduled_date->toDateString(),
+                            'day_of_week'    => $s->day_of_week,
+                            'start_time'     => $s->start_time->format('H:i:s'),
+                            'end_time'       => $s->end_time->format('H:i:s'),
+                            'room'           => $s->room,
+                            'section'        => $s->section,
+                            'status'         => $s->status instanceof \BackedEnum ? $s->status->value : $s->status,
+                            'notes'          => $s->notes,
+                            'is_holiday'     => (bool) $s->is_holiday,
+                            'holiday_name'   => $s->holiday_name,
+                        ]),
+                        'total'        => $paginated->total(),
+                        'current_page' => $paginated->currentPage(),
+                        'last_page'    => $paginated->lastPage(),
+                        'per_page'     => $paginated->perPage(),
+                        'from'         => $paginated->firstItem(),
+                        'to'           => $paginated->lastItem(),
+                    ],
+                    'subject'  => [
+                        'id'            => $first?->subject_id,
+                        'code'          => $first?->subject->code ?? '',
+                        'title'         => $first?->subject->title ?? '',
+                        'semester_name' => $first?->semester->name ?? '',
+                        'academic_year' => $first?->semester->academic_year ?? '',
+                        'section'       => $first?->section,
+                        'room'          => $first?->room,
+                        'start_time'    => $first?->start_time?->format('H:i:s'),
+                        'end_time'      => $first?->end_time?->format('H:i:s'),
+                    ],
+                    'filters'  => $request->only(['subject_id', 'semester_id', 'status', 'per_page']),
+                ]);
+            }
+
+            // Mode 1: subject-grouped cards
+            $sessions = TeacherSchedule::with(['subject', 'semester'])
+                ->where('teacher_id', $teacherId)
+                ->get();
+
+            $grouped = $sessions->groupBy(fn ($s) => $s->subject_id.'-'.$s->semester_id)
+                ->map(function ($group) {
+                    $first = $group->first();
+                    $today = now()->toDateString();
+                    $next  = $group
+                        ->filter(fn ($s) => ($s->status instanceof \BackedEnum ? $s->status->value : $s->status) === 'scheduled'
+                            && $s->scheduled_date->toDateString() >= $today)
+                        ->sortBy(fn ($s) => $s->scheduled_date->toDateString())
+                        ->first();
+                    $days = $group->pluck('day_of_week')->unique()->sort()->values();
+
+                    return [
+                        'subject_id'   => $first->subject_id,
+                        'semester_id'  => $first->semester_id,
+                        'subject_code' => $first->subject->code ?? '',
+                        'subject_title' => $first->subject->title ?? '',
+                        'semester_name' => $first->semester->name ?? '',
+                        'academic_year' => $first->semester->academic_year ?? '',
+                        'section'      => $first->section,
+                        'room'         => $first->room,
+                        'start_time'   => $first->start_time->format('H:i:s'),
+                        'end_time'     => $first->end_time->format('H:i:s'),
+                        'days'         => $days,
+                        'total'        => $group->count(),
+                        'scheduled'    => $group->filter(fn ($s) => ($s->status instanceof \BackedEnum ? $s->status->value : $s->status) === 'scheduled')->count(),
+                        'completed'    => $group->filter(fn ($s) => ($s->status instanceof \BackedEnum ? $s->status->value : $s->status) === 'completed')->count(),
+                        'cancelled'    => $group->filter(fn ($s) => ($s->status instanceof \BackedEnum ? $s->status->value : $s->status) === 'cancelled')->count(),
+                        'postponed'    => $group->filter(fn ($s) => ($s->status instanceof \BackedEnum ? $s->status->value : $s->status) === 'postponed')->count(),
+                        'next_session' => $next?->scheduled_date->toDateString(),
+                    ];
+                })->values();
+
+            return Inertia::render('teacher-schedules/index', [
+                'mode'     => 'subjects',
+                'subjects' => $grouped,
+                'filters'  => [],
+            ]);
+        }
+
+        // Admin / non-teacher paginated view (original behaviour)
         $filters = $request->only(['teacher_id', 'semester_id', 'status', 'start_date', 'end_date', 'per_page']);
 
         $query = TeacherSchedule::query()->with(['teacher.user', 'subject', 'semester']);
 
-        // If user is a teacher, automatically filter by their teacher ID
-        // unless they're explicitly viewing another teacher's schedules (admin only)
-        if (auth()->user()->isTeacher() && !auth()->user()->hasRole('admin')) {
-            $query->where('teacher_id', auth()->user()->teacher->id);
-        } elseif (isset($filters['teacher_id'])) {
+        if (isset($filters['teacher_id'])) {
             $query->where('teacher_id', $filters['teacher_id']);
         }
 

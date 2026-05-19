@@ -125,7 +125,7 @@ class LeaveRequestController extends Controller
         $query = LeaveRequest::with(['approver'])
             ->where('teacher_id', $teacherId);
 
-        if ($request->has('status')) {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 

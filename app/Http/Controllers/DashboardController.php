@@ -11,6 +11,10 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
+        if (auth()->user()->hasAnyRole(['Admin', 'Faculty Admin', 'Faculty Staff'])) {
+            return redirect()->route('admin.dashboard');
+        }
+
         $teacher   = auth()->user()->teacher ?? null;
         $teacherId = $teacher?->id ?? 0;
 
