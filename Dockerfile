@@ -5,6 +5,9 @@ FROM node:22-alpine AS node-builder
 
 WORKDIR /app
 
+# Install Python and build tools for native modules
+RUN apk add --no-cache python3 make g++
+
 # Copy dependency manifests first for layer caching
 COPY package.json package-lock.json ./
 
@@ -12,6 +15,11 @@ RUN npm ci
 
 # Copy the full source so Vite can resolve app paths
 COPY . .
+
+# Set Node options to handle memory limits in constrained environments
+ENV NODE_OPTIONS=--max-old-space-size=2048
+# Disable wayfinder in Docker build (requires PHP, not available in node-builder stage)
+ENV DISABLE_WAYFINDER=true
 
 RUN npm run build
 

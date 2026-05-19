@@ -18,8 +18,11 @@ export default defineConfig({
             },
         }),
         tailwindcss(),
-        wayfinder({
-            formVariants: true,
-        }),
+        // Disable wayfinder in Docker builds (no PHP available)
+        ...(process.env.DISABLE_WAYFINDER !== 'true' ? [
+            wayfinder({
+                formVariants: true,
+            }),
+        ] : []),
     ],
 });
