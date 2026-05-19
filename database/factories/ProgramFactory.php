@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Enums\DegreeLevel;
+use App\Models\Department;
 use App\Models\Program;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Program>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Program>
  */
 class ProgramFactory extends Factory
 {
@@ -28,7 +29,7 @@ class ProgramFactory extends Factory
             'code' => fake()->unique()->lexify('alpha', 4),
             'name' => fake()->jobTitle(),
             'degree_level' => fake()->randomElement(DegreeLevel::values()),
-            'department_id' => \App\Models\Department::factory(),
+            'department_id' => Department::factory(),
             'description' => fake()->paragraph(),
             'duration_years' => fake()->randomFloat(2, 5, 1),
             'total_units' => fake()->randomFloat(100, 200, 1),

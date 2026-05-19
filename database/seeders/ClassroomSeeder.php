@@ -89,6 +89,6 @@ class ClassroomSeeder extends Seeder
             );
         }
 
-        $this->command->info('Classrooms seeded: ' . count($classrooms) . ' WMSU rooms across ' . count(array_unique(array_column($classrooms, 'building'))) . ' buildings.');
+        $this->command->info('Classrooms seeded: '.count($classrooms).' WMSU rooms across '.count(array_unique(array_column($classrooms, 'building'))).' buildings.');
     }
 }

@@ -2,11 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\FeatureFlag;
 use App\Repositories\FeatureFlagRepository;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class FeatureFlagMiddleware
 {
@@ -17,23 +15,23 @@ class FeatureFlagMiddleware
     public function handle(Request $request, Closure $next)
     {
         $routeName = $request->route()?->getName();
-        
-        if (!$routeName) {
+
+        if (! $routeName) {
             return $next($request);
         }
 
         // Define feature flags required for each route/module
         $routeFeatureFlags = $this->getRouteFeatureFlags($routeName);
-        
+
         foreach ($routeFeatureFlags as $featureFlag) {
-            if (!$this->isFeatureEnabled($featureFlag)) {
+            if (! $this->isFeatureEnabled($featureFlag)) {
                 if ($request->expectsJson()) {
                     return response()->json([
                         'message' => 'Feature disabled',
                         'feature' => $featureFlag,
                     ], 403);
                 }
-                
+
                 return redirect()->back()->with('error', "The '{$featureFlag}' feature is currently disabled.");
             }
         }
@@ -58,7 +56,7 @@ class FeatureFlagMiddleware
             'substitute-requests.approve' => ['substitute_requests'],
             'substitute-requests.reject' => ['substitute_requests'],
             'substitute-requests.cancel' => ['substitute_requests'],
-            
+
             // Leave Requests
             'leave-requests.index' => ['leave_requests'],
             'leave-requests.create' => ['leave_requests'],
@@ -71,7 +69,7 @@ class FeatureFlagMiddleware
             'leave-requests.reject' => ['leave_requests'],
             'leave-requests.cancel' => ['leave_requests'],
             'leave-requests.my-requests' => ['leave_requests'],
-            
+
             // Teaching History
             'teaching-histories.index' => ['teaching_histories'],
             'teaching-histories.create' => ['teaching_histories'],
@@ -82,7 +80,7 @@ class FeatureFlagMiddleware
             'teaching-histories.destroy' => ['teaching_histories'],
             'teaching-histories.archive' => ['teaching_histories'],
             'teaching-histories.teacher-history' => ['teaching_histories'],
-            
+
             // Room Schedules
             'room-schedules.index' => ['room_schedules'],
             'room-schedules.create' => ['room_schedules'],
@@ -91,7 +89,7 @@ class FeatureFlagMiddleware
             'room-schedules.edit' => ['room_schedules'],
             'room-schedules.update' => ['room_schedules'],
             'room-schedules.destroy' => ['room_schedules'],
-            
+
             // Sections
             'sections.index' => ['sections'],
             'sections.create' => ['sections'],
@@ -113,6 +111,7 @@ class FeatureFlagMiddleware
     protected function isFeatureEnabled(string $featureFlag): bool
     {
         $feature = $this->repository->findByKey($featureFlag);
+
         return $feature && $feature->isEnabled();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\LeaveRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Cast(['approved_at' => 'datetime'])]
 class LeaveRequest extends Model
 {
-    /** @use HasFactory<\Database\Factories\LeaveRequestFactory> */
+    /** @use HasFactory<LeaveRequestFactory> */
     use HasFactory, SoftDeletes;
 
     /**

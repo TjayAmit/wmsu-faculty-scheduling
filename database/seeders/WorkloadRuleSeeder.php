@@ -55,6 +55,6 @@ class WorkloadRuleSeeder extends Seeder
             );
         }
 
-        $this->command->info('Workload rules seeded: ' . count($rules) . ' rules (full_time, part_time, casual).');
+        $this->command->info('Workload rules seeded: '.count($rules).' rules (full_time, part_time, casual).');
     }
 }

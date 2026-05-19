@@ -26,12 +26,12 @@ class CurriculumController extends Controller
             $search = $request->search;
             $query->whereHas('program', function ($q) use ($search) {
                 $q->where('name', 'like', '%'.$search.'%')
-                  ->orWhere('code', 'like', '%'.$search.'%');
+                    ->orWhere('code', 'like', '%'.$search.'%');
             })
-            ->orWhereHas('subject', function ($q) use ($search) {
-                $q->where('title', 'like', '%'.$search.'%')
-                  ->orWhere('code', 'like', '%'.$search.'%');
-            });
+                ->orWhereHas('subject', function ($q) use ($search) {
+                    $q->where('title', 'like', '%'.$search.'%')
+                        ->orWhere('code', 'like', '%'.$search.'%');
+                });
         }
 
         return Inertia::render('curricula/index', [

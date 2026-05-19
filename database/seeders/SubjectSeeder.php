@@ -774,6 +774,6 @@ class SubjectSeeder extends Seeder
             );
         }
 
-        $this->command->info('Subjects seeded: ' . count($subjects) . ' WMSU subjects created.');
+        $this->command->info('Subjects seeded: '.count($subjects).' WMSU subjects created.');
     }
 }

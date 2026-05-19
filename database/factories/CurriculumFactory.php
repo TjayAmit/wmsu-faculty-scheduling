@@ -4,9 +4,11 @@ namespace Database\Factories;
 
 use App\Enums\CurriculumSemesterType;
 use App\Models\Curriculum;
+use App\Models\Program;
+use App\Models\Subject;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Curriculum>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Curriculum>
  */
 class CurriculumFactory extends Factory
 {
@@ -25,8 +27,8 @@ class CurriculumFactory extends Factory
     public function definition(): array
     {
         return [
-            'program_id' => \App\Models\Program::factory(),
-            'subject_id' => \App\Models\Subject::factory(),
+            'program_id' => Program::factory(),
+            'subject_id' => Subject::factory(),
             'year_level' => fake()->numberBetween(1, 4),
             'semester_type' => fake()->randomElement(CurriculumSemesterType::values()),
             'is_required' => fake()->boolean(80), // 80% chance of being required

@@ -8,7 +8,7 @@ use App\Models\Schedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\RoomSchedule>
+ * @extends Factory<RoomSchedule>
  */
 class RoomScheduleFactory extends Factory
 {

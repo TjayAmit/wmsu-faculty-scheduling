@@ -5,7 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\FeatureFlag;
 use App\Repositories\FeatureFlagRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class EloquentFeatureFlagRepository implements FeatureFlagRepository
 {
@@ -40,12 +40,14 @@ class EloquentFeatureFlagRepository implements FeatureFlagRepository
     {
         $featureFlag = FeatureFlag::findOrFail($id);
         $featureFlag->update($data);
+
         return $featureFlag->fresh();
     }
 
     public function delete(int $id): bool
     {
         $featureFlag = FeatureFlag::findOrFail($id);
+
         return $featureFlag->delete();
     }
 
@@ -57,6 +59,7 @@ class EloquentFeatureFlagRepository implements FeatureFlagRepository
             'enabled_by' => $enabledBy,
             'enabled_at' => now(),
         ]);
+
         return $featureFlag->fresh();
     }
 
@@ -68,6 +71,7 @@ class EloquentFeatureFlagRepository implements FeatureFlagRepository
             'enabled_by' => null,
             'enabled_at' => null,
         ]);
+
         return $featureFlag->fresh();
     }
 
@@ -81,7 +85,7 @@ class EloquentFeatureFlagRepository implements FeatureFlagRepository
         return FeatureFlag::disabled()->with('enabledBy')->get()->toArray();
     }
 
-    public function getAllEnabled(): \Illuminate\Support\Collection
+    public function getAllEnabled(): Collection
     {
         return FeatureFlag::enabled()->get();
     }

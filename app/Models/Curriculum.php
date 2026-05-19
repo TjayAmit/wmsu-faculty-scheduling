@@ -7,9 +7,9 @@ use Database\Factories\CurriculumFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['program_id', 'subject_id', 'year_level', 'semester_type', 'is_required', 'prerequisite_subjects', 'units_override'])]
 #[Cast(['prerequisite_subjects' => 'array', 'is_required' => 'boolean', 'units_override' => 'decimal:1'])]
@@ -55,7 +55,7 @@ class Curriculum extends Model
      */
     public function hasPrerequisites(): bool
     {
-        return !empty($this->prerequisite_subjects);
+        return ! empty($this->prerequisite_subjects);
     }
 
     /**
@@ -63,7 +63,7 @@ class Curriculum extends Model
      */
     public function getPrerequisiteSubjects()
     {
-        if (!$this->hasPrerequisites()) {
+        if (! $this->hasPrerequisites()) {
             return collect();
         }
 

@@ -9,8 +9,8 @@ class SubstituteRequestData
 {
     public function __construct(
         public readonly int $requesting_teacher_id,
-        public readonly ?int $substitute_teacher_id = null,
-        public readonly ?int $schedule_id = null,
+        public readonly ?int $substitute_teacher_id,
+        public readonly ?int $schedule_id,
         public readonly string $date,
         public readonly string $reason,
         public readonly string $status = 'pending',

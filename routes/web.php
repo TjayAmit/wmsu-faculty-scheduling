@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AssignScheduleController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\CurriculumController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\Dev\SwitchUserController;
 use App\Http\Controllers\DraftScheduleController;
 use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\LeaveRequestController;
@@ -14,13 +17,13 @@ use App\Http\Controllers\RoomScheduleController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SemesterController;
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\SubstituteRequestController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\TeachingHistoryController;
 use App\Http\Controllers\TeacherScheduleController;
+use App\Http\Controllers\TeachingHistoryController;
 use App\Http\Controllers\TimeSlotController;
-use App\Http\Controllers\StaffController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -30,8 +33,8 @@ Route::inertia('/', 'welcome', [
 ])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', \App\Http\Controllers\DashboardController::class)->name('dashboard');
-    Route::get('admin/dashboard', \App\Http\Controllers\AdminDashboardController::class)->name('admin.dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+    Route::get('admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
 
     // Users Routes
     Route::get('users', [UserController::class, 'index'])->name('users.index');
@@ -270,7 +273,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 if (app()->environment('local')) {
     Route::middleware('auth')
-        ->post('/dev/switch-user/{user}', [\App\Http\Controllers\Dev\SwitchUserController::class, '__invoke'])
+        ->post('/dev/switch-user/{user}', [SwitchUserController::class, '__invoke'])
         ->name('dev.switch-user');
 }
 

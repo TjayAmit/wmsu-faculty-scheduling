@@ -109,6 +109,6 @@ class DepartmentSeeder extends Seeder
             );
         }
 
-        $this->command->info('Departments seeded: ' . count($departments) . ' WMSU colleges/institutes.');
+        $this->command->info('Departments seeded: '.count($departments).' WMSU colleges/institutes.');
     }
 }

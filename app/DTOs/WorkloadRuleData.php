@@ -9,13 +9,13 @@ class WorkloadRuleData
 {
     public function __construct(
         public readonly EmploymentType $employment_type,
-        public readonly float $max_teaching_hours = 24.0,
-        public readonly float $max_units = 24.0,
-        public readonly ?float $min_units = null,
-        public readonly ?float $max_preparation_hours = null,
-        public readonly ?float $overtime_rate = null,
-        public readonly ?string $description = null,
-        public readonly bool $is_active = true,
+        public readonly float $max_teaching_hours,
+        public readonly float $max_units,
+        public readonly ?float $min_units,
+        public readonly ?float $max_preparation_hours,
+        public readonly ?float $overtime_rate,
+        public readonly ?string $description,
+        public readonly bool $is_active,
         public readonly string $effective_date,
     ) {}
 

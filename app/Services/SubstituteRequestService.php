@@ -19,14 +19,14 @@ class SubstituteRequestService
     {
         $model = null;
         $dto = null;
-        
+
         DB::transaction(function () use ($request, &$model, &$dto) {
             $dto = SubstituteRequestData::fromRequest($request);
             $model = $this->repository->create($dto->toArray());
         });
-        
+
         $this->logActivity('created', $model, $dto->toArray());
-        
+
         return $model;
     }
 
@@ -35,17 +35,17 @@ class SubstituteRequestService
         $oldData = $model->getOriginal();
         $dto = null;
         $updatedModel = null;
-        
+
         DB::transaction(function () use ($request, $model, &$dto, &$updatedModel) {
             $dto = SubstituteRequestData::fromRequest($request);
             $updatedModel = $this->repository->update($model->id, $dto->toArray());
         });
-        
+
         $this->logActivity('updated', $updatedModel, [
             'old' => $oldData,
-            'new' => $dto->toArray()
+            'new' => $dto->toArray(),
         ]);
-        
+
         return $updatedModel;
     }
 
@@ -53,13 +53,13 @@ class SubstituteRequestService
     {
         $data = $model->toArray();
         $result = false;
-        
+
         DB::transaction(function () use ($model, &$result) {
             $result = $this->repository->delete($model->id);
         });
-        
+
         $this->logActivity('deleted', $model, $data);
-        
+
         return $result;
     }
 
@@ -67,7 +67,7 @@ class SubstituteRequestService
     {
         $oldData = $model->getOriginal();
         $result = null;
-        
+
         DB::transaction(function () use ($model, &$result) {
             $result = $this->repository->update($model->id, [
                 'status' => 'approved',
@@ -75,12 +75,12 @@ class SubstituteRequestService
                 'approved_at' => now(),
             ]);
         });
-        
+
         $this->logActivity('approved', $result, [
             'old' => $oldData,
-            'new' => $result->toArray()
+            'new' => $result->toArray(),
         ]);
-        
+
         return $result;
     }
 
@@ -88,7 +88,7 @@ class SubstituteRequestService
     {
         $oldData = $model->getOriginal();
         $result = null;
-        
+
         DB::transaction(function () use ($model, $reason, &$result) {
             $result = $this->repository->update($model->id, [
                 'status' => 'rejected',
@@ -97,12 +97,12 @@ class SubstituteRequestService
                 'notes' => $reason,
             ]);
         });
-        
+
         $this->logActivity('rejected', $result, [
             'old' => $oldData,
-            'new' => $result->toArray()
+            'new' => $result->toArray(),
         ]);
-        
+
         return $result;
     }
 
@@ -110,18 +110,18 @@ class SubstituteRequestService
     {
         $oldData = $model->getOriginal();
         $result = null;
-        
+
         DB::transaction(function () use ($model, &$result) {
             $result = $this->repository->update($model->id, [
                 'status' => 'cancelled',
             ]);
         });
-        
+
         $this->logActivity('cancelled', $result, [
             'old' => $oldData,
-            'new' => $result->toArray()
+            'new' => $result->toArray(),
         ]);
-        
+
         return $result;
     }
 
@@ -133,12 +133,14 @@ class SubstituteRequestService
     public function updateFromRequest(int $id, Request $request): SubstituteRequest
     {
         $model = $this->repository->findById($id);
+
         return $this->update($request, $model);
     }
 
     public function deleteById(int $id): bool
     {
         $model = $this->repository->findById($id);
+
         return $this->delete($model);
     }
 
@@ -150,31 +152,31 @@ class SubstituteRequestService
     protected function logActivity(string $action, Model $model, array $data): void
     {
         $properties = [];
-        
+
         if ($action === 'updated') {
             $properties['old'] = $data['old'] ?? [];
             $properties['new'] = $data['new'] ?? [];
         }
-        
+
         if ($action === 'deleted') {
             $properties['deleted_data'] = $data;
             $properties['deleted_by'] = auth()->id();
         }
-        
+
         if ($action === 'created') {
             $properties['new_data'] = $data;
         }
-        
+
         if (in_array($action, ['approved', 'rejected', 'cancelled'])) {
             $properties['old'] = $data['old'] ?? [];
             $properties['new'] = $data['new'] ?? [];
             $properties['action_by'] = auth()->id();
         }
-        
+
         activity()
             ->causedBy(auth()->user())
             ->performedOn($model)
             ->withProperties($properties)
-            ->log("{$action} " . class_basename($model));
+            ->log("{$action} ".class_basename($model));
     }
 }

@@ -7,7 +7,7 @@ use App\Models\Teacher;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\LeaveRequest>
+ * @extends Factory<LeaveRequest>
  */
 class LeaveRequestFactory extends Factory
 {

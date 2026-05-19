@@ -15,13 +15,14 @@ class SectionSeeder extends Seeder
 
         if (! $currentSemesterId) {
             $this->command->warn('No current semester found. Skipping section seeder.');
+
             return;
         }
 
         $bscs = Program::where('code', 'BSCS')->value('id');
         $bsit = Program::where('code', 'BSIT')->value('id');
         $bsee = Program::where('code', 'BSEE')->value('id');
-        $bsn  = Program::where('code', 'BSN')->value('id');
+        $bsn = Program::where('code', 'BSN')->value('id');
         $bsba = Program::where('code', 'BSBA-FM')->value('id');
 
         $sections = [];
@@ -31,14 +32,14 @@ class SectionSeeder extends Seeder
             foreach (range(1, 4) as $year) {
                 foreach (['A', 'B'] as $section) {
                     $sections[] = [
-                        'section_code'     => "BSCS-{$year}{$section}",
-                        'program_id'       => $bscs,
-                        'semester_id'      => $currentSemesterId,
-                        'year_level'       => $year,
-                        'max_students'     => 40,
+                        'section_code' => "BSCS-{$year}{$section}",
+                        'program_id' => $bscs,
+                        'semester_id' => $currentSemesterId,
+                        'year_level' => $year,
+                        'max_students' => 40,
                         'current_students' => 0,
-                        'adviser_id'       => null,
-                        'is_active'        => true,
+                        'adviser_id' => null,
+                        'is_active' => true,
                     ];
                 }
             }
@@ -49,14 +50,14 @@ class SectionSeeder extends Seeder
             foreach (range(1, 4) as $year) {
                 foreach (['A', 'B'] as $section) {
                     $sections[] = [
-                        'section_code'     => "BSIT-{$year}{$section}",
-                        'program_id'       => $bsit,
-                        'semester_id'      => $currentSemesterId,
-                        'year_level'       => $year,
-                        'max_students'     => 40,
+                        'section_code' => "BSIT-{$year}{$section}",
+                        'program_id' => $bsit,
+                        'semester_id' => $currentSemesterId,
+                        'year_level' => $year,
+                        'max_students' => 40,
                         'current_students' => 0,
-                        'adviser_id'       => null,
-                        'is_active'        => true,
+                        'adviser_id' => null,
+                        'is_active' => true,
                     ];
                 }
             }
@@ -66,14 +67,14 @@ class SectionSeeder extends Seeder
         if ($bsee) {
             foreach (range(1, 5) as $year) {
                 $sections[] = [
-                    'section_code'     => "BSEE-{$year}A",
-                    'program_id'       => $bsee,
-                    'semester_id'      => $currentSemesterId,
-                    'year_level'       => $year,
-                    'max_students'     => 40,
+                    'section_code' => "BSEE-{$year}A",
+                    'program_id' => $bsee,
+                    'semester_id' => $currentSemesterId,
+                    'year_level' => $year,
+                    'max_students' => 40,
                     'current_students' => 0,
-                    'adviser_id'       => null,
-                    'is_active'        => true,
+                    'adviser_id' => null,
+                    'is_active' => true,
                 ];
             }
         }
@@ -83,14 +84,14 @@ class SectionSeeder extends Seeder
             foreach (range(1, 4) as $year) {
                 foreach (['A', 'B'] as $section) {
                     $sections[] = [
-                        'section_code'     => "BSN-{$year}{$section}",
-                        'program_id'       => $bsn,
-                        'semester_id'      => $currentSemesterId,
-                        'year_level'       => $year,
-                        'max_students'     => 45,
+                        'section_code' => "BSN-{$year}{$section}",
+                        'program_id' => $bsn,
+                        'semester_id' => $currentSemesterId,
+                        'year_level' => $year,
+                        'max_students' => 45,
                         'current_students' => 0,
-                        'adviser_id'       => null,
-                        'is_active'        => true,
+                        'adviser_id' => null,
+                        'is_active' => true,
                     ];
                 }
             }
@@ -100,14 +101,14 @@ class SectionSeeder extends Seeder
         if ($bsba) {
             foreach (range(1, 4) as $year) {
                 $sections[] = [
-                    'section_code'     => "BSBA-FM-{$year}A",
-                    'program_id'       => $bsba,
-                    'semester_id'      => $currentSemesterId,
-                    'year_level'       => $year,
-                    'max_students'     => 40,
+                    'section_code' => "BSBA-FM-{$year}A",
+                    'program_id' => $bsba,
+                    'semester_id' => $currentSemesterId,
+                    'year_level' => $year,
+                    'max_students' => 40,
                     'current_students' => 0,
-                    'adviser_id'       => null,
-                    'is_active'        => true,
+                    'adviser_id' => null,
+                    'is_active' => true,
                 ];
             }
         }
@@ -119,6 +120,6 @@ class SectionSeeder extends Seeder
             );
         }
 
-        $this->command->info('Sections seeded: ' . count($sections) . ' sections for current semester (2nd Sem AY 2025-2026).');
+        $this->command->info('Sections seeded: '.count($sections).' sections for current semester (2nd Sem AY 2025-2026).');
     }
 }

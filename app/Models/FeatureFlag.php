@@ -59,7 +59,7 @@ class FeatureFlag extends Model
      */
     public function isDisabled(): bool
     {
-        return !$this->is_enabled;
+        return ! $this->is_enabled;
     }
 
     /**

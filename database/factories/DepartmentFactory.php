@@ -3,9 +3,10 @@
 namespace Database\Factories;
 
 use App\Models\Department;
+use App\Models\Teacher;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Department>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Department>
  */
 class DepartmentFactory extends Factory
 {
@@ -41,7 +42,7 @@ class DepartmentFactory extends Factory
     public function withHead(): static
     {
         return $this->state(fn (array $attributes) => array_merge($attributes, [
-            'head_id' => \App\Models\Teacher::factory(),
+            'head_id' => Teacher::factory(),
         ]));
     }
 

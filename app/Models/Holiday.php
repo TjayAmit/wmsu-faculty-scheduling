@@ -7,8 +7,8 @@ use Database\Factories\HolidayFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['name', 'date', 'type', 'description', 'affects_schedules', 'academic_year'])]
 #[Cast(['affects_schedules' => 'boolean'])]

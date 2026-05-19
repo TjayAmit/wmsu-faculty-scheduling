@@ -6,7 +6,7 @@ use App\Enums\HolidayType;
 use App\Models\Holiday;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Holiday>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Holiday>
  */
 class HolidayFactory extends Factory
 {
@@ -30,7 +30,7 @@ class HolidayFactory extends Factory
             'type' => fake()->randomElement(HolidayType::values()),
             'description' => fake()->sentence(),
             'affects_schedules' => true,
-            'academic_year' => fake()->year() . '-' . (fake()->year() + 1),
+            'academic_year' => fake()->year().'-'.(fake()->year() + 1),
         ];
     }
 

@@ -6,7 +6,7 @@ use App\Enums\EmploymentType;
 use App\Models\WorkloadRule;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\WorkloadRule>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<WorkloadRule>
  */
 class WorkloadRuleFactory extends Factory
 {

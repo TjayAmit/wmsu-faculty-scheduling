@@ -5,10 +5,10 @@ namespace App\Models;
 use Database\Factories\SectionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['section_code', 'program_id', 'semester_id', 'year_level', 'max_students', 'current_students', 'adviser_id', 'is_active'])]
 class Section extends Model
@@ -105,7 +105,7 @@ class Section extends Model
      */
     public function hasAdviser(): bool
     {
-        return !is_null($this->adviser_id);
+        return ! is_null($this->adviser_id);
     }
 
     /**

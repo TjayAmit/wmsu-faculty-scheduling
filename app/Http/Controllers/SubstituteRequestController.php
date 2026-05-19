@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SubstituteRequestRequest;
-use App\Models\Teacher;
 use App\Models\SubstituteRequest;
+use App\Models\Teacher;
 use App\Services\SubstituteRequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -121,7 +121,7 @@ class SubstituteRequestController extends Controller
     public function myRequests(Request $request)
     {
         $teacherId = auth()->user()->teacher?->id;
-        
+
         $query = SubstituteRequest::with(['substituteTeacher', 'schedule', 'approver'])
             ->where('requesting_teacher_id', $teacherId);
 

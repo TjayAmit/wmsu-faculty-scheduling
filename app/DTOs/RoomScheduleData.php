@@ -9,7 +9,7 @@ class RoomScheduleData
 {
     public function __construct(
         public readonly int $classroom_id,
-        public readonly ?int $schedule_id = null,
+        public readonly ?int $schedule_id,
         public readonly string $date,
         public readonly string $start_time,
         public readonly string $end_time,

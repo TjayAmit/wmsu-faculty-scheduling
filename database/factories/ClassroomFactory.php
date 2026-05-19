@@ -6,7 +6,7 @@ use App\Enums\RoomType;
 use App\Models\Classroom;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Classroom>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Classroom>
  */
 class ClassroomFactory extends Factory
 {

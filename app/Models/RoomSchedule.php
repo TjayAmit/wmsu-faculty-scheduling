@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\RoomScheduleFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Cast(['is_active' => 'boolean'])]
 class RoomSchedule extends Model
 {
-    /** @use HasFactory<\Database\Factories\RoomScheduleFactory> */
+    /** @use HasFactory<RoomScheduleFactory> */
     use HasFactory, SoftDeletes;
 
     /**
@@ -69,7 +70,7 @@ class RoomSchedule extends Model
      */
     public function overlapsWith(string $startTime, string $endTime): bool
     {
-        return ($this->start_time < $endTime && $this->end_time > $startTime);
+        return $this->start_time < $endTime && $this->end_time > $startTime;
     }
 
     /**

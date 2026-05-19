@@ -34,6 +34,7 @@ class CurriculumSeeder extends Seeder
 
             if (! $subjectId) {
                 $this->command->warn("Subject not found: {$item['subject_code']}, skipping.");
+
                 continue;
             }
 
@@ -43,11 +44,11 @@ class CurriculumSeeder extends Seeder
                     'subject_id' => $subjectId,
                 ],
                 [
-                    'program_id'            => $programId,
-                    'subject_id'            => $subjectId,
-                    'year_level'            => $item['year_level'],
-                    'semester_type'         => $item['semester_type'],
-                    'is_required'           => $item['is_required'],
+                    'program_id' => $programId,
+                    'subject_id' => $subjectId,
+                    'year_level' => $item['year_level'],
+                    'semester_type' => $item['semester_type'],
+                    'is_required' => $item['is_required'],
                     'prerequisite_subjects' => $item['prerequisites'] ?? null,
                 ]
             );
@@ -60,6 +61,7 @@ class CurriculumSeeder extends Seeder
 
         if (! $programId) {
             $this->command->warn('BSCS program not found, skipping curriculum seed.');
+
             return;
         }
 
@@ -71,7 +73,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'GEC 105',  'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'COSC 101', 'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'MATH 101', 'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
-            ['subject_code' => 'PATHFIT 1','year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
+            ['subject_code' => 'PATHFIT 1', 'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'NSTP 101', 'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
 
             // ==========================================
@@ -82,7 +84,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'COSC 102', 'year_level' => 1, 'semester_type' => 'second', 'is_required' => true,
                 'prerequisites' => null],
             ['subject_code' => 'CS 101',   'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
-            ['subject_code' => 'PATHFIT 2','year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
+            ['subject_code' => 'PATHFIT 2', 'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'NSTP 102', 'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
 
             // ==========================================
@@ -93,7 +95,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'COSC 103', 'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'COSC 104', 'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'CS 102',   'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
-            ['subject_code' => 'PATHFIT 3','year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
+            ['subject_code' => 'PATHFIT 3', 'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
 
             // ==========================================
             // YEAR 2 - SECOND SEMESTER
@@ -103,7 +105,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'COSC 105', 'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'CS 103',   'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'CS 104',   'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
-            ['subject_code' => 'PATHFIT 4','year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
+            ['subject_code' => 'PATHFIT 4', 'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
 
             // ==========================================
             // YEAR 3 - FIRST SEMESTER
@@ -142,7 +144,7 @@ class CurriculumSeeder extends Seeder
 
         $this->seedCurriculum($programId, $curriculum);
 
-        $this->command->info('  - BSCS curriculum: ' . count($curriculum) . ' subjects mapped.');
+        $this->command->info('  - BSCS curriculum: '.count($curriculum).' subjects mapped.');
     }
 
     private function seedBSITCurriculum(): void
@@ -151,6 +153,7 @@ class CurriculumSeeder extends Seeder
 
         if (! $programId) {
             $this->command->warn('BSIT program not found, skipping curriculum seed.');
+
             return;
         }
 
@@ -162,7 +165,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'GEC 105',  'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'COSC 101', 'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'IT 103',   'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
-            ['subject_code' => 'PATHFIT 1','year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
+            ['subject_code' => 'PATHFIT 1', 'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'NSTP 101', 'year_level' => 1, 'semester_type' => 'first',  'is_required' => true],
 
             // ==========================================
@@ -172,7 +175,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'FIL 101',  'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'COSC 102', 'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'IT 101',   'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
-            ['subject_code' => 'PATHFIT 2','year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
+            ['subject_code' => 'PATHFIT 2', 'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'NSTP 102', 'year_level' => 1, 'semester_type' => 'second', 'is_required' => true],
 
             // ==========================================
@@ -183,7 +186,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'COSC 103', 'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'COSC 104', 'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
             ['subject_code' => 'IT 104',   'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
-            ['subject_code' => 'PATHFIT 3','year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
+            ['subject_code' => 'PATHFIT 3', 'year_level' => 2, 'semester_type' => 'first',  'is_required' => true],
 
             // ==========================================
             // YEAR 2 - SECOND SEMESTER
@@ -193,7 +196,7 @@ class CurriculumSeeder extends Seeder
             ['subject_code' => 'COSC 105', 'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'IT 102',   'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
             ['subject_code' => 'COSC 106', 'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
-            ['subject_code' => 'PATHFIT 4','year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
+            ['subject_code' => 'PATHFIT 4', 'year_level' => 2, 'semester_type' => 'second', 'is_required' => true],
 
             // ==========================================
             // YEAR 3 - FIRST SEMESTER
@@ -229,6 +232,6 @@ class CurriculumSeeder extends Seeder
 
         $this->seedCurriculum($programId, $curriculum);
 
-        $this->command->info('  - BSIT curriculum: ' . count($curriculum) . ' subjects mapped.');
+        $this->command->info('  - BSIT curriculum: '.count($curriculum).' subjects mapped.');
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LeaveRequestRequest;
-use App\Models\Teacher;
 use App\Models\LeaveRequest;
+use App\Models\Teacher;
 use App\Services\LeaveRequestService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -121,7 +121,7 @@ class LeaveRequestController extends Controller
     public function myRequests(Request $request)
     {
         $teacherId = auth()->user()->teacher?->id;
-        
+
         $query = LeaveRequest::with(['approver'])
             ->where('teacher_id', $teacherId);
 

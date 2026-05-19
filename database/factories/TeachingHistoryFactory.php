@@ -9,7 +9,7 @@ use App\Models\TeachingHistory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TeachingHistory>
+ * @extends Factory<TeachingHistory>
  */
 class TeachingHistoryFactory extends Factory
 {

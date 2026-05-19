@@ -30,6 +30,6 @@ class SemesterSeeder extends Seeder
             );
         }
 
-        $this->command->info('Semesters seeded: ' . count($semesters) . ' academic semesters (current: Second Semester AY 2025-2026).');
+        $this->command->info('Semesters seeded: '.count($semesters).' academic semesters (current: Second Semester AY 2025-2026).');
     }
 }

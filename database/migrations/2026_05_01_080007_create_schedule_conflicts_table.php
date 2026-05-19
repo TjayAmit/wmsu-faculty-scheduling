@@ -1,8 +1,8 @@
 <?php
 
-use App\Enums\ConflictType;
 use App\Enums\ConflictSeverity;
 use App\Enums\ConflictStatus;
+use App\Enums\ConflictType;
 use App\Enums\DayOfWeek;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;

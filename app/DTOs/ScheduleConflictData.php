@@ -2,9 +2,9 @@
 
 namespace App\DTOs;
 
-use App\Enums\ConflictType;
 use App\Enums\ConflictSeverity;
 use App\Enums\ConflictStatus;
+use App\Enums\ConflictType;
 use App\Enums\DayOfWeek;
 use Illuminate\Http\Request;
 
@@ -12,12 +12,12 @@ class ScheduleConflictData
 {
     public function __construct(
         public readonly ConflictType $conflict_type,
-        public readonly ?int $primary_schedule_id = null,
-        public readonly ?int $secondary_schedule_id = null,
-        public readonly ?int $teacher_id = null,
-        public readonly ?int $classroom_id = null,
-        public readonly ?int $time_slot_id = null,
-        public readonly ?DayOfWeek $day_of_week = null,
+        public readonly ?int $primary_schedule_id,
+        public readonly ?int $secondary_schedule_id,
+        public readonly ?int $teacher_id,
+        public readonly ?int $classroom_id,
+        public readonly ?int $time_slot_id,
+        public readonly ?DayOfWeek $day_of_week,
         public readonly int $semester_id,
         public readonly ConflictSeverity $severity = ConflictSeverity::MEDIUM,
         public readonly ConflictStatus $status = ConflictStatus::PENDING,

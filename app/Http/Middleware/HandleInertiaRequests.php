@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Teacher;
+use App\Models\User;
 use App\Repositories\FeatureFlagRepository;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -41,10 +42,10 @@ class HandleInertiaRequests extends Middleware
             ->orderBy('last_name')
             ->get(['id', 'first_name', 'last_name', 'employee_id', 'department'])
             ->map(fn ($t) => [
-                'id'          => $t->id,
-                'full_name'   => trim("{$t->first_name} {$t->last_name}"),
+                'id' => $t->id,
+                'full_name' => trim("{$t->first_name} {$t->last_name}"),
                 'employee_id' => $t->employee_id,
-                'department'  => $t->department,
+                'department' => $t->department,
             ])
             ->values()
             ->toArray();
@@ -81,7 +82,7 @@ class HandleInertiaRequests extends Middleware
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'featureFlags' => $featureFlags,
             'devUsers' => app()->environment('local')
-                ? \App\Models\User::with('roles')->get(['id', 'name', 'email'])
+                ? User::with('roles')->get(['id', 'name', 'email'])
                     ->map(fn ($u) => [
                         'id' => $u->id,
                         'name' => $u->name,

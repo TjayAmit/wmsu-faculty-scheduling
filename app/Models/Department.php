@@ -5,10 +5,10 @@ namespace App\Models;
 use Database\Factories\DepartmentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['code', 'name', 'description', 'head_id', 'office_location', 'contact_phone', 'contact_email', 'is_active'])]
 class Department extends Model
@@ -53,7 +53,7 @@ class Department extends Model
      */
     public function hasHead(): bool
     {
-        return !is_null($this->head_id);
+        return ! is_null($this->head_id);
     }
 
     /**

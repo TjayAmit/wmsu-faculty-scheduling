@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\TeachingHistoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Cast(['hours_assigned' => 'decimal:2', 'hours_completed' => 'decimal:2'])]
 class TeachingHistory extends Model
 {
-    /** @use HasFactory<\Database\Factories\TeachingHistoryFactory> */
+    /** @use HasFactory<TeachingHistoryFactory> */
     use HasFactory, SoftDeletes;
 
     /**

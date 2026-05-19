@@ -10,14 +10,14 @@ class ProgramSeeder extends Seeder
 {
     public function run(): void
     {
-        $ccs   = Department::where('code', 'CCS')->value('id');
-        $coe   = Department::where('code', 'COE')->value('id');
-        $cas   = Department::where('code', 'CAS')->value('id');
-        $cba   = Department::where('code', 'CBA')->value('id');
-        $coed  = Department::where('code', 'COEd')->value('id');
-        $con   = Department::where('code', 'CON')->value('id');
-        $col   = Department::where('code', 'COL')->value('id');
-        $ca    = Department::where('code', 'CA')->value('id');
+        $ccs = Department::where('code', 'CCS')->value('id');
+        $coe = Department::where('code', 'COE')->value('id');
+        $cas = Department::where('code', 'CAS')->value('id');
+        $cba = Department::where('code', 'CBA')->value('id');
+        $coed = Department::where('code', 'COEd')->value('id');
+        $con = Department::where('code', 'CON')->value('id');
+        $col = Department::where('code', 'COL')->value('id');
+        $ca = Department::where('code', 'CA')->value('id');
         $chehm = Department::where('code', 'CHEHM')->value('id');
         $ipesr = Department::where('code', 'IPESR')->value('id');
 
@@ -290,6 +290,6 @@ class ProgramSeeder extends Seeder
             );
         }
 
-        $this->command->info('Programs seeded: ' . count($programs) . ' WMSU academic programs created.');
+        $this->command->info('Programs seeded: '.count($programs).' WMSU academic programs created.');
     }
 }

@@ -8,7 +8,7 @@ use App\Models\Teacher;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SubstituteRequest>
+ * @extends Factory<SubstituteRequest>
  */
 class SubstituteRequestFactory extends Factory
 {

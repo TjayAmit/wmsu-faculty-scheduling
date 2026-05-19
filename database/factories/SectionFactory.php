@@ -2,10 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Program;
 use App\Models\Section;
+use App\Models\Semester;
+use App\Models\Teacher;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Section>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<Section>
  */
 class SectionFactory extends Factory
 {
@@ -25,8 +28,8 @@ class SectionFactory extends Factory
     {
         return [
             'section_code' => fake()->unique()->bothify('alphaNumeric'),
-            'program_id' => \App\Models\Program::factory(),
-            'semester_id' => \App\Models\Semester::factory(),
+            'program_id' => Program::factory(),
+            'semester_id' => Semester::factory(),
             'year_level' => fake()->numberBetween(1, 4),
             'max_students' => fake()->numberBetween(30, 50),
             'current_students' => fake()->numberBetween(0, 30),
@@ -41,7 +44,7 @@ class SectionFactory extends Factory
     public function withAdviser(): static
     {
         return $this->state(fn (array $attributes) => array_merge($attributes, [
-            'adviser_id' => \App\Models\Teacher::factory(),
+            'adviser_id' => Teacher::factory(),
         ]));
     }
 

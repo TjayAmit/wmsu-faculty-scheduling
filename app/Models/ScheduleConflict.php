@@ -10,9 +10,9 @@ use Database\Factories\ScheduleConflictFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['conflict_type', 'primary_schedule_id', 'secondary_schedule_id', 'teacher_id', 'classroom_id', 'time_slot_id', 'day_of_week', 'semester_id', 'severity', 'status', 'resolved_by', 'resolution_notes'])]
 class ScheduleConflict extends Model

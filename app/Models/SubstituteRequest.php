@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\SubstituteRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Cast;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Cast(['approved_at' => 'datetime'])]
 class SubstituteRequest extends Model
 {
-    /** @use HasFactory<\Database\Factories\SubstituteRequestFactory> */
+    /** @use HasFactory<SubstituteRequestFactory> */
     use HasFactory, SoftDeletes;
 
     /**
