@@ -6,7 +6,20 @@ FROM node:22-alpine AS node-builder
 WORKDIR /app
 
 # Install PHP and build tools for wayfinder and native modules
-RUN apk add --no-cache php83 php83-ctype php83-dom php83-mbstring php83-openssl php83-tokenizer python3 make g++ composer
+RUN apk add --no-cache \
+        php84 \
+        php84-ctype \
+        php84-dom \
+        php84-fileinfo \
+        php84-mbstring \
+        php84-openssl \
+        php84-phar \
+        php84-session \
+        php84-simplexml \
+        php84-tokenizer \
+        php84-xml \
+        php84-xmlwriter \
+        python3 make g++ composer
 
 # Copy dependency manifests first for layer caching
 COPY package.json package-lock.json ./
