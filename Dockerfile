@@ -13,6 +13,7 @@ RUN apk add --no-cache \
         php84-fileinfo \
         php84-mbstring \
         php84-openssl \
+        php84-pdo_mysql \
         php84-phar \
         php84-session \
         php84-simplexml \
