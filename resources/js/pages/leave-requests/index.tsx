@@ -40,6 +40,7 @@ import {
     reject as leaveRequestsReject,
     cancel as leaveRequestsCancel,
 } from '@/routes/leave-requests';
+import { fmtDate } from '@/lib/utils';
 import type { LeaveRequestsIndexProps } from '@/types';
 
 export default function Index({ data, filters, teachers }: LeaveRequestsIndexProps) {
@@ -137,14 +138,6 @@ return;
         };
 
         return labels[type] || type;
-    };
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-        });
     };
 
     return (
@@ -330,8 +323,8 @@ return;
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
                                             <div className="flex flex-col">
-                                                <span>{formatDate(item.start_date)}</span>
-                                                <span className="text-xs text-muted-foreground/60">to {formatDate(item.end_date)}</span>
+                                                <span>{fmtDate(item.start_date)}</span>
+                                                <span className="text-xs text-muted-foreground/60">to {fmtDate(item.end_date)}</span>
                                             </div>
                                         </TableCell>
 

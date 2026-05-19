@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as classrooms, edit as classroomsEdit, destroy as classroomsDestroy } from '@/routes/classrooms';
+import { fmtDate } from '@/lib/utils';
 import type { ClassroomsShowProps } from '@/types';
 
 export default function Show({ classroom }: ClassroomsShowProps) {
@@ -117,12 +118,12 @@ export default function Show({ classroom }: ClassroomsShowProps) {
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{classroom.created_at}</p>
+                            <p>{fmtDate(classroom.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{classroom.updated_at}</p>
+                            <p>{fmtDate(classroom.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

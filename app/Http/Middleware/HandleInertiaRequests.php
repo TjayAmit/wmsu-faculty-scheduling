@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Teacher;
 use App\Repositories\FeatureFlagRepository;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -25,6 +26,30 @@ class HandleInertiaRequests extends Middleware
     public function version(Request $request): ?string
     {
         return parent::version($request);
+    }
+
+    private function unlinkedTeachersForPrompt(Request $request): ?array
+    {
+        $user = $request->user();
+
+        if (! $user || ! $user->hasRole('Teacher') || $user->teacher !== null) {
+            return null;
+        }
+
+        $teachers = Teacher::whereNull('user_id')
+            ->where('is_active', true)
+            ->orderBy('last_name')
+            ->get(['id', 'first_name', 'last_name', 'employee_id', 'department'])
+            ->map(fn ($t) => [
+                'id'          => $t->id,
+                'full_name'   => trim("{$t->first_name} {$t->last_name}"),
+                'employee_id' => $t->employee_id,
+                'department'  => $t->department,
+            ])
+            ->values()
+            ->toArray();
+
+        return count($teachers) > 0 ? $teachers : null;
     }
 
     /**
@@ -51,6 +76,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'roles' => $request->user()?->getRoleNames() ?? collect(),
                 'permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? collect(),
+                'unlinked_teachers' => $this->unlinkedTeachersForPrompt($request),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'featureFlags' => $featureFlags,

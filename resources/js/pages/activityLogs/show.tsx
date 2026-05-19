@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as activityLogs, destroy as activityLogsDestroy } from '@/routes/activityLogs';
+import { fmtDate } from '@/lib/utils';
 import type { ActivityLogsShowProps } from '@/types';
 
 export default function Show({ activityLog }: ActivityLogsShowProps) {
@@ -130,11 +131,11 @@ return 'N/A';
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                <p className="text-sm">{activityLog.created_at}</p>
+                                <p className="text-sm">{fmtDate(activityLog.created_at)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                <p className="text-sm">{activityLog.updated_at}</p>
+                                <p className="text-sm">{fmtDate(activityLog.updated_at)}</p>
                             </div>
                         </div>
 

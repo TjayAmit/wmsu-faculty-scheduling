@@ -28,6 +28,7 @@ import {
     edit as usersEdit,
     destroy as usersDestroy,
 } from '@/routes/users';
+import { fmtDate } from '@/lib/utils';
 import type { UsersIndexProps } from '@/types';
 
 export default function Index({ data, filters }: UsersIndexProps) {
@@ -150,7 +151,7 @@ return;
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
-                                            {item.created_at}
+                                            {fmtDate(item.created_at)}
                                         </TableCell>
 
                                         <TableCell

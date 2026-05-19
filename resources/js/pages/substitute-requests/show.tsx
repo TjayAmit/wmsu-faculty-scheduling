@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as substituteRequests, edit as substituteRequestsEdit, destroy as substituteRequestsDestroy, approve as substituteRequestsApprove, reject as substituteRequestsReject, cancel as substituteRequestsCancel } from '@/routes/substitute-requests';
+import { fmtDate } from '@/lib/utils';
 import type { SubstituteRequestsShowProps } from '@/types';
 
 export default function Show({ substituteRequest }: SubstituteRequestsShowProps) {
@@ -52,15 +53,6 @@ export default function Show({ substituteRequest }: SubstituteRequestsShowProps)
         };
 
         return <Badge variant={variants[status] || 'secondary'}>{status}</Badge>;
-    };
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
     };
 
     const isPending = substituteRequest.status === 'pending';
@@ -123,7 +115,7 @@ export default function Show({ substituteRequest }: SubstituteRequestsShowProps)
                     <CardContent className="space-y-4">
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Date</p>
-                            <p>{formatDate(substituteRequest.date)}</p>
+                            <p>{fmtDate(substituteRequest.date)}</p>
                         </div>
 
                         <div className="grid gap-1">
@@ -171,7 +163,7 @@ export default function Show({ substituteRequest }: SubstituteRequestsShowProps)
                                 <p>{substituteRequest.approver.name}</p>
                                 {substituteRequest.approved_at && (
                                     <p className="text-sm text-muted-foreground">
-                                        on {formatDate(substituteRequest.approved_at)}
+                                        on {fmtDate(substituteRequest.approved_at)}
                                     </p>
                                 )}
                             </div>
@@ -179,12 +171,12 @@ export default function Show({ substituteRequest }: SubstituteRequestsShowProps)
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{substituteRequest.created_at}</p>
+                            <p>{fmtDate(substituteRequest.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{substituteRequest.updated_at}</p>
+                            <p>{fmtDate(substituteRequest.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

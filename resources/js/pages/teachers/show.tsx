@@ -18,6 +18,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index as teachers, edit as teachersEdit, destroy as teachersDestroy } from '@/routes/teachers';
+import { fmtDate } from '@/lib/utils';
 import type { TeachersShowProps } from '@/types';
 
 export default function Show({ teacher, availableRoles, availableUsers }: TeachersShowProps) {
@@ -303,11 +304,11 @@ export default function Show({ teacher, availableRoles, availableUsers }: Teache
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                    <p>{teacher.created_at}</p>
+                                    <p>{fmtDate(teacher.created_at)}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                    <p>{teacher.updated_at}</p>
+                                    <p>{fmtDate(teacher.updated_at)}</p>
                                 </div>
                             </div>
                         </div>

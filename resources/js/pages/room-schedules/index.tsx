@@ -39,6 +39,7 @@ import {
     destroy as roomSchedulesDestroy,
     calendar as roomSchedulesCalendar,
 } from '@/routes/room-schedules';
+import { fmtDate } from '@/lib/utils';
 import type { RoomSchedulesIndexProps } from '@/types';
 
 export default function Index({ data, filters, classrooms }: RoomSchedulesIndexProps) {
@@ -94,15 +95,6 @@ return;
                 setIsDeleting(false);
                 setDeleteId(null);
             },
-        });
-    };
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
         });
     };
 
@@ -257,7 +249,7 @@ return;
                                     >
                                         <TableCell className="py-3.5 pl-6 pr-4">
                                             <span className="text-sm font-medium text-foreground">
-                                                {formatDate(item.date)}
+                                                {fmtDate(item.date)}
                                             </span>
                                         </TableCell>
 

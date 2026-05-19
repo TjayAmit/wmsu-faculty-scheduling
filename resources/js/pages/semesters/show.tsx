@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as semesters, edit as semestersEdit, destroy as semestersDestroy } from '@/routes/semesters';
+import { fmtDate } from '@/lib/utils';
 import type { SemestersShowProps } from '@/types';
 
 const semesterTypeLabels: Record<string, string> = {
@@ -96,22 +97,22 @@ export default function Show({ semester }: SemestersShowProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Start Date</p>
-                                <p>{semester.start_date}</p>
+                                <p>{fmtDate(semester.start_date)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">End Date</p>
-                                <p>{semester.end_date}</p>
+                                <p>{fmtDate(semester.end_date)}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                <p>{semester.created_at}</p>
+                                <p>{fmtDate(semester.created_at)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                <p>{semester.updated_at}</p>
+                                <p>{fmtDate(semester.updated_at)}</p>
                             </div>
                         </div>
                     </CardContent>

@@ -29,6 +29,7 @@ import {
     edit as rolesEdit,
     destroy as rolesDestroy,
 } from '@/routes/roles';
+import { fmtDate } from '@/lib/utils';
 import type { RolesIndexProps } from '@/types';
 
 export default function Index({ data, filters }: RolesIndexProps) {
@@ -174,7 +175,7 @@ return;
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
-                                            {role.created_at}
+                                            {fmtDate(role.created_at)}
                                         </TableCell>
 
                                         <TableCell

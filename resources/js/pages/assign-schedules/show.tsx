@@ -18,6 +18,7 @@ import {
     index as assignSchedules,
     destroy as assignSchedulesDestroy,
 } from '@/routes/assign-schedules';
+import { fmtDate } from '@/lib/utils';
 import type { AssignSchedulesShowProps } from '@/types';
 
 export default function Show({ assignment }: AssignSchedulesShowProps) {
@@ -28,15 +29,6 @@ export default function Show({ assignment }: AssignSchedulesShowProps) {
         setIsDeleting(true);
         router.delete(assignSchedulesDestroy(assignment.id).url, {
             onFinish: () => setIsDeleting(false),
-        });
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
         });
     };
 
@@ -122,18 +114,18 @@ export default function Show({ assignment }: AssignSchedulesShowProps) {
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Assigned At</p>
-                                <p className="text-sm">{formatDate(assignment.reviewed_at)}</p>
+                                <p className="text-sm">{fmtDate(assignment.reviewed_at)}</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 border-t pt-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                <p className="text-sm">{new Date(assignment.created_at).toLocaleString()}</p>
+                                <p className="text-sm">{fmtDate(assignment.created_at)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                <p className="text-sm">{new Date(assignment.updated_at).toLocaleString()}</p>
+                                <p className="text-sm">{fmtDate(assignment.updated_at)}</p>
                             </div>
                         </div>
                     </CardContent>

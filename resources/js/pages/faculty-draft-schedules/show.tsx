@@ -25,6 +25,7 @@ import {
     getFacultyDraftScheduleStatusVariant,
     getFacultyDraftScheduleStatusLabel,
 } from '@/types/facultyDraftSchedules';
+import { fmtDate } from '@/lib/utils';
 
 export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) {
     const [showReject, setShowReject] = useState(false);
@@ -45,15 +46,6 @@ export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) 
                 setIsProcessing(false);
                 setShowReject(false);
             },
-        });
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
         });
     };
 
@@ -138,7 +130,7 @@ export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) 
                         {draftSchedule.submitted_at && (
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Submitted At</p>
-                                <p>{formatDate(draftSchedule.submitted_at)}</p>
+                                <p>{fmtDate(draftSchedule.submitted_at)}</p>
                             </div>
                         )}
 
@@ -150,7 +142,7 @@ export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) 
                                 </div>
                                 <div className="grid gap-1">
                                     <p className="text-sm font-medium text-muted-foreground">Reviewed At</p>
-                                    <p>{formatDate(draftSchedule.reviewed_at)}</p>
+                                    <p>{fmtDate(draftSchedule.reviewed_at)}</p>
                                 </div>
                             </>
                         )}
@@ -165,11 +157,11 @@ export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) 
                         <div className="grid grid-cols-2 gap-4 border-t pt-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                <p className="text-sm">{new Date(draftSchedule.created_at).toLocaleString()}</p>
+                                <p className="text-sm">{fmtDate(draftSchedule.created_at)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                <p className="text-sm">{new Date(draftSchedule.updated_at).toLocaleString()}</p>
+                                <p className="text-sm">{fmtDate(draftSchedule.updated_at)}</p>
                             </div>
                         </div>
                     </CardContent>

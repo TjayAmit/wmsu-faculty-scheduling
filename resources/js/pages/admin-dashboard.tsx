@@ -505,25 +505,44 @@ return today;
 
                 {/* ── Stat cards ── */}
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {STATS.map(({ label, value, icon: Icon, iconCls, bgCls, href }) => {
+                    {STATS.map(({ label, value, icon: Icon, iconCls, bgCls, href }, idx) => {
+                        if (idx === 0) {
+                            return (
+                                <Card key={label} className="relative gap-0 overflow-hidden py-0 bg-primary text-primary-foreground min-h-[120px]">
+                                    <span className="pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-white/10" />
+                                    <span className="pointer-events-none absolute -right-2 -top-2 h-16 w-16 rounded-full bg-white/10" />
+                                    <CardContent className="relative h-full flex flex-col justify-between px-5 py-5">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <p className="text-[11px] font-semibold uppercase tracking-wider text-primary-foreground/70">{label}</p>
+                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/20">
+                                                <Icon className="h-5 w-5 text-primary-foreground" />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p className="text-4xl font-bold tracking-tight text-primary-foreground">{value}</p>
+                                            <p className="mt-1 text-xs text-primary-foreground/60">currently active</p>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        }
+
                         const inner = (
-                            <CardContent className="px-5 py-4">
+                            <CardContent className="h-full flex flex-col justify-between px-5 py-5">
                                 <div className="flex items-start justify-between gap-2">
-                                    <div>
-                                        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
-                                        <p className="mt-2 text-3xl font-bold tracking-tight">{value}</p>
-                                    </div>
+                                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
                                     <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', bgCls)}>
                                         <Icon className={cn('h-5 w-5', iconCls)} />
                                     </div>
                                 </div>
+                                <p className="text-4xl font-bold tracking-tight">{value}</p>
                             </CardContent>
                         );
 
                         return (
-                            <Card key={label} className={cn('gap-0 py-0', href && 'transition-shadow hover:shadow-md')}>
+                            <Card key={label} className={cn('gap-0 py-0 min-h-[120px]', href && 'cursor-pointer transition-shadow hover:shadow-md')}>
                                 {href ? (
-                                    <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl">
+                                    <Link href={href} className="block h-full rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                         {inner}
                                     </Link>
                                 ) : inner}

@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as roles, edit as rolesEdit, destroy as rolesDestroy } from '@/routes/roles';
+import { fmtDate } from '@/lib/utils';
 import type { RolesShowProps } from '@/types';
 
 export default function Show({ role }: RolesShowProps) {
@@ -96,11 +97,11 @@ acc[module] = [];
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                    <p className="text-sm">{role.created_at}</p>
+                                    <p className="text-sm">{fmtDate(role.created_at)}</p>
                                 </div>
                                 <div>
                                     <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                    <p className="text-sm">{role.updated_at}</p>
+                                    <p className="text-sm">{fmtDate(role.updated_at)}</p>
                                 </div>
                             </div>
 

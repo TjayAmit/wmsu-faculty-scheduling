@@ -33,6 +33,7 @@ import {
     show as activityLogsShow,
     destroy as activityLogsDestroy,
 } from '@/routes/activityLogs';
+import { fmtDate } from '@/lib/utils';
 import type { ActivityLogsIndexProps } from '@/types';
 
 export default function Index({ data, filters, logNames, events }: ActivityLogsIndexProps) {
@@ -249,7 +250,7 @@ return 'destructive';
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
-                                            {item.created_at}
+                                            {fmtDate(item.created_at)}
                                         </TableCell>
 
                                         <TableCell

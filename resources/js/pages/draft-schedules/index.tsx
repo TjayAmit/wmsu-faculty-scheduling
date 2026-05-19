@@ -45,6 +45,7 @@ import {
     getDraftScheduleStatusVariant,
     getDraftScheduleStatusLabel,
 } from '@/types/draftSchedules';
+import { fmtDate } from '@/lib/utils';
 
 export default function Index({ data, filters }: DraftSchedulesIndexProps) {
     const [status, setStatus] = useState(filters.status || '_all');
@@ -189,7 +190,7 @@ return;
                                         </TableCell>
                                         <TableCell className="px-4 py-3.5">
                                             <span className="text-sm text-muted-foreground">
-                                                {item.submitted_at ? new Date(item.submitted_at).toLocaleDateString() : '-'}
+                                                {fmtDate(item.submitted_at)}
                                             </span>
                                         </TableCell>
                                         <TableCell className="py-3.5 pl-4 pr-6 text-right">

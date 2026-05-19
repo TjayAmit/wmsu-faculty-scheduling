@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as subjects, edit as subjectsEdit, destroy as subjectsDestroy } from '@/routes/subjects';
+import { fmtDate } from '@/lib/utils';
 import type { SubjectsShowProps } from '@/types';
 
 export default function Show({ subject }: SubjectsShowProps) {
@@ -95,12 +96,12 @@ export default function Show({ subject }: SubjectsShowProps) {
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{subject.created_at}</p>
+                            <p>{fmtDate(subject.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{subject.updated_at}</p>
+                            <p>{fmtDate(subject.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

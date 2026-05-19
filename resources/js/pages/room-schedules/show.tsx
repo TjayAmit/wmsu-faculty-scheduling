@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as roomSchedules, edit as roomSchedulesEdit, destroy as roomSchedulesDestroy } from '@/routes/room-schedules';
+import { fmtDate } from '@/lib/utils';
 import type { RoomSchedulesShowProps } from '@/types';
 
 export default function Show({ roomSchedule }: RoomSchedulesShowProps) {
@@ -28,15 +29,6 @@ export default function Show({ roomSchedule }: RoomSchedulesShowProps) {
                 setIsDeleting(false);
                 setShowDelete(false);
             },
-        });
-    };
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
         });
     };
 
@@ -96,7 +88,7 @@ export default function Show({ roomSchedule }: RoomSchedulesShowProps) {
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Date</p>
-                            <p>{formatDate(roomSchedule.date)}</p>
+                            <p>{fmtDate(roomSchedule.date)}</p>
                         </div>
 
                         <div className="grid gap-1">
@@ -122,12 +114,12 @@ export default function Show({ roomSchedule }: RoomSchedulesShowProps) {
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{roomSchedule.created_at}</p>
+                            <p>{fmtDate(roomSchedule.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{roomSchedule.updated_at}</p>
+                            <p>{fmtDate(roomSchedule.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -147,7 +139,7 @@ export default function Show({ roomSchedule }: RoomSchedulesShowProps) {
                                     <span className="font-medium text-foreground">
                                         {roomSchedule.classroom?.building} - {roomSchedule.classroom?.room_number}
                                     </span>{' '}
-                                    on {formatDate(roomSchedule.date)}?
+                                    on {fmtDate(roomSchedule.date)}?
                                     This action cannot be undone.
                                 </DialogDescription>
                             </DialogHeader>

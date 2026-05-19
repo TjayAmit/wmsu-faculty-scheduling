@@ -21,6 +21,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as staff,
     create as staffCreate,
@@ -150,7 +151,7 @@ return;
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
-                                            {item.created_at}
+                                            {fmtDate(item.created_at)}
                                         </TableCell>
 
                                         <TableCell

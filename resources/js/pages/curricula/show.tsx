@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as curricula, edit as curriculaEdit, destroy as curriculaDestroy } from '@/routes/curricula';
+import { fmtDate } from '@/lib/utils';
 import type { CurriculaShowProps } from '@/types';
 
 export default function Show({ curriculum }: CurriculaShowProps) {
@@ -104,7 +105,7 @@ export default function Show({ curriculum }: CurriculaShowProps) {
                                 <div>
                                     <span className="text-muted-foreground">Created</span>
                                     <p className="font-medium">
-                                        {new Date(curriculum.created_at).toLocaleDateString()}
+                                        {fmtDate(curriculum.created_at)}
                                     </p>
                                 </div>
                             </div>

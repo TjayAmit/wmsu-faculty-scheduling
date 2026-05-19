@@ -35,6 +35,7 @@ import {
     approve as facultyDraftSchedulesApprove,
     reject as facultyDraftSchedulesReject,
 } from '@/routes/faculty-draft-schedules';
+import { fmtDate } from '@/lib/utils';
 import type { FacultyDraftSchedulesIndexProps, FacultyDraftSchedule } from '@/types';
 import {
     facultyDraftScheduleStatusOptions,
@@ -93,14 +94,6 @@ return;
                 setShowRejectDialog(false);
                 setRejectId(null);
             },
-        });
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
         });
     };
 
@@ -185,7 +178,7 @@ return;
                                         </TableCell>
                                         <TableCell className="px-4 py-3.5">
                                             <span className="text-sm text-muted-foreground">
-                                                {item.submitted_at ? formatDate(item.submitted_at) : '-'}
+                                                {item.submitted_at ? fmtDate(item.submitted_at) : '-'}
                                             </span>
                                         </TableCell>
                                         <TableCell className="py-3.5 pl-4 pr-6 text-right">

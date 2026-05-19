@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as programs, edit as programsEdit, destroy as programsDestroy } from '@/routes/programs';
+import { fmtDate } from '@/lib/utils';
 import type { ProgramsShowProps } from '@/types';
 
 export default function Show({ program }: ProgramsShowProps) {
@@ -132,12 +133,12 @@ export default function Show({ program }: ProgramsShowProps) {
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{program.created_at}</p>
+                            <p>{fmtDate(program.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{program.updated_at}</p>
+                            <p>{fmtDate(program.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

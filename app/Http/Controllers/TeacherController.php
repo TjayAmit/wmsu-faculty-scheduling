@@ -227,6 +227,31 @@ class TeacherController extends Controller
     }
 
     /**
+     * Self-service: Teacher-role user claims an unlinked teacher profile.
+     */
+    public function claimProfile(Request $request)
+    {
+        $request->validate(['teacher_id' => 'required|exists:teachers,id']);
+
+        $teacher = Teacher::findOrFail($request->teacher_id);
+
+        if ($teacher->hasUserAccount()) {
+            return back()->with('error', 'This teacher profile is already linked to another account.');
+        }
+
+        $user = auth()->user();
+
+        if ($user->teacher) {
+            return back()->with('error', 'Your account is already linked to a teacher profile.');
+        }
+
+        $teacher->user_id = $user->id;
+        $teacher->save();
+
+        return redirect()->route('dashboard');
+    }
+
+    /**
      * Show user account linking form for teacher.
      */
     public function showLinkUserAccountForm(Teacher $teacher)

@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as leaveRequests, edit as leaveRequestsEdit, destroy as leaveRequestsDestroy, approve as leaveRequestsApprove, reject as leaveRequestsReject, cancel as leaveRequestsCancel } from '@/routes/leave-requests';
+import { fmtDate } from '@/lib/utils';
 import type { LeaveRequestsShowProps } from '@/types';
 
 export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
@@ -66,15 +67,6 @@ export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
         };
 
         return labels[type] || type;
-    };
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-        });
     };
 
     const calculateDays = () => {
@@ -158,9 +150,9 @@ export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
                             <p className="text-sm font-medium text-muted-foreground">Duration</p>
                             <div className="flex items-center gap-2">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                                <span>{formatDate(leaveRequest.start_date)}</span>
+                                <span>{fmtDate(leaveRequest.start_date)}</span>
                                 <span className="text-muted-foreground">→</span>
-                                <span>{formatDate(leaveRequest.end_date)}</span>
+                                <span>{fmtDate(leaveRequest.end_date)}</span>
                             </div>
                             <p className="text-sm text-muted-foreground mt-1">
                                 {calculateDays()} {calculateDays() === 1 ? 'day' : 'days'}
@@ -193,19 +185,19 @@ export default function Show({ leaveRequest }: LeaveRequestsShowProps) {
 
                                 <div className="grid gap-1">
                                     <p className="text-sm font-medium text-muted-foreground">Approved At</p>
-                                    <p>{leaveRequest.approved_at ? new Date(leaveRequest.approved_at).toLocaleString('en-US') : '-'}</p>
+                                    <p>{fmtDate(leaveRequest.approved_at)}</p>
                                 </div>
                             </>
                         )}
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{new Date(leaveRequest.created_at).toLocaleString('en-US')}</p>
+                            <p>{fmtDate(leaveRequest.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{new Date(leaveRequest.updated_at).toLocaleString('en-US')}</p>
+                            <p>{fmtDate(leaveRequest.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

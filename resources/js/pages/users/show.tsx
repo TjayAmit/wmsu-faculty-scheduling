@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as users, edit as usersEdit, destroy as usersDestroy } from '@/routes/users';
+import { fmtDate } from '@/lib/utils';
 import type { UsersShowProps } from '@/types';
 
 export default function Show({ user }: UsersShowProps) {
@@ -85,11 +86,11 @@ export default function Show({ user }: UsersShowProps) {
                         </div>
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{user.created_at}</p>
+                            <p>{fmtDate(user.created_at)}</p>
                         </div>
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{user.updated_at}</p>
+                            <p>{fmtDate(user.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

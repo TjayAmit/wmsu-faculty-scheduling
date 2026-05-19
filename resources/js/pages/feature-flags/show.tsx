@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as featureFlags, edit as featureFlagsEdit, destroy as featureFlagsDestroy, toggle as featureFlagsToggle } from '@/routes/feature-flags';
+import { fmtDate } from '@/lib/utils';
 import type { FeatureFlagsShowProps } from '@/types';
 
 export default function Show({ featureFlag }: FeatureFlagsShowProps) {
@@ -33,21 +34,6 @@ export default function Show({ featureFlag }: FeatureFlagsShowProps) {
 
     const handleToggle = () => {
         router.post(featureFlagsToggle.url(featureFlag.id));
-    };
-
-    const formatDate = (date: string | null) => {
-        if (!date) {
-return '-';
-}
-
-        return new Date(date).toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-        });
     };
 
     return (
@@ -135,18 +121,18 @@ return '-';
                         {featureFlag.enabled_at && (
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Enabled At</p>
-                                <p>{formatDate(featureFlag.enabled_at)}</p>
+                                <p>{fmtDate(featureFlag.enabled_at)}</p>
                             </div>
                         )}
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{featureFlag.created_at}</p>
+                            <p>{fmtDate(featureFlag.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{featureFlag.updated_at}</p>
+                            <p>{fmtDate(featureFlag.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

@@ -27,6 +27,7 @@ import {
     show as assignSchedulesShow,
     destroy as assignSchedulesDestroy,
 } from '@/routes/assign-schedules';
+import { fmtDate } from '@/lib/utils';
 import type { AssignSchedulesIndexProps, AssignSchedule } from '@/types';
 
 export default function Index({ data, filters, teachers, availableSchedules }: AssignSchedulesIndexProps) {
@@ -75,14 +76,6 @@ return;
                 setIsDeleting(false);
                 setDeleteId(null);
             },
-        });
-    };
-
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
         });
     };
 
@@ -185,7 +178,7 @@ return;
                                         </TableCell>
                                         <TableCell className="px-4 py-3.5">
                                             <span className="text-sm text-muted-foreground">
-                                                {formatDate(item.created_at)}
+                                                {fmtDate(item.created_at)}
                                             </span>
                                         </TableCell>
                                         <TableCell className="py-3.5 pl-4 pr-6 text-right">

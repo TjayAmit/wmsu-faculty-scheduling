@@ -13,6 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { fmtDate } from '@/lib/utils';
 import AppLayout from '@/layouts/app-layout';
 import {
     index as draftSchedules,
@@ -176,7 +177,7 @@ export default function Show({ draftSchedule }: DraftSchedulesShowProps) {
                         {draftSchedule.submitted_at && (
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Submitted At</p>
-                                <p>{new Date(draftSchedule.submitted_at).toLocaleString()}</p>
+                                <p>{fmtDate(draftSchedule.submitted_at)}</p>
                             </div>
                         )}
 
@@ -188,7 +189,7 @@ export default function Show({ draftSchedule }: DraftSchedulesShowProps) {
                                 </div>
                                 <div className="grid gap-1">
                                     <p className="text-sm font-medium text-muted-foreground">Reviewed At</p>
-                                    <p>{new Date(draftSchedule.reviewed_at).toLocaleString()}</p>
+                                    <p>{fmtDate(draftSchedule.reviewed_at)}</p>
                                 </div>
                             </>
                         )}
@@ -212,11 +213,11 @@ export default function Show({ draftSchedule }: DraftSchedulesShowProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                <p>{new Date(draftSchedule.created_at).toLocaleString()}</p>
+                                <p>{fmtDate(draftSchedule.created_at)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                <p>{new Date(draftSchedule.updated_at).toLocaleString()}</p>
+                                <p>{fmtDate(draftSchedule.updated_at)}</p>
                             </div>
                         </div>
                     </CardContent>

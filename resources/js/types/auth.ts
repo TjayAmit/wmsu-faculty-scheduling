@@ -10,10 +10,18 @@ export type User = {
     [key: string]: unknown;
 };
 
+export type UnlinkedTeacher = {
+    id: number;
+    full_name: string;
+    employee_id: string | null;
+    department: string | null;
+};
+
 export type Auth = {
     user: User;
     roles: string[];
     permissions: string[];
+    unlinked_teachers: UnlinkedTeacher[] | null;
 };
 
 export type TwoFactorSetupData = {

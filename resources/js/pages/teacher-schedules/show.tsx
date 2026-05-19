@@ -13,17 +13,9 @@ import {
     getTeacherScheduleStatusLabel,
     dayLabels,
 } from '@/types/teacherSchedules';
+import { fmtDate } from '@/lib/utils';
 
 export default function Show({ schedule }: TeacherSchedulesShowProps) {
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-            weekday: 'long',
-            month: 'long',
-            day: 'numeric',
-            year: 'numeric',
-        });
-    };
-
     const formatTime = (timeString: string) => {
         return new Date(timeString).toLocaleTimeString('en-US', {
             hour: 'numeric',
@@ -66,7 +58,7 @@ export default function Show({ schedule }: TeacherSchedulesShowProps) {
                                 </div>
                                 <div className="grid gap-1">
                                     <p className="text-sm font-medium text-muted-foreground">Scheduled Date</p>
-                                    <p className="font-medium">{formatDate(schedule.scheduled_date)}</p>
+                                    <p className="font-medium">{fmtDate(schedule.scheduled_date)}</p>
                                     <p className="text-sm text-muted-foreground">{dayLabels[schedule.day_of_week]}</p>
                                 </div>
                             </div>
@@ -141,11 +133,11 @@ export default function Show({ schedule }: TeacherSchedulesShowProps) {
                         <div className="grid grid-cols-2 gap-4 border-t pt-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                <p className="text-sm">{new Date(schedule.created_at).toLocaleString()}</p>
+                                <p className="text-sm">{fmtDate(schedule.created_at)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                <p className="text-sm">{new Date(schedule.updated_at).toLocaleString()}</p>
+                                <p className="text-sm">{fmtDate(schedule.updated_at)}</p>
                             </div>
                         </div>
                     </CardContent>

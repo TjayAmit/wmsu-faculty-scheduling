@@ -29,6 +29,7 @@ import {
     edit as semestersEdit,
     destroy as semestersDestroy,
 } from '@/routes/semesters';
+import { fmtDate } from '@/lib/utils';
 import type { SemestersIndexProps } from '@/types';
 
 const semesterTypeLabels: Record<string, string> = {
@@ -168,8 +169,8 @@ return;
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
                                             <div className="flex flex-col">
-                                                <span>{item.start_date}</span>
-                                                <span className="text-xs text-muted-foreground/70">to {item.end_date}</span>
+                                                <span>{fmtDate(item.start_date)}</span>
+                                                <span className="text-xs text-muted-foreground/70">to {fmtDate(item.end_date)}</span>
                                             </div>
                                         </TableCell>
 

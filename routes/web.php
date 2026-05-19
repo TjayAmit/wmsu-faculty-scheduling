@@ -106,6 +106,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('teachers/{teacher}', [TeacherController::class, 'update'])->name('teachers.update');
     Route::delete('teachers/{teacher}', [TeacherController::class, 'destroy'])->name('teachers.destroy');
 
+    // Self-service teacher profile claim (Teacher-role users with no linked profile)
+    Route::post('teacher/claim-profile', [TeacherController::class, 'claimProfile'])->name('teacher.claim-profile');
+
     // Teacher User Account Linking Routes
     Route::prefix('teachers/{teacher}')->group(function () {
         Route::get('create-user-account', [TeacherController::class, 'showCreateUserAccountForm'])->name('teachers.create-user-account');

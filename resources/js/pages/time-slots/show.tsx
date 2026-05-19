@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as timeSlots, edit as timeSlotsEdit, destroy as timeSlotsDestroy } from '@/routes/time-slots';
+import { fmtDate } from '@/lib/utils';
 import type { TimeSlotsShowProps } from '@/types';
 
 export default function Show({ timeSlot }: TimeSlotsShowProps) {
@@ -98,11 +99,11 @@ export default function Show({ timeSlot }: TimeSlotsShowProps) {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                                <p>{timeSlot.created_at}</p>
+                                <p>{fmtDate(timeSlot.created_at)}</p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                                <p>{timeSlot.updated_at}</p>
+                                <p>{fmtDate(timeSlot.updated_at)}</p>
                             </div>
                         </div>
                     </CardContent>

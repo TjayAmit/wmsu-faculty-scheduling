@@ -1,10 +1,18 @@
-import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
+import { Link, router, usePage } from '@inertiajs/react';
+import { BookOpen, Folder, LayoutGrid, Menu, Search, UserCheck } from 'lucide-react';
+import { useState } from 'react';
 import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -34,6 +42,7 @@ import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
+import type { UnlinkedTeacher } from '@/types/auth';
 
 type Props = {
     breadcrumbs?: BreadcrumbItem[];
@@ -63,6 +72,71 @@ const rightNavItems: NavItem[] = [
 const activeItemStyles =
     'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
+function TeacherProfileSelectDialog({ teachers }: { teachers: UnlinkedTeacher[] }) {
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+
+    function handleClaim() {
+        if (!selectedId) return;
+        setSubmitting(true);
+        router.post(
+            '/teacher/claim-profile',
+            { teacher_id: selectedId },
+            { onFinish: () => setSubmitting(false) },
+        );
+    }
+
+    return (
+        <Dialog open>
+            <DialogContent
+                className="sm:max-w-md"
+                onPointerDownOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+            >
+                <DialogHeader>
+                    <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                        <UserCheck className="h-6 w-6 text-primary" />
+                    </div>
+                    <DialogTitle className="text-center">Select Your Teacher Profile</DialogTitle>
+                    <DialogDescription className="text-center">
+                        Your account is not yet linked to a teacher profile. Please select which
+                        teacher you are to continue.
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="mt-2 flex flex-col gap-2">
+                    {teachers.map((t) => (
+                        <button
+                            key={t.id}
+                            type="button"
+                            onClick={() => setSelectedId(t.id)}
+                            className={cn(
+                                'flex w-full flex-col gap-0.5 rounded-lg border px-4 py-3 text-left transition-colors',
+                                selectedId === t.id
+                                    ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                                    : 'border-border hover:bg-accent',
+                            )}
+                        >
+                            <span className="font-medium">{t.full_name}</span>
+                            <span className="text-xs text-muted-foreground">
+                                {[t.employee_id, t.department].filter(Boolean).join(' · ')}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+
+                <Button
+                    className="mt-4 w-full"
+                    disabled={!selectedId || submitting}
+                    onClick={handleClaim}
+                >
+                    {submitting ? 'Linking…' : 'Confirm — This is me'}
+                </Button>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage();
     const { auth } = page.props;
@@ -71,6 +145,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
     return (
         <>
+            {auth.unlinked_teachers && auth.unlinked_teachers.length > 0 && (
+                <TeacherProfileSelectDialog teachers={auth.unlinked_teachers} />
+            )}
             <div className="border-b border-sidebar-border/80">
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     {/* Mobile Menu */}

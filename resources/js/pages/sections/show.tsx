@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
 import { index as sections, edit as sectionsEdit, destroy as sectionsDestroy, toggleStatus as sectionsToggleStatus } from '@/routes/sections';
+import { fmtDate } from '@/lib/utils';
 import type { SectionsShowProps } from '@/types';
 
 export default function Show({ section }: SectionsShowProps) {
@@ -158,12 +159,12 @@ export default function Show({ section }: SectionsShowProps) {
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>
-                            <p>{section.created_at}</p>
+                            <p>{fmtDate(section.created_at)}</p>
                         </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Updated At</p>
-                            <p>{section.updated_at}</p>
+                            <p>{fmtDate(section.updated_at)}</p>
                         </div>
                     </CardContent>
                 </Card>

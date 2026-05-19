@@ -41,6 +41,7 @@ import {
     reject as substituteRequestsReject,
     cancel as substituteRequestsCancel,
 } from '@/routes/substitute-requests';
+import { fmtDate } from '@/lib/utils';
 import type { SubstituteRequestsIndexProps } from '@/types';
 
 export default function Index({ data, filters, teachers }: SubstituteRequestsIndexProps) {
@@ -124,15 +125,6 @@ return;
                 {status}
             </Badge>
         );
-    };
-
-    const formatDate = (date: string) => {
-        return new Date(date).toLocaleDateString('en-US', {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        });
     };
 
     return (
@@ -312,7 +304,7 @@ return;
                                     >
                                         <TableCell className="py-3.5 pl-6 pr-4">
                                             <span className="text-sm font-medium text-foreground">
-                                                {formatDate(item.date)}
+                                                {fmtDate(item.date)}
                                             </span>
                                         </TableCell>
 
