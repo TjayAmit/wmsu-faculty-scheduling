@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  app:
+    image: ghcr.io/your-github-username/your-repo-name:master
+    ports:
+      - "80:8000"
+    env_file:
+      - .env # Automatically injects Client 1's unique configurations
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: secret_password_one
+      MYSQL_DATABASE: client_one_db
