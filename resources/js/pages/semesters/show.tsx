@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as semesters, edit as semestersEdit, destroy as semestersDestroy } from '@/routes/semesters';
 import { fmtDate } from '@/lib/utils';
+import { index as semesters, edit as semestersEdit, destroy as semestersDestroy } from '@/routes/semesters';
 import type { SemestersShowProps } from '@/types';
 
 const semesterTypeLabels: Record<string, string> = {

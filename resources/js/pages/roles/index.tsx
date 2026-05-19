@@ -22,6 +22,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as roles,
     create as rolesCreate,
@@ -29,7 +30,6 @@ import {
     edit as rolesEdit,
     destroy as rolesDestroy,
 } from '@/routes/roles';
-import { fmtDate } from '@/lib/utils';
 import type { RolesIndexProps } from '@/types';
 
 export default function Index({ data, filters }: RolesIndexProps) {

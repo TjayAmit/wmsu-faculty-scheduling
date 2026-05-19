@@ -1,6 +1,6 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Plus, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,15 +25,14 @@ interface TimeSlot {
 }
 
 export default function Edit({ schedule, subjects, semesters, timeSlots, daysOfWeek }: SchedulesFormProps) {
-    const [timeSlotsForm, setTimeSlotsForm] = useState<TimeSlot[]>([]);
+    const [timeSlotsForm, setTimeSlotsForm] = useState<TimeSlot[]>(
+        schedule?.time_slots?.map(slot => ({
+            day: slot.day,
+            time_slot_id: slot.time_slot_id.toString(),
+        })) || []
+    );
     const [newDay, setNewDay] = useState('');
     const [newTimeSlotId, setNewTimeSlotId] = useState('');
-
-    useEffect(() => {
-        if (schedule?.time_slots) {
-            setTimeSlotsForm(schedule.time_slots);
-        }
-    }, [schedule]);
 
     const { data, setData, put, processing, errors } = useForm({
         subject_id: schedule?.subject_id.toString() || '',

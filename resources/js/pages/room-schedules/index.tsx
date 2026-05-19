@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, CalendarDays, Filter } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, CalendarDays } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
@@ -31,6 +31,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as roomSchedules,
     create as roomSchedulesCreate,
@@ -39,7 +40,6 @@ import {
     destroy as roomSchedulesDestroy,
     calendar as roomSchedulesCalendar,
 } from '@/routes/room-schedules';
-import { fmtDate } from '@/lib/utils';
 import type { RoomSchedulesIndexProps } from '@/types';
 
 export default function Index({ data, filters, classrooms }: RoomSchedulesIndexProps) {

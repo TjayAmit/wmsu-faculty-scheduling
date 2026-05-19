@@ -65,10 +65,6 @@ export default function Index({ data, filters, employmentTypes }: TeachersIndexP
         router.get(`/teachers/${teacherId}/create-user-account`);
     };
 
-    const linkUserAccount = (teacherId: number) => {
-        router.get(`/teachers/${teacherId}/link-user-account`);
-    };
-
     const unlinkUserAccount = (teacherId: number) => {
         if (confirm('Are you sure you want to unlink the user account from this teacher?')) {
             router.delete(`/teachers/${teacherId}/unlink-user-account`);

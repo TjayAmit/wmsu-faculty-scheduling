@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as timeSlots, edit as timeSlotsEdit, destroy as timeSlotsDestroy } from '@/routes/time-slots';
 import { fmtDate } from '@/lib/utils';
+import { index as timeSlots, edit as timeSlotsEdit, destroy as timeSlotsDestroy } from '@/routes/time-slots';
 import type { TimeSlotsShowProps } from '@/types';
 
 export default function Show({ timeSlot }: TimeSlotsShowProps) {

@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as sections, edit as sectionsEdit, destroy as sectionsDestroy, toggleStatus as sectionsToggleStatus } from '@/routes/sections';
 import { fmtDate } from '@/lib/utils';
+import { index as sections, edit as sectionsEdit, destroy as sectionsDestroy, toggleStatus as sectionsToggleStatus } from '@/routes/sections';
 import type { SectionsShowProps } from '@/types';
 
 export default function Show({ section }: SectionsShowProps) {

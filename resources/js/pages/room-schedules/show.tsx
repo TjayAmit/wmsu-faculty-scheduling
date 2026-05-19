@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as roomSchedules, edit as roomSchedulesEdit, destroy as roomSchedulesDestroy } from '@/routes/room-schedules';
 import { fmtDate } from '@/lib/utils';
+import { index as roomSchedules, edit as roomSchedulesEdit, destroy as roomSchedulesDestroy } from '@/routes/room-schedules';
 import type { RoomSchedulesShowProps } from '@/types';
 
 export default function Show({ roomSchedule }: RoomSchedulesShowProps) {

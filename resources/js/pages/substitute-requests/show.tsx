@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as substituteRequests, edit as substituteRequestsEdit, destroy as substituteRequestsDestroy, approve as substituteRequestsApprove, reject as substituteRequestsReject, cancel as substituteRequestsCancel } from '@/routes/substitute-requests';
 import { fmtDate } from '@/lib/utils';
+import { index as substituteRequests, edit as substituteRequestsEdit, destroy as substituteRequestsDestroy, approve as substituteRequestsApprove, reject as substituteRequestsReject, cancel as substituteRequestsCancel } from '@/routes/substitute-requests';
 import type { SubstituteRequestsShowProps } from '@/types';
 
 export default function Show({ substituteRequest }: SubstituteRequestsShowProps) {

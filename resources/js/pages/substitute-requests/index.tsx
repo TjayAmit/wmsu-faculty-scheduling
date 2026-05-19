@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, Users, CheckCircle, XCircle, Ban, Clock } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
 import { TablePagination } from '@/components/table-pagination';
@@ -31,6 +31,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as substituteRequests,
     create as substituteRequestsCreate,
@@ -41,7 +42,6 @@ import {
     reject as substituteRequestsReject,
     cancel as substituteRequestsCancel,
 } from '@/routes/substitute-requests';
-import { fmtDate } from '@/lib/utils';
 import type { SubstituteRequestsIndexProps } from '@/types';
 
 export default function Index({ data, filters, teachers }: SubstituteRequestsIndexProps) {

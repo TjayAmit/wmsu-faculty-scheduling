@@ -1,8 +1,7 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, FileText, CheckCircle, XCircle, Send } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { MoreVertical, Pencil, Trash2, Eye, CheckCircle, XCircle, Send } from 'lucide-react';
+import { useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
-import { TablePageHeader } from '@/components/table-page-header';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,6 +28,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as draftSchedules,
     create as draftSchedulesCreate,
@@ -45,7 +45,6 @@ import {
     getDraftScheduleStatusVariant,
     getDraftScheduleStatusLabel,
 } from '@/types/draftSchedules';
-import { fmtDate } from '@/lib/utils';
 
 export default function Index({ data, filters }: DraftSchedulesIndexProps) {
     const [status, setStatus] = useState(filters.status || '_all');

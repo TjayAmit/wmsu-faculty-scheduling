@@ -77,7 +77,10 @@ function TeacherProfileSelectDialog({ teachers }: { teachers: UnlinkedTeacher[] 
     const [submitting, setSubmitting] = useState(false);
 
     function handleClaim() {
-        if (!selectedId) return;
+        if (!selectedId) {
+return;
+}
+
         setSubmitting(true);
         router.post(
             '/teacher/claim-profile',

@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as curricula, edit as curriculaEdit, destroy as curriculaDestroy } from '@/routes/curricula';
 import { fmtDate } from '@/lib/utils';
+import { index as curricula, edit as curriculaEdit, destroy as curriculaDestroy } from '@/routes/curricula';
 import type { CurriculaShowProps } from '@/types';
 
 export default function Show({ curriculum }: CurriculaShowProps) {

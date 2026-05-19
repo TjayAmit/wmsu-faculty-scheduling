@@ -16,9 +16,8 @@ import AppLayout from '@/layouts/app-layout';
 import { index as teachers, show as teachersShow, update as teachersUpdate } from '@/routes/teachers';
 import type { TeachersFormProps } from '@/types';
 
-export default function Edit({ teacher, users, employmentTypes, availableRoles, availableUsers }: TeachersFormProps) {
+export default function Edit({ teacher, employmentTypes, availableRoles }: TeachersFormProps) {
     const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
-    const [showLinkUserDialog, setShowLinkUserDialog] = useState(false);
     
     const { data, setData, put, processing, errors } = useForm({
         email: teacher?.email || '',
@@ -45,12 +44,6 @@ export default function Edit({ teacher, users, employmentTypes, availableRoles, 
     const createUserAccount = (formData: any) => {
         router.post(`/teachers/${teacher?.id}/create-user-account`, formData, {
             onSuccess: () => setShowCreateUserDialog(false),
-        });
-    };
-
-    const linkUserAccount = (formData: any) => {
-        router.post(`/teachers/${teacher?.id}/link-user-account`, formData, {
-            onSuccess: () => setShowLinkUserDialog(false),
         });
     };
 

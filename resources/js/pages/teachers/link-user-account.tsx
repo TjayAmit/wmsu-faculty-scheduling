@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -8,7 +8,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import type { Role } from '@/types';
 
 interface LinkUserAccountProps {
     teacher: {
@@ -136,9 +135,7 @@ export default function LinkUserAccount({ teacher, availableUsers, roles }: Link
     );
 }
 
-LinkUserAccount.layout = (page: React.ReactNode) => {
-    // Access teacher data from page props using usePage hook
-    const { props } = usePage<{ teacher: { id: number; full_name: string } }>();
+LinkUserAccount.layout = (page: React.ReactNode, props: { teacher: { id: number; full_name: string } }) => {
     const teacher = props.teacher;
 
     return (

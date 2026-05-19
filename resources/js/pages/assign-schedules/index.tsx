@@ -21,13 +21,13 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as assignSchedules,
     create as assignSchedulesCreate,
     show as assignSchedulesShow,
     destroy as assignSchedulesDestroy,
 } from '@/routes/assign-schedules';
-import { fmtDate } from '@/lib/utils';
 import type { AssignSchedulesIndexProps, AssignSchedule } from '@/types';
 
 export default function Index({ data, filters, teachers, availableSchedules }: AssignSchedulesIndexProps) {

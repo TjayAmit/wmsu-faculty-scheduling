@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { index as classrooms, show as classroomsShow, update as classroomsUpdate } from '@/routes/classrooms';
-import type { ClassroomsFormProps, RoomType } from '@/types';
+import type { ClassroomsFormProps } from '@/types';
 
 export default function Edit({ classroom, roomTypes }: ClassroomsFormProps) {
     const { data, setData, put, processing, errors } = useForm({

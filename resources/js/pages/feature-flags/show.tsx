@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as featureFlags, edit as featureFlagsEdit, destroy as featureFlagsDestroy, toggle as featureFlagsToggle } from '@/routes/feature-flags';
 import { fmtDate } from '@/lib/utils';
+import { index as featureFlags, edit as featureFlagsEdit, destroy as featureFlagsDestroy, toggle as featureFlagsToggle } from '@/routes/feature-flags';
 import type { FeatureFlagsShowProps } from '@/types';
 
 export default function Show({ featureFlag }: FeatureFlagsShowProps) {

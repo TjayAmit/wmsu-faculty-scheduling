@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as programs, edit as programsEdit, destroy as programsDestroy } from '@/routes/programs';
 import { fmtDate } from '@/lib/utils';
+import { index as programs, edit as programsEdit, destroy as programsDestroy } from '@/routes/programs';
 import type { ProgramsShowProps } from '@/types';
 
 export default function Show({ program }: ProgramsShowProps) {

@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as activityLogs, destroy as activityLogsDestroy } from '@/routes/activityLogs';
 import { fmtDate } from '@/lib/utils';
+import { index as activityLogs, destroy as activityLogsDestroy } from '@/routes/activityLogs';
 import type { ActivityLogsShowProps } from '@/types';
 
 export default function Show({ activityLog }: ActivityLogsShowProps) {

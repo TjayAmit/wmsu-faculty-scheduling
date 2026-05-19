@@ -21,6 +21,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as users,
     create as usersCreate,
@@ -28,7 +29,6 @@ import {
     edit as usersEdit,
     destroy as usersDestroy,
 } from '@/routes/users';
-import { fmtDate } from '@/lib/utils';
 import type { UsersIndexProps } from '@/types';
 
 export default function Index({ data, filters }: UsersIndexProps) {

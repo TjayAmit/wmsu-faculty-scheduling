@@ -29,6 +29,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     create as leaveRequestsCreate,
     show as leaveRequestsShow,
@@ -36,7 +37,6 @@ import {
     destroy as leaveRequestsDestroy,
     cancel as leaveRequestsCancel,
 } from '@/routes/leave-requests';
-import { fmtDate } from '@/lib/utils';
 import type { LeaveRequestsMyRequestsProps, LeaveRequest } from '@/types';
 
 export default function MyRequests({ data, filters }: LeaveRequestsMyRequestsProps) {

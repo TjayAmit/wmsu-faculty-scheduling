@@ -1,5 +1,3 @@
-import type { Teacher } from './teachers';
-
 export interface LeaveRequestTeacher {
     id: number;
     first_name: string;

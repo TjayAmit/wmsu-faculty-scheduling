@@ -15,7 +15,6 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { index as leaveRequests, store as leaveRequestsStore } from '@/routes/leave-requests';
-import type { LeaveRequestTeacher } from '@/types';
 import type { LeaveRequestsFormProps } from '@/types';
 
 export default function Create({ teachers }: LeaveRequestsFormProps) {

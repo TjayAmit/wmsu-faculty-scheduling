@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle, XCircle, Calendar, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as facultyDraftSchedules,
     approve as facultyDraftSchedulesApprove,
@@ -25,7 +26,6 @@ import {
     getFacultyDraftScheduleStatusVariant,
     getFacultyDraftScheduleStatusLabel,
 } from '@/types/facultyDraftSchedules';
-import { fmtDate } from '@/lib/utils';
 
 export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) {
     const [showReject, setShowReject] = useState(false);

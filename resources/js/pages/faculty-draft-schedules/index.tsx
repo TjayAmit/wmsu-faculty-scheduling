@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Eye, CheckCircle, XCircle, Send, FileText } from 'lucide-react';
+import { Eye, CheckCircle, XCircle, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
@@ -29,13 +29,13 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as facultyDraftSchedules,
     show as facultyDraftSchedulesShow,
     approve as facultyDraftSchedulesApprove,
     reject as facultyDraftSchedulesReject,
 } from '@/routes/faculty-draft-schedules';
-import { fmtDate } from '@/lib/utils';
 import type { FacultyDraftSchedulesIndexProps, FacultyDraftSchedule } from '@/types';
 import {
     facultyDraftScheduleStatusOptions,

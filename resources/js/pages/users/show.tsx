@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as users, edit as usersEdit, destroy as usersDestroy } from '@/routes/users';
 import { fmtDate } from '@/lib/utils';
+import { index as users, edit as usersEdit, destroy as usersDestroy } from '@/routes/users';
 import type { UsersShowProps } from '@/types';
 
 export default function Show({ user }: UsersShowProps) {

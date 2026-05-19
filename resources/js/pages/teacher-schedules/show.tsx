@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as teacherSchedules,
 } from '@/routes/teacher-schedules';
@@ -13,7 +14,6 @@ import {
     getTeacherScheduleStatusLabel,
     dayLabels,
 } from '@/types/teacherSchedules';
-import { fmtDate } from '@/lib/utils';
 
 export default function Show({ schedule }: TeacherSchedulesShowProps) {
     const formatTime = (timeString: string) => {

@@ -12,8 +12,15 @@ export function toUrl(url: NonNullable<InertiaLinkProps['href']>): string {
 }
 
 export function fmtDate(value: string | null | undefined): string {
-    if (!value) return '—';
+    if (!value) {
+return '—';
+}
+
     const d = new Date(value);
-    if (isNaN(d.getTime())) return value;
+
+    if (isNaN(d.getTime())) {
+return value;
+}
+
     return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }

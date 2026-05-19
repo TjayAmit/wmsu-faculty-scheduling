@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, User, BookOpen, CheckCircle, Calendar, Trash2 } from 'lucide-react';
+import { ArrowLeft, User, BookOpen, CheckCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,11 +14,11 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as assignSchedules,
     destroy as assignSchedulesDestroy,
 } from '@/routes/assign-schedules';
-import { fmtDate } from '@/lib/utils';
 import type { AssignSchedulesShowProps } from '@/types';
 
 export default function Show({ assignment }: AssignSchedulesShowProps) {

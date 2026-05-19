@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { Loader2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -15,7 +15,7 @@ interface CreateUserAccountFormProps {
 }
 
 export default function CreateUserAccountForm({ teacherEmail, availableRoles, onSubmit }: CreateUserAccountFormProps) {
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, processing, errors } = useForm({
         name: '',
         password: '',
         password_confirmation: '',
@@ -93,7 +93,7 @@ export default function CreateUserAccountForm({ teacherEmail, availableRoles, on
                                 onCheckedChange={(checked) => handleRoleChange(role.name, checked as boolean)}
                             />
                             <Label htmlFor={`role-${role.id}`} className="text-sm">
-                                {role.display_name || role.name}
+                                {role.name}
                             </Label>
                         </div>
                     ))}

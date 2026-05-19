@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as roles, edit as rolesEdit, destroy as rolesDestroy } from '@/routes/roles';
 import { fmtDate } from '@/lib/utils';
+import { index as roles, edit as rolesEdit, destroy as rolesDestroy } from '@/routes/roles';
 import type { RolesShowProps } from '@/types';
 
 export default function Show({ role }: RolesShowProps) {

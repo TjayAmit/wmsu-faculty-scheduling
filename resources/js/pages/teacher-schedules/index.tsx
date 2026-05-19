@@ -9,8 +9,8 @@ import {
     MapPin,
     Users,
 } from 'lucide-react';
-import { TablePagination } from '@/components/table-pagination';
 import { useState } from 'react';
+import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -324,11 +324,13 @@ function SessionsView({ sessions, subject, filters }: SessionsViewProps) {
             year: 'numeric',
         });
         const last = acc[acc.length - 1];
+
         if (last && last.month === month) {
             last.items.push(s);
         } else {
             acc.push({ month, items: [s] });
         }
+
         return acc;
     }, []);
 

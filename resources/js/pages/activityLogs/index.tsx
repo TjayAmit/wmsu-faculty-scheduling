@@ -28,12 +28,12 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as activityLogs,
     show as activityLogsShow,
     destroy as activityLogsDestroy,
 } from '@/routes/activityLogs';
-import { fmtDate } from '@/lib/utils';
 import type { ActivityLogsIndexProps } from '@/types';
 
 export default function Index({ data, filters, logNames, events }: ActivityLogsIndexProps) {

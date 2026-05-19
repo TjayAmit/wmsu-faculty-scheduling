@@ -13,8 +13,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as staff, edit as staffEdit, destroy as staffDestroy } from '@/routes/staff';
 import { fmtDate } from '@/lib/utils';
+import { index as staff, edit as staffEdit, destroy as staffDestroy } from '@/routes/staff';
 import type { StaffShowProps } from '@/types';
 
 export default function Show({ user }: StaffShowProps) {

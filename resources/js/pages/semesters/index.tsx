@@ -22,6 +22,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as semesters,
     create as semestersCreate,
@@ -29,7 +30,6 @@ import {
     edit as semestersEdit,
     destroy as semestersDestroy,
 } from '@/routes/semesters';
-import { fmtDate } from '@/lib/utils';
 import type { SemestersIndexProps } from '@/types';
 
 const semesterTypeLabels: Record<string, string> = {

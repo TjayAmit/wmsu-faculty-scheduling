@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as subjects, edit as subjectsEdit, destroy as subjectsDestroy } from '@/routes/subjects';
 import { fmtDate } from '@/lib/utils';
+import { index as subjects, edit as subjectsEdit, destroy as subjectsDestroy } from '@/routes/subjects';
 import type { SubjectsShowProps } from '@/types';
 
 export default function Show({ subject }: SubjectsShowProps) {

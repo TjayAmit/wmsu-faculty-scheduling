@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as classrooms, edit as classroomsEdit, destroy as classroomsDestroy } from '@/routes/classrooms';
 import { fmtDate } from '@/lib/utils';
+import { index as classrooms, edit as classroomsEdit, destroy as classroomsDestroy } from '@/routes/classrooms';
 import type { ClassroomsShowProps } from '@/types';
 
 export default function Show({ classroom }: ClassroomsShowProps) {

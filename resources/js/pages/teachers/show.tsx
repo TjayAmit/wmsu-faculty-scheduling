@@ -2,7 +2,6 @@ import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Pencil, Trash2, UserPlus, UserX, Mail, Phone, MapPin, Calendar, Briefcase } from 'lucide-react';
 import { useState } from 'react';
 import CreateUserAccountForm from '@/components/teachers/CreateUserAccountForm';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,15 +16,14 @@ import {
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { index as teachers, edit as teachersEdit, destroy as teachersDestroy } from '@/routes/teachers';
 import { fmtDate } from '@/lib/utils';
+import { index as teachers, edit as teachersEdit, destroy as teachersDestroy } from '@/routes/teachers';
 import type { TeachersShowProps } from '@/types';
 
-export default function Show({ teacher, availableRoles, availableUsers }: TeachersShowProps) {
+export default function Show({ teacher, availableRoles }: TeachersShowProps) {
     const [showDelete, setShowDelete] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
-    const [showLinkUserDialog, setShowLinkUserDialog] = useState(false);
 
     const handleDelete = () => {
         setIsDeleting(true);
@@ -40,12 +38,6 @@ export default function Show({ teacher, availableRoles, availableUsers }: Teache
     const createUserAccount = (data: any) => {
         router.post(`/teachers/${teacher.id}/create-user-account`, data, {
             onSuccess: () => setShowCreateUserDialog(false),
-        });
-    };
-
-    const linkUserAccount = (data: any) => {
-        router.post(`/teachers/${teacher.id}/link-user-account`, data, {
-            onSuccess: () => setShowLinkUserDialog(false),
         });
     };
 
@@ -152,7 +144,7 @@ export default function Show({ teacher, availableRoles, availableUsers }: Teache
                                             User: {teacher.user.name} ({teacher.user.email})
                                         </span>
                                     </div>
-                                    {teacher.user?.roles && Array.isArray(teacher.user.roles) && teacher.user.roles.length > 0 && (
+                                    {teacher.user?.roles && Array.isArray(teacher.user.roles) && teacher.user.roles.length > 0 ? (
                                         <div className="flex items-center space-x-2">
                                             <span className="text-sm font-medium">Roles:</span>
                                             <div className="flex space-x-1">
@@ -163,7 +155,7 @@ export default function Show({ teacher, availableRoles, availableUsers }: Teache
                                                 ))}
                                             </div>
                                         </div>
-                                    )}
+                                    ) : null}
                                 </div>
                             ) : (
                                 <div className="space-y-4">

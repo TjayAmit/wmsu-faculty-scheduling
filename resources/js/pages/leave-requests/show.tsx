@@ -14,8 +14,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import AppLayout from '@/layouts/app-layout';
-import { index as leaveRequests, edit as leaveRequestsEdit, destroy as leaveRequestsDestroy, approve as leaveRequestsApprove, reject as leaveRequestsReject, cancel as leaveRequestsCancel } from '@/routes/leave-requests';
 import { fmtDate } from '@/lib/utils';
+import { index as leaveRequests, edit as leaveRequestsEdit, destroy as leaveRequestsDestroy, approve as leaveRequestsApprove, reject as leaveRequestsReject, cancel as leaveRequestsCancel } from '@/routes/leave-requests';
 import type { LeaveRequestsShowProps } from '@/types';
 
 export default function Show({ leaveRequest }: LeaveRequestsShowProps) {

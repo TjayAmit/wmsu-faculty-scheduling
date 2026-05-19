@@ -30,6 +30,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { fmtDate } from '@/lib/utils';
 import {
     index as leaveRequests,
     create as leaveRequestsCreate,
@@ -40,7 +41,6 @@ import {
     reject as leaveRequestsReject,
     cancel as leaveRequestsCancel,
 } from '@/routes/leave-requests';
-import { fmtDate } from '@/lib/utils';
 import type { LeaveRequestsIndexProps } from '@/types';
 
 export default function Index({ data, filters, teachers }: LeaveRequestsIndexProps) {
