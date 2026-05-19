@@ -5,21 +5,28 @@ FROM node:22-alpine AS node-builder
 
 WORKDIR /app
 
-# Install Python and build tools for native modules
-RUN apk add --no-cache python3 make g++
+# Install PHP and build tools for wayfinder and native modules
+RUN apk add --no-cache php83 php83-ctype php83-dom php83-mbstring php83-openssl php83-tokenizer python3 make g++ composer
 
 # Copy dependency manifests first for layer caching
 COPY package.json package-lock.json ./
 
 RUN npm ci
 
+# Copy composer files for wayfinder
+COPY composer.json composer.lock ./
+
+# Install PHP dependencies for wayfinder
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
 # Copy the full source so Vite can resolve app paths
 COPY . .
 
 # Set Node options to handle memory limits in constrained environments
 ENV NODE_OPTIONS=--max-old-space-size=2048
-# Disable wayfinder in Docker build (requires PHP, not available in node-builder stage)
-ENV DISABLE_WAYFINDER=true
+
+# Generate wayfinder routes before build
+RUN php artisan wayfinder:generate --with-form
 
 RUN npm run build
 
