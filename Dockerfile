@@ -30,7 +30,7 @@ RUN npm ci
 COPY composer.json composer.lock ./
 
 # Install PHP dependencies for wayfinder
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev --no-scripts
 
 # Copy the full source so Vite can resolve app paths
 COPY . .
