@@ -28,6 +28,9 @@ const DURATION_PRESETS = [
     { label: '4.0 hrs', hours: 4.0, minutes: 240 },
 ];
 
+const HOURS = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+const MINUTES = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
+
 function formatTo12Hour(time24: string): string {
     if (!time24) return '';
     const [hStr, mStr] = time24.split(':');
@@ -37,6 +40,28 @@ function formatTo12Hour(time24: string): string {
     const period = h >= 12 ? 'PM' : 'AM';
     const h12 = h % 12 || 12;
     return `${h12}:${m.toString().padStart(2, '0')} ${period}`;
+}
+
+function parse24Hour(value: string) {
+    if (!value) return { hour: '07', minute: '00', period: 'AM' as 'AM' | 'PM' };
+    const [hStr, mStr] = value.split(':');
+    const h = parseInt(hStr, 10);
+    const m = parseInt(mStr, 10);
+    if (isNaN(h) || isNaN(m)) return { hour: '07', minute: '00', period: 'AM' as 'AM' | 'PM' };
+    const period: 'AM' | 'PM' = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    const hour = h12.toString().padStart(2, '0');
+    const minute = m.toString().padStart(2, '0');
+    return { hour, minute, period };
+}
+
+function to24Hour(hour12: string, minute: string, period: 'AM' | 'PM'): string {
+    let h = parseInt(hour12, 10);
+    if (isNaN(h)) h = 7;
+    if (period === 'PM' && h < 12) h += 12;
+    if (period === 'AM' && h === 12) h = 0;
+    const m = parseInt(minute, 10) || 0;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
 
 function addMinutesToTime(time24: string, minutesToAdd: number): string {
@@ -66,17 +91,150 @@ function calculateMinutes(start: string, end: string): number | null {
     return endMins - startMins;
 }
 
-const BASE_TIME_OPTIONS: { value: string; label: string }[] = [];
-for (let h = 6; h <= 21; h++) {
-    for (const m of [0, 30]) {
-        const time24 = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-        BASE_TIME_OPTIONS.push({
-            value: time24,
-            label: formatTo12Hour(time24),
-        });
-    }
+interface TimeSectionPickerProps {
+    id: string;
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    error?: string;
+    required?: boolean;
 }
-BASE_TIME_OPTIONS.push({ value: '22:00', label: '10:00 PM' });
+
+function TimeSectionPicker({
+    id,
+    label,
+    value,
+    onChange,
+    error,
+    required = false,
+}: TimeSectionPickerProps) {
+    const { hour, minute, period } = parse24Hour(value);
+
+    const handleHourChange = (newHour: string) => {
+        onChange(to24Hour(newHour, minute, period));
+    };
+
+    const handleMinuteChange = (newMinute: string) => {
+        onChange(to24Hour(hour, newMinute, period));
+    };
+
+    const handlePeriodChange = (newPeriod: 'AM' | 'PM') => {
+        onChange(to24Hour(hour, minute, newPeriod));
+    };
+
+    return (
+        <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+                <Label htmlFor={id} className="text-xs font-medium">
+                    {label} {required && <span className="text-destructive">*</span>}
+                </Label>
+                {value ? (
+                    <Badge variant="outline" className="text-xs font-semibold bg-background">
+                        {formatTo12Hour(value)}
+                    </Badge>
+                ) : (
+                    <span className="text-[11px] text-muted-foreground italic">Not set</span>
+                )}
+            </div>
+
+            <div className="rounded-xl border border-border bg-card p-3 space-y-2.5 shadow-2xs">
+                <div className="flex items-center gap-2">
+                    {/* Hour Select with existing Select component */}
+                    <div className="flex-1">
+                        <span className="text-[10px] uppercase font-semibold text-muted-foreground block mb-1">
+                            Hour
+                        </span>
+                        <Select value={hour} onValueChange={handleHourChange}>
+                            <SelectTrigger id={id} className="h-9 text-xs justify-center font-medium">
+                                <SelectValue placeholder="Hour" />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-60">
+                                {HOURS.map((h) => (
+                                    <SelectItem key={h} value={h}>
+                                        {h}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <span className="text-base font-bold text-muted-foreground mt-4">:</span>
+
+                    {/* Minute Select with existing Select component */}
+                    <div className="flex-1">
+                        <span className="text-[10px] uppercase font-semibold text-muted-foreground block mb-1">
+                            Minute
+                        </span>
+                        <Select value={minute} onValueChange={handleMinuteChange}>
+                            <SelectTrigger className="h-9 text-xs justify-center font-medium">
+                                <SelectValue placeholder="Min" />
+                            </SelectTrigger>
+                            <SelectContent className="max-h-60">
+                                {MINUTES.map((m) => (
+                                    <SelectItem key={m} value={m}>
+                                        {m}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* AM / PM Segmented Control */}
+                    <div className="w-24">
+                        <span className="text-[10px] uppercase font-semibold text-muted-foreground block mb-1">
+                            Period
+                        </span>
+                        <div className="flex h-9 rounded-md border border-input bg-muted/40 p-0.5">
+                            <button
+                                type="button"
+                                onClick={() => handlePeriodChange('AM')}
+                                className={`flex-1 rounded text-xs font-semibold transition-colors ${
+                                    period === 'AM'
+                                        ? 'bg-primary text-primary-foreground shadow-xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                AM
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handlePeriodChange('PM')}
+                                className={`flex-1 rounded text-xs font-semibold transition-colors ${
+                                    period === 'PM'
+                                        ? 'bg-primary text-primary-foreground shadow-xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                PM
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Quick Minute Selection Bar: :00 is the very first button */}
+                <div className="flex items-center gap-1.5 pt-2 border-t border-border/60">
+                    <span className="text-[10px] text-muted-foreground font-medium shrink-0">Minute:</span>
+                    {['00', '15', '30', '45'].map((m) => (
+                        <button
+                            key={m}
+                            type="button"
+                            onClick={() => handleMinuteChange(m)}
+                            className={`px-2.5 py-0.5 rounded text-[11px] font-semibold border transition-colors ${
+                                minute === m
+                                    ? 'bg-primary text-primary-foreground border-primary shadow-2xs'
+                                    : 'bg-muted/30 hover:bg-muted text-foreground border-border/80'
+                            }`}
+                        >
+                            :{m}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {error && <InputError message={error} />}
+        </div>
+    );
+}
 
 export default function Edit({ timeSlot }: TimeSlotsFormProps) {
     const { data, setData, put, processing, errors } = useForm({
@@ -151,18 +309,6 @@ export default function Edit({ timeSlot }: TimeSlotsFormProps) {
         }
     };
 
-    const startOptions = [...BASE_TIME_OPTIONS];
-    if (data.start_time && !startOptions.some((o) => o.value === data.start_time)) {
-        startOptions.push({ value: data.start_time, label: formatTo12Hour(data.start_time) });
-        startOptions.sort((a, b) => a.value.localeCompare(b.value));
-    }
-
-    const endOptions = [...BASE_TIME_OPTIONS];
-    if (data.end_time && !endOptions.some((o) => o.value === data.end_time)) {
-        endOptions.push({ value: data.end_time, label: formatTo12Hour(data.end_time) });
-        endOptions.sort((a, b) => a.value.localeCompare(b.value));
-    }
-
     return (
         <>
             <Head title={`Edit Time Slot - ${timeSlot?.name || 'Time Slot'}`} />
@@ -214,8 +360,8 @@ export default function Edit({ timeSlot }: TimeSlotsFormProps) {
                                                 onClick={() => handleSelectDuration(preset.minutes)}
                                                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
                                                     isSelected
-                                                        ? 'bg-primary text-primary-foreground border-primary shadow-xs'
-                                                        : 'bg-background hover:bg-muted text-foreground border-border'
+                                                ? 'bg-primary text-primary-foreground border-primary shadow-xs'
+                                                : 'bg-background hover:bg-muted text-foreground border-border'
                                                 }`}
                                             >
                                                 {isSelected && <Check className="size-3" />}
@@ -231,48 +377,24 @@ export default function Edit({ timeSlot }: TimeSlotsFormProps) {
 
                             {/* Start and Flexible End Time using existing Select component */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="start_time" className="text-xs font-medium">
-                                        Start Time <span className="text-destructive">*</span>
-                                    </Label>
-                                    <Select
-                                        value={data.start_time}
-                                        onValueChange={handleStartTimeChange}
-                                    >
-                                        <SelectTrigger id="start_time" className="h-9 text-xs">
-                                            <SelectValue placeholder="Select start time" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {startOptions.map((opt) => (
-                                                <SelectItem key={opt.value} value={opt.value}>
-                                                    {opt.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.start_time} />
-                                </div>
+                                <TimeSectionPicker
+                                    id="start_time"
+                                    label="Start Time"
+                                    value={data.start_time}
+                                    onChange={handleStartTimeChange}
+                                    error={errors.start_time}
+                                    required
+                                />
 
-                                <div className="space-y-1.5">
-                                    <Label htmlFor="end_time" className="text-xs font-medium">
-                                        End Time (Flexible) <span className="text-destructive">*</span>
-                                    </Label>
-                                    <Select
+                                <div className="space-y-2">
+                                    <TimeSectionPicker
+                                        id="end_time"
+                                        label="End Time (Flexible)"
                                         value={data.end_time}
-                                        onValueChange={handleEndTimeChange}
-                                    >
-                                        <SelectTrigger id="end_time" className="h-9 text-xs">
-                                            <SelectValue placeholder="Select end time" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {endOptions.map((opt) => (
-                                                <SelectItem key={opt.value} value={opt.value}>
-                                                    {opt.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.end_time} />
+                                        onChange={handleEndTimeChange}
+                                        error={errors.end_time}
+                                        required
+                                    />
 
                                     {/* Duration Indicator */}
                                     <div className="pt-1">
