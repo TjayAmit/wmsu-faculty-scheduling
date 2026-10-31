@@ -109,11 +109,19 @@ return;
         <>
             <Head title="Teachers" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* Page Title & Description OUTSIDE the table card */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Teachers
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage faculty instructors, employment profiles, and department assignments.
+                    </p>
+                </div>
 
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Teachers"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search teachers…"

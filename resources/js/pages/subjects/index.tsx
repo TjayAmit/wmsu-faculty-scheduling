@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, BookOpen } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, BookOpen, CheckCircle2, GraduationCap, Calendar } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
@@ -31,7 +31,7 @@ import {
 } from '@/routes/subjects';
 import type { SubjectsIndexProps } from '@/types';
 
-export default function Index({ data, filters }: SubjectsIndexProps) {
+export default function Index({ data, filters, stats }: SubjectsIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -77,11 +77,95 @@ return;
         <>
             <Head title="Subjects" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Subjects
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage academic course offerings, subject codes, descriptions, and credit unit definitions.
+                    </p>
+                </div>
 
+                {/* 2. Summary KPI Cards */}
+                {stats && (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Total Subjects
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <BookOpen className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.total}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Official course offerings
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-emerald-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Active Offerings
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.active}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {stats.inactive} inactive / archived
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Total Units
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                    <GraduationCap className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 flex items-baseline gap-2">
+                                <span className="text-2xl font-bold tracking-tight text-foreground">
+                                    {stats.total_units}
+                                </span>
+                                <span className="text-xs text-muted-foreground">Units</span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Avg {stats.avg_units} units per subject
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-purple-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Scheduled Courses
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                    <Calendar className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.scheduled_count}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {stats.unscheduled_count} without active schedule
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Subjects"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search subjects…"

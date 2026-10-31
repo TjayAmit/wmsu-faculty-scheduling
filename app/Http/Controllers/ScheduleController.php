@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ScheduleRequest;
+use App\Models\Classroom;
 use App\Models\Schedule;
 use App\Models\Semester;
 use App\Models\Subject;
@@ -20,7 +21,7 @@ class ScheduleController extends Controller
     public function index(Request $request)
     {
         $query = Schedule::query()
-            ->with(['subject', 'semester', 'teacherAssignment.teacher.user']);
+            ->with(['subject', 'semester', 'classroom.zktecoDevice', 'teacherAssignment.teacher.user']);
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -43,6 +44,7 @@ class ScheduleController extends Controller
         return Inertia::render('schedules/create', [
             'subjects' => Subject::active()->select('id', 'code', 'title')->get(),
             'semesters' => Semester::select('id', 'name', 'academic_year', 'is_current')->get(),
+            'classrooms' => Classroom::active()->with('zktecoDevice')->orderBy('building')->orderBy('room_number')->get(),
             'timeSlots' => TimeSlot::active()->select('id', 'name', 'start_time', 'end_time')->get(),
             'daysOfWeek' => [
                 ['value' => 'monday', 'label' => 'Monday'],
@@ -64,7 +66,7 @@ class ScheduleController extends Controller
 
     public function show(Schedule $schedule)
     {
-        $schedule->load(['subject', 'semester', 'teacherAssignment.teacher.user']);
+        $schedule->load(['subject', 'semester', 'classroom.zktecoDevice', 'teacherAssignment.teacher.user', 'teacherAssignment.teacher.department']);
 
         return Inertia::render('schedules/show', [
             'schedule' => $schedule,
@@ -73,12 +75,13 @@ class ScheduleController extends Controller
 
     public function edit(Schedule $schedule)
     {
-        $schedule->load(['subject', 'semester']);
+        $schedule->load(['subject', 'semester', 'classroom.zktecoDevice']);
 
         return Inertia::render('schedules/edit', [
             'schedule' => $schedule,
             'subjects' => Subject::active()->select('id', 'code', 'title')->get(),
             'semesters' => Semester::select('id', 'name', 'academic_year', 'is_current')->get(),
+            'classrooms' => Classroom::active()->with('zktecoDevice')->orderBy('building')->orderBy('room_number')->get(),
             'timeSlots' => TimeSlot::active()->select('id', 'name', 'start_time', 'end_time')->get(),
             'daysOfWeek' => [
                 ['value' => 'monday', 'label' => 'Monday'],

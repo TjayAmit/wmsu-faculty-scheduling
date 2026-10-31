@@ -10,7 +10,7 @@ import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
 
-const sidebarNavItems: NavItem[] = [
+const defaultNavItems: NavItem[] = [
     {
         title: 'Profile',
         href: edit(),
@@ -24,6 +24,19 @@ const sidebarNavItems: NavItem[] = [
     {
         title: 'Appearance',
         href: editAppearance(),
+        icon: null,
+    },
+];
+
+const academicNavItems: NavItem[] = [
+    {
+        title: 'Time Slots',
+        href: '/settings/time-slots',
+        icon: null,
+    },
+    {
+        title: 'Semesters',
+        href: '/settings/semesters',
         icon: null,
     },
 ];
@@ -44,7 +57,28 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         className="flex flex-col space-y-1 space-x-0"
                         aria-label="Settings"
                     >
-                        {sidebarNavItems.map((item, index) => (
+                        {defaultNavItems.map((item, index) => (
+                            <Button
+                                key={`${toUrl(item.href)}-${index}`}
+                                size="sm"
+                                variant="ghost"
+                                asChild
+                                className={cn('w-full justify-start', {
+                                    'bg-muted': isCurrentOrParentUrl(item.href),
+                                })}
+                            >
+                                <Link href={item.href}>
+                                    {item.icon && (
+                                        <item.icon className="h-4 w-4" />
+                                    )}
+                                    {item.title}
+                                </Link>
+                            </Button>
+                        ))}
+
+                        <Separator className="my-2" />
+
+                        {academicNavItems.map((item, index) => (
                             <Button
                                 key={`${toUrl(item.href)}-${index}`}
                                 size="sm"

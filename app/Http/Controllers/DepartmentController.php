@@ -29,9 +29,22 @@ class DepartmentController extends Controller
             });
         }
 
+        $totalDepartments = Department::count();
+        $activeDepartments = Department::where('is_active', true)->count();
+        $inactiveDepartments = $totalDepartments - $activeDepartments;
+        $totalFaculty = Teacher::count();
+        $totalPrograms = \App\Models\Program::count();
+
         return Inertia::render('departments/index', [
             'data' => $query->with('head')->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'per_page']),
+            'stats' => [
+                'total' => $totalDepartments,
+                'active' => $activeDepartments,
+                'inactive' => $inactiveDepartments,
+                'total_faculty' => $totalFaculty,
+                'total_programs' => $totalPrograms,
+            ],
         ]);
     }
 

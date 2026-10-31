@@ -83,18 +83,27 @@ return;
         <>
             <Head title="Assign Schedules" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Assign Schedules
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Allocate teaching schedules, section assignments, and faculty instructor workloads.
+                    </p>
+                </div>
+
                 <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border bg-muted/40 px-6 py-4">
                         <div className="flex items-center gap-4">
-                            <h1 className="text-xl font-semibold">Assign Schedules</h1>
+                            <span className="text-sm font-medium text-muted-foreground">
+                                {data.total} {data.total === 1 ? 'assignment' : 'assignments'}
+                            </span>
                             <Badge variant="default" className="text-xs">
                                 <CheckCircle className="mr-1 h-3 w-3" />
                                 Auto-approved
                             </Badge>
-                            <span className="text-sm text-muted-foreground">
-                                {data.total} total
-                            </span>
                         </div>
                         <div className="flex items-center gap-3">
                             <Select value={teacherId} onValueChange={handleTeacherChange}>

@@ -10,6 +10,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\Dev\SwitchUserController;
 use App\Http\Controllers\DraftScheduleController;
 use App\Http\Controllers\FeatureFlagController;
+use App\Http\Controllers\InstructorDashboardController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\RoleController;
@@ -23,8 +24,11 @@ use App\Http\Controllers\SubstituteRequestController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeacherScheduleController;
 use App\Http\Controllers\TeachingHistoryController;
+use App\Http\Controllers\Api\ZktecoPushController;
 use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ZktecoDeviceController;
+use App\Http\Controllers\ZktecoLogController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
@@ -35,6 +39,7 @@ Route::inertia('/', 'welcome', [
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
     Route::get('admin/dashboard', AdminDashboardController::class)->name('admin.dashboard');
+    Route::get('instructor/dashboard', InstructorDashboardController::class)->name('instructor.dashboard');
 
     // Users Routes
     Route::get('users', [UserController::class, 'index'])->name('users.index');
@@ -269,7 +274,27 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('assign-schedules', [AssignScheduleController::class, 'store'])->name('assign-schedules.store');
     Route::get('assign-schedules/{draftSchedule}', [AssignScheduleController::class, 'show'])->name('assign-schedules.show');
     Route::delete('assign-schedules/{draftSchedule}', [AssignScheduleController::class, 'destroy'])->name('assign-schedules.destroy');
+
+    // ZKTeco Biometric Devices & Room-Verified Attendance Routes
+    Route::get('zkteco-devices', [ZktecoDeviceController::class, 'index'])->name('zkteco-devices.index');
+    Route::get('zkteco-devices/create', [ZktecoDeviceController::class, 'create'])->name('zkteco-devices.create');
+    Route::post('zkteco-devices', [ZktecoDeviceController::class, 'store'])->name('zkteco-devices.store');
+    Route::get('zkteco-devices/{zktecoDevice}', [ZktecoDeviceController::class, 'show'])->name('zkteco-devices.show');
+    Route::get('zkteco-devices/{zktecoDevice}/edit', [ZktecoDeviceController::class, 'edit'])->name('zkteco-devices.edit');
+    Route::put('zkteco-devices/{zktecoDevice}', [ZktecoDeviceController::class, 'update'])->name('zkteco-devices.update');
+    Route::delete('zkteco-devices/{zktecoDevice}', [ZktecoDeviceController::class, 'destroy'])->name('zkteco-devices.destroy');
+    Route::post('zkteco-devices/{zktecoDevice}/ping', [ZktecoDeviceController::class, 'ping'])->name('zkteco-devices.ping');
+    Route::post('zkteco-devices/{zktecoDevice}/sync', [ZktecoDeviceController::class, 'sync'])->name('zkteco-devices.sync');
+    Route::post('zkteco-devices/{zktecoDevice}/simulate-punch', [ZktecoDeviceController::class, 'simulatePunch'])->name('zkteco-devices.simulate-punch');
+
+    // ZKTeco Room Attendance Punch Logs
+    Route::get('zkteco-logs', [ZktecoLogController::class, 'index'])->name('zkteco-logs.index');
 });
+
+// ZKTeco ADMS / ICLOCK Push Endpoint for Physical Hardware
+Route::match(['get', 'post'], 'iclock/cdata', [ZktecoPushController::class, 'handlePush'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->name('zkteco.iclock.cdata');
 
 if (app()->environment('local')) {
     Route::middleware('auth')

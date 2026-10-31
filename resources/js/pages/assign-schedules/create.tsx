@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { ArrowLeft, Plus, User, BookOpen, Clock } from 'lucide-react';
+import { Plus, User, BookOpen, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,20 +48,20 @@ return;
         <>
             <Head title="Assign Schedule" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex items-center gap-4">
-                    <Button variant="ghost" size="sm" asChild>
-                        <a href={assignSchedules().url}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Assignments
-                        </a>
-                    </Button>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Assign Schedule
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Allocate available faculty instructors to scheduled courses and class sections.
+                    </p>
                 </div>
 
-                <div className="mx-auto w-full max-w-2xl">
-                    <Card>
+                <div className="w-full">
+                    <Card className="w-full">
                         <CardHeader>
-                            <CardTitle>Assign Schedule to Teacher</CardTitle>
+                            <CardTitle>Assignment Details</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-6">

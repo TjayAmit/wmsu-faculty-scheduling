@@ -23,6 +23,15 @@ export interface SubjectsIndexProps {
         search?: string;
         per_page?: number;
     };
+    stats?: {
+        total: number;
+        active: number;
+        inactive: number;
+        total_units: number;
+        avg_units: number;
+        scheduled_count: number;
+        unscheduled_count: number;
+    };
 }
 
 export interface SubjectsFormProps {

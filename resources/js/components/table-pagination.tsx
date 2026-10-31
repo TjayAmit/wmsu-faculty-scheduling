@@ -10,7 +10,14 @@ export interface PaginationMeta {
 }
 
 interface TablePaginationProps {
-    meta: PaginationMeta;
+    meta?: PaginationMeta;
+    total?: number;
+    from?: number | null;
+    to?: number | null;
+    current_page?: number;
+    currentPage?: number;
+    last_page?: number;
+    lastPage?: number;
     perPage: number;
     onPerPageChange: (value: number) => void;
     onPageChange: (page: number) => void;
@@ -19,28 +26,39 @@ interface TablePaginationProps {
 
 function getPageNumbers(current: number, total: number): (number | string)[] {
     if (total <= 7) {
-return Array.from({ length: total }, (_, i) => i + 1);
-}
+        return Array.from({ length: total }, (_, i) => i + 1);
+    }
 
     if (current <= 3) {
-return [1, 2, 3, 4, 5, '…', total];
-}
+        return [1, 2, 3, 4, 5, '…', total];
+    }
 
     if (current >= total - 2) {
-return [1, '…', total - 4, total - 3, total - 2, total - 1, total];
-}
+        return [1, '…', total - 4, total - 3, total - 2, total - 1, total];
+    }
 
     return [1, '…', current - 1, current, current + 1, '…', total];
 }
 
 export function TablePagination({
     meta,
+    total: flatTotal,
+    from: flatFrom,
+    to: flatTo,
+    current_page: flatCurrentPage,
+    currentPage,
+    last_page: flatLastPage,
+    lastPage,
     perPage,
     onPerPageChange,
     onPageChange,
     perPageOptions = [10, 25, 50, 100],
 }: TablePaginationProps) {
-    const { total, from, to, current_page, last_page } = meta;
+    const total = meta?.total ?? flatTotal ?? 0;
+    const from = meta?.from ?? flatFrom ?? 0;
+    const to = meta?.to ?? flatTo ?? 0;
+    const current_page = meta?.current_page ?? currentPage ?? flatCurrentPage ?? 1;
+    const last_page = meta?.last_page ?? lastPage ?? flatLastPage ?? 1;
 
     return (
         <div className="flex flex-col gap-3 border-t border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">

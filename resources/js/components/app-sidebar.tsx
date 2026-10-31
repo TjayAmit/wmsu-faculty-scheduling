@@ -1,9 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, DoorOpen, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Clock, Activity, Shield, FileText, CalendarCheck, Flag } from 'lucide-react';
+import { BookOpen, Building2, DoorOpen, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Activity, Shield, FileText, CalendarCheck, Flag, Fingerprint, Cpu } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
     SidebarContent,
@@ -30,14 +29,12 @@ import { index as roles } from '@/routes/roles';
 import { index as roomSchedules } from '@/routes/room-schedules';
 import { index as schedules } from '@/routes/schedules';
 import { index as sections } from '@/routes/sections';
-import { index as semesters } from '@/routes/semesters';
 import { index as staff } from '@/routes/staff';
 import { index as subjects } from '@/routes/subjects';
 import { index as substituteRequests } from '@/routes/substitute-requests';
 import { index as teacherSchedules } from '@/routes/teacher-schedules';
 import { index as teachers } from '@/routes/teachers';
 import { index as teachingHistories } from '@/routes/teaching-histories';
-import { index as timeSlots } from '@/routes/time-slots';
 import { index as users } from '@/routes/users';
 import type { NavGroup, NavItem } from '@/types';
 
@@ -54,7 +51,7 @@ const navGroups: NavGroup[] = [
         items: [
             {
                 title: 'Dashboard',
-                href: dashboard(),
+                href: '/instructor/dashboard',
                 icon: LayoutGrid,
                 roles: ['Teacher'],
             },
@@ -129,18 +126,6 @@ const navGroups: NavGroup[] = [
         roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
         items: [
             {
-                title: 'Semesters',
-                href: semesters(),
-                icon: Calendar,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Time Slots',
-                href: timeSlots(),
-                icon: Clock,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
                 title: 'Subjects',
                 href: subjects(),
                 icon: Library,
@@ -178,6 +163,24 @@ const navGroups: NavGroup[] = [
             },
             // Note: Holidays - would need: Non-teaching days configuration
             // Note: Workload Rules - would need: Max hours per faculty settings
+        ],
+    },
+    {
+        title: 'Biometric Attendance',
+        roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+        items: [
+            {
+                title: 'ZKTeco Devices',
+                href: '/zkteco-devices',
+                icon: Cpu,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'Attendance Logs',
+                href: '/zkteco-logs',
+                icon: Fingerprint,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
         ],
     },
     {
@@ -301,10 +304,11 @@ export function AppSidebar() {
                 <NavMain groups={filteredGroups} />
             </SidebarContent>
 
-            <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
-            </SidebarFooter>
+            {footerNavItems.length > 0 && (
+                <SidebarFooter>
+                    <NavFooter items={footerNavItems} className="mt-auto" />
+                </SidebarFooter>
+            )}
         </Sidebar>
     );
 }

@@ -30,6 +30,15 @@ export interface Curriculum {
     subject?: CurriculumSubject;
 }
 
+export interface CurriculaStats {
+    total: number;
+    required: number;
+    elective: number;
+    programs_count: number;
+    subjects_count: number;
+    has_prerequisites: number;
+}
+
 export interface CurriculaIndexProps {
     data: {
         data: Curriculum[];
@@ -46,6 +55,7 @@ export interface CurriculaIndexProps {
     };
     programs: Program[];
     subjects: CurriculumSubject[];
+    stats?: CurriculaStats;
 }
 
 export interface CurriculaFormProps {

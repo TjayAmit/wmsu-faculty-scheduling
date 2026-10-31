@@ -45,11 +45,26 @@ class SectionController extends Controller
             $query->where('is_active', $request->is_active);
         }
 
+        $totalSections = Section::count();
+        $activeSections = Section::where('is_active', true)->count();
+        $inactiveSections = $totalSections - $activeSections;
+        $totalEnrolled = (int) Section::sum('current_students');
+        $totalCapacity = (int) Section::sum('max_students');
+        $utilizationRate = $totalCapacity > 0 ? round(($totalEnrolled / $totalCapacity) * 100, 1) : 0;
+
         return Inertia::render('sections/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'program_id', 'semester_id', 'year_level', 'is_active', 'per_page']),
             'programs' => Program::all(['id', 'name']),
             'semesters' => Semester::all(['id', 'name', 'academic_year']),
+            'stats' => [
+                'total' => $totalSections,
+                'active' => $activeSections,
+                'inactive' => $inactiveSections,
+                'total_enrolled' => $totalEnrolled,
+                'total_capacity' => $totalCapacity,
+                'utilization_rate' => $utilizationRate,
+            ],
         ]);
     }
 

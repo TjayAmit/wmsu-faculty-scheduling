@@ -91,65 +91,57 @@ return;
         <>
             <Head title="Feature Flags" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Feature Flags
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage system feature toggles, environment capabilities, and experimental modules.
+                    </p>
+                </div>
 
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Feature Flags"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search feature flags…"
                         onSearchChange={handleSearchChange}
                         createHref={featureFlagsCreate().url}
                         createLabel="New Feature Flag"
-                    />
+                    >
+                        <Select
+                            value={isEnabled || 'all'}
+                            onValueChange={(value) => {
+                                setIsEnabled(value === 'all' ? '' : value);
+                                setTimeout(() => navigate({ is_enabled: value === 'all' ? '' : value, page: 1 }), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[130px] text-xs">
+                                <SelectValue placeholder="All statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All statuses</SelectItem>
+                                <SelectItem value="1">Enabled only</SelectItem>
+                                <SelectItem value="0">Disabled only</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                    {/* Filters */}
-                    <div className="border-b border-border bg-muted/30 px-6 py-4">
-                        <div className="flex items-center gap-6">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="enabled_only"
-                                    checked={isEnabled === '1'}
-                                    onCheckedChange={(checked) => {
-                                        setIsEnabled(checked ? '1' : '');
-                                        setTimeout(() => navigate({ is_enabled: checked ? '1' : '', page: 1 }), 0);
-                                    }}
-                                />
-                                <Label htmlFor="enabled_only" className="text-sm font-normal cursor-pointer">
-                                    Show enabled only
-                                </Label>
-                            </div>
-
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="disabled_only"
-                                    checked={isEnabled === '0'}
-                                    onCheckedChange={(checked) => {
-                                        setIsEnabled(checked ? '0' : '');
-                                        setTimeout(() => navigate({ is_enabled: checked ? '0' : '', page: 1 }), 0);
-                                    }}
-                                />
-                                <Label htmlFor="disabled_only" className="text-sm font-normal cursor-pointer">
-                                    Show disabled only
-                                </Label>
-                            </div>
-
-                            {(isEnabled || search) && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                        setIsEnabled('');
-                                        setSearch('');
-                                        setTimeout(() => navigate({ is_enabled: '', search: '', page: 1 }), 0);
-                                    }}
-                                >
-                                    Clear filters
-                                </Button>
-                            )}
-                        </div>
-                    </div>
+                        {isEnabled && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    setIsEnabled('');
+                                    setTimeout(() => navigate({ is_enabled: '', page: 1 }), 0);
+                                }}
+                                className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground"
+                            >
+                                Clear
+                            </Button>
+                        )}
+                    </TablePageHeader>
 
                     <Table>
                         <TableHeader>

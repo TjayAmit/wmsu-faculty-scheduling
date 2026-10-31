@@ -77,16 +77,24 @@ return;
         <>
             <Head title="Time Slots" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Title & Description OUTSIDE table card */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Time Slots
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage academic scheduling time blocks, class hours, and period definitions.
+                    </p>
+                </div>
 
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Time Slots"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search time slots…"
                         onSearchChange={handleSearchChange}
-                        createHref={timeSlotsCreate().url}
+                        createHref="/settings/time-slots"
                         createLabel="New Time Slot"
                     />
 

@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, Pencil, Trash2, Shield, Check, X } from 'lucide-react';
+import { Pencil, Trash2, Shield, Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -51,14 +51,8 @@ acc[module] = [];
         <>
             <Head title={`Role - ${role.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex items-center justify-between">
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={roles()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
-                    </Button>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+                <div className="flex items-center justify-end">
                     <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
                             <Link href={rolesEdit(role.id)}>

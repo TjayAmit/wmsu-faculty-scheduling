@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['building', 'room_number', 'room_name', 'capacity', 'room_type', 'equipment', 'is_active'])]
@@ -17,6 +18,14 @@ class Classroom extends Model
 {
     /** @use HasFactory<ClassroomFactory> */
     use HasFactory, SoftDeletes;
+
+    /**
+     * Get the ZKTeco biometric device exclusively assigned to this classroom.
+     */
+    public function zktecoDevice(): HasOne
+    {
+        return $this->hasOne(ZktecoDevice::class);
+    }
 
     /**
      * Get the schedule conflicts associated with this classroom.

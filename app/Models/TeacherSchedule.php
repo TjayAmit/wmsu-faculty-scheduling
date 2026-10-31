@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'start_time',
     'end_time',
     'room',
+    'classroom_id',
     'section',
     'status',
     'attendance_record_id',
@@ -34,6 +35,14 @@ class TeacherSchedule extends Model
 
     #[Cast(type: TeacherScheduleStatus::class)]
     protected TeacherScheduleStatus|string $status;
+
+    /**
+     * Get the classroom for this schedule.
+     */
+    public function classroom(): BelongsTo
+    {
+        return $this->belongsTo(Classroom::class);
+    }
 
     /**
      * Get the teacher assignment for this schedule.

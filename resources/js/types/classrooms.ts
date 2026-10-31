@@ -32,6 +32,16 @@ export interface ClassroomsIndexProps {
         search?: string;
         per_page?: number;
     };
+    stats?: {
+        total: number;
+        active: number;
+        inactive: number;
+        total_capacity: number;
+        avg_capacity: number;
+        with_device: number;
+        without_device: number;
+        total_buildings: number;
+    };
 }
 
 export interface ClassroomsFormProps {

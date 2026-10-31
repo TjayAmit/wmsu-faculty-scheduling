@@ -1,6 +1,8 @@
 import { router, usePage } from '@inertiajs/react';
 import { Check, ChevronDown } from 'lucide-react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { NotificationMenu } from '@/components/notification-menu';
+import { SettingsMenu } from '@/components/settings-menu';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -11,6 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { UserNavMenu } from '@/components/user-nav-menu';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function AppSidebarHeader({
@@ -26,15 +29,15 @@ export function AppSidebarHeader({
                 <SidebarTrigger className="-ml-1" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
 
-                {devUsers && devUsers.length > 0 && (
-                    <div className="ml-auto">
+                <div className="ml-auto flex items-center gap-1 sm:gap-2">
+                    {devUsers && devUsers.length > 0 && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                                <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs">
                                     <span className="rounded bg-amber-100 px-1 font-mono font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
                                         DEV
                                     </span>
-                                    <span className="max-w-[120px] truncate">{auth.user.name}</span>
+                                    <span className="hidden md:inline max-w-[100px] truncate">{auth.user?.name}</span>
                                     <ChevronDown className="h-3 w-3 opacity-60" />
                                 </Button>
                             </DropdownMenuTrigger>
@@ -46,16 +49,16 @@ export function AppSidebarHeader({
                                 {devUsers.map((user) => (
                                     <DropdownMenuItem
                                         key={user.id}
-                                        disabled={user.id === auth.user.id}
+                                        disabled={user.id === auth.user?.id}
                                         onClick={() => {
-                                            if (user.id !== auth.user.id) {
+                                            if (user.id !== auth.user?.id) {
                                                 router.post(`/dev/switch-user/${user.id}`);
                                             }
                                         }}
                                         className="flex cursor-pointer items-center gap-2"
                                     >
                                         <span className="flex h-4 w-4 shrink-0 items-center justify-center">
-                                            {user.id === auth.user.id && (
+                                            {user.id === auth.user?.id && (
                                                 <Check className="h-3 w-3 text-green-500" />
                                             )}
                                         </span>
@@ -69,8 +72,12 @@ export function AppSidebarHeader({
                                 ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </div>
-                )}
+                    )}
+
+                    <NotificationMenu />
+                    <SettingsMenu />
+                    <UserNavMenu />
+                </div>
             </div>
         </header>
     );

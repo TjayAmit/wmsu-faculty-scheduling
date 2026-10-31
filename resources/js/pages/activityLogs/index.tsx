@@ -116,14 +116,22 @@ return 'destructive';
         <>
             <Head title="Activity Logs" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Activity Logs
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Audit system activity trails, user logins, data modifications, and administrative events.
+                    </p>
+                </div>
 
-                    {/* Custom Header without Create Button */}
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+                    {/* Controls Header */}
                     <div className="flex flex-col gap-4 border-b border-border px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <h2 className="text-lg font-semibold tracking-tight">Activity Logs</h2>
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm font-medium text-muted-foreground">
                                 {data.total} {data.total === 1 ? 'entry' : 'entries'} found
                             </p>
                         </div>

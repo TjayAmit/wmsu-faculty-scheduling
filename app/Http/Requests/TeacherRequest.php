@@ -21,6 +21,7 @@ class TeacherRequest extends FormRequest
             'first_name' => 'required|string|max:100',
             'last_name' => 'required|string|max:100',
             'employee_id' => ['required', 'string', 'max:50', Rule::unique('teachers', 'employee_id')->ignore($teacherId)],
+            'biometric_pin' => ['nullable', 'string', 'max:50', Rule::unique('teachers', 'biometric_pin')->ignore($teacherId)],
             'department' => 'nullable|string|max:255',
             'rank' => 'nullable|string|max:100',
             'employment_type' => 'required|string|in:full_time,part_time,casual',

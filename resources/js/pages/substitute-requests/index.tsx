@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, Users, CheckCircle, XCircle, Ban, Clock } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
 import { TablePagination } from '@/components/table-pagination';
@@ -45,6 +45,7 @@ import {
 import type { SubstituteRequestsIndexProps } from '@/types';
 
 export default function Index({ data, filters, teachers }: SubstituteRequestsIndexProps) {
+    const [search, setSearch] = useState((filters as Record<string, unknown>).search as string || '');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [status, setStatus] = useState(filters.status || '');
     const [requestingTeacherId, setRequestingTeacherId] = useState(filters.requesting_teacher_id?.toString() || '');
@@ -53,11 +54,13 @@ export default function Index({ data, filters, teachers }: SubstituteRequestsInd
     const [dateTo, setDateTo] = useState(filters.date_to || '');
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     const navigate = (params: Record<string, unknown> = {}) => {
         router.get(
             substituteRequests(),
             {
+                search,
                 per_page: perPage,
                 status,
                 requesting_teacher_id: requestingTeacherId,
@@ -68,6 +71,14 @@ export default function Index({ data, filters, teachers }: SubstituteRequestsInd
             },
             { preserveState: true, preserveScroll: true },
         );
+    };
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        clearTimeout(searchTimeout.current);
+        searchTimeout.current = setTimeout(() => {
+            navigate({ search: value, page: 1 });
+        }, 350);
     };
 
     const handlePerPageChange = (value: number) => {
@@ -131,115 +142,106 @@ return;
         <>
             <Head title="Substitute Requests" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Substitute Requests
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage faculty substitution requests, replacement approvals, and emergency class coverage.
+                    </p>
+                </div>
 
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Substitute Requests"
                         count={data.total}
-                        search={''}
-                        searchPlaceholder=""
-                        onSearchChange={() => {}}
+                        search={search}
+                        searchPlaceholder="Search substitute requests..."
+                        onSearchChange={handleSearchChange}
                         createHref={substituteRequestsCreate().url}
                         createLabel="New Request"
-                    />
+                    >
+                        <Select
+                            value={status || 'all'}
+                            onValueChange={(value) => {
+                                setStatus(value === 'all' ? '' : value);
+                                setTimeout(() => navigate({ status: value === 'all' ? '' : value, page: 1 }), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[130px] text-xs">
+                                <SelectValue placeholder="All statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All statuses</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                    {/* Filters */}
-                    <div className="border-b border-border bg-muted/30 px-6 py-4">
-                        <div className="flex flex-wrap items-end gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="status_filter" className="text-xs">Status</Label>
-                                <Select
-                                    value={status}
-                                    onValueChange={(value) => {
-                                        setStatus(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="status_filter" className="w-[140px]">
-                                        <SelectValue placeholder="All statuses" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="pending">Pending</SelectItem>
-                                        <SelectItem value="approved">Approved</SelectItem>
-                                        <SelectItem value="rejected">Rejected</SelectItem>
-                                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={requestingTeacherId || 'all'}
+                            onValueChange={(value) => {
+                                setRequestingTeacherId(value === 'all' ? '' : value);
+                                setTimeout(() => navigate({ requesting_teacher_id: value === 'all' ? '' : value, page: 1 }), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All teachers" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All teachers</SelectItem>
+                                {teachers.map((teacher) => (
+                                    <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                        {teacher.first_name} {teacher.last_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="requesting_teacher_filter" className="text-xs">Requesting Teacher</Label>
-                                <Select
-                                    value={requestingTeacherId}
-                                    onValueChange={(value) => {
-                                        setRequestingTeacherId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="requesting_teacher_filter" className="w-[180px]">
-                                        <SelectValue placeholder="All teachers" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {teachers.map((teacher) => (
-                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                                {teacher.first_name} {teacher.last_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={substituteTeacherId || 'all'}
+                            onValueChange={(value) => {
+                                setSubstituteTeacherId(value === 'all' ? '' : value);
+                                setTimeout(() => navigate({ substitute_teacher_id: value === 'all' ? '' : value, page: 1 }), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All substitutes" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All substitutes</SelectItem>
+                                {teachers.map((teacher) => (
+                                    <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                        {teacher.first_name} {teacher.last_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="substitute_teacher_filter" className="text-xs">Substitute Teacher</Label>
-                                <Select
-                                    value={substituteTeacherId}
-                                    onValueChange={(value) => {
-                                        setSubstituteTeacherId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="substitute_teacher_filter" className="w-[180px]">
-                                        <SelectValue placeholder="All substitutes" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {teachers.map((teacher) => (
-                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                                {teacher.first_name} {teacher.last_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Input
+                            type="date"
+                            value={dateFrom}
+                            onChange={(e) => {
+                                setDateFrom(e.target.value);
+                                setTimeout(() => navigate({ date_from: e.target.value, page: 1 }), 0);
+                            }}
+                            className="h-9 w-[130px] text-xs"
+                        />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="date_from" className="text-xs">From Date</Label>
-                                <Input
-                                    id="date_from"
-                                    type="date"
-                                    value={dateFrom}
-                                    onChange={(e) => {
-                                        setDateFrom(e.target.value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                    className="w-[160px]"
-                                />
-                            </div>
+                        <Input
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => {
+                                setDateTo(e.target.value);
+                                setTimeout(() => navigate({ date_to: e.target.value, page: 1 }), 0);
+                            }}
+                            className="h-9 w-[130px] text-xs"
+                        />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="date_to" className="text-xs">To Date</Label>
-                                <Input
-                                    id="date_to"
-                                    type="date"
-                                    value={dateTo}
-                                    onChange={(e) => {
-                                        setDateTo(e.target.value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                    className="w-[160px]"
-                                />
-                            </div>
-
+                        {(status || requestingTeacherId || substituteTeacherId || dateFrom || dateTo) && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -251,11 +253,12 @@ return;
                                     setDateTo('');
                                     setTimeout(() => navigate({ status: '', requesting_teacher_id: '', substitute_teacher_id: '', date_from: '', date_to: '', page: 1 }), 0);
                                 }}
+                                className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground"
                             >
                                 Clear filters
                             </Button>
-                        </div>
-                    </div>
+                        )}
+                    </TablePageHeader>
 
                     <Table>
                         <TableHeader>

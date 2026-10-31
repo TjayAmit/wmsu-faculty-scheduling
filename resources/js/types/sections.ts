@@ -56,6 +56,15 @@ export interface SectionTeacherOption {
     last_name: string;
 }
 
+export interface SectionsStats {
+    total: number;
+    active: number;
+    inactive: number;
+    total_enrolled: number;
+    total_capacity: number;
+    utilization_rate: number;
+}
+
 export interface SectionsIndexProps {
     data: {
         data: SectionModel[];
@@ -76,6 +85,7 @@ export interface SectionsIndexProps {
     };
     programs: SectionProgramOption[];
     semesters: SectionSemesterOption[];
+    stats?: SectionsStats;
 }
 
 export interface SectionsFormProps {

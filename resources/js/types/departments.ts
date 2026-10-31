@@ -26,6 +26,14 @@ export interface TeacherOption {
     last_name: string;
 }
 
+export interface DepartmentsStats {
+    total: number;
+    active: number;
+    inactive: number;
+    total_faculty: number;
+    total_programs: number;
+}
+
 export interface DepartmentsIndexProps {
     data: {
         data: Department[];
@@ -40,6 +48,7 @@ export interface DepartmentsIndexProps {
         search?: string;
         per_page?: number;
     };
+    stats?: DepartmentsStats;
 }
 
 export interface DepartmentsFormProps {

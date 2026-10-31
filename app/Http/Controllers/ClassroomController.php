@@ -17,7 +17,7 @@ class ClassroomController extends Controller
 
     public function index(Request $request)
     {
-        $query = Classroom::query();
+        $query = Classroom::query()->with('zktecoDevice');
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -26,9 +26,28 @@ class ClassroomController extends Controller
                 ->orWhere('room_name', 'like', '%'.$search.'%');
         }
 
+        $totalRooms = Classroom::count();
+        $activeRooms = Classroom::where('is_active', true)->count();
+        $inactiveRooms = $totalRooms - $activeRooms;
+        $totalCapacity = (int) Classroom::where('is_active', true)->sum('capacity');
+        $avgCapacity = $activeRooms > 0 ? round(Classroom::where('is_active', true)->avg('capacity')) : 0;
+        $withDevice = Classroom::has('zktecoDevice')->count();
+        $withoutDevice = max(0, $totalRooms - $withDevice);
+        $totalBuildings = Classroom::distinct('building')->count('building');
+
         return Inertia::render('classrooms/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'per_page']),
+            'stats' => [
+                'total' => $totalRooms,
+                'active' => $activeRooms,
+                'inactive' => $inactiveRooms,
+                'total_capacity' => $totalCapacity,
+                'avg_capacity' => $avgCapacity,
+                'with_device' => $withDevice,
+                'without_device' => $withoutDevice,
+                'total_buildings' => $totalBuildings,
+            ],
         ]);
     }
 
@@ -48,7 +67,7 @@ class ClassroomController extends Controller
 
     public function show(Classroom $classroom)
     {
-        $classroom->load('scheduleConflicts');
+        $classroom->load(['scheduleConflicts', 'zktecoDevice']);
 
         return Inertia::render('classrooms/show', [
             'classroom' => $classroom,

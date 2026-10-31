@@ -43,6 +43,14 @@ export interface DepartmentOption {
     name: string;
 }
 
+export interface ProgramsStats {
+    total: number;
+    active: number;
+    inactive: number;
+    undergraduate: number;
+    postgraduate: number;
+}
+
 export interface ProgramsIndexProps {
     data: {
         data: ProgramModel[];
@@ -57,6 +65,7 @@ export interface ProgramsIndexProps {
         search?: string;
         per_page?: number;
     };
+    stats?: ProgramsStats;
 }
 
 export interface ProgramsFormProps {

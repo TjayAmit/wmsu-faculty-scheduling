@@ -1,5 +1,4 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,19 +40,19 @@ export default function Edit({ roomSchedule, classrooms }: RoomSchedulesFormProp
         <>
             <Head title="Edit Room Schedule" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={roomSchedule ? roomSchedulesShow(roomSchedule.id) : roomSchedules()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to details
-                        </Link>
-                    </Button>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Edit Room Schedule
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Update classroom allocation, scheduled periods, and facility assignments.
+                    </p>
                 </div>
 
-                <Card className="max-w-2xl">
+                <Card className="w-full">
                     <CardHeader>
-                        <CardTitle>Edit Room Schedule</CardTitle>
+                        <CardTitle>Room Schedule Specifications</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">

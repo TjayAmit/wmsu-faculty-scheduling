@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { Pencil, Trash2, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,16 +43,7 @@ export default function Show({ curriculum }: CurriculaShowProps) {
         <>
             <Head title={`Curriculum - ${curriculum.subject?.title || 'Details'}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={curricula()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
-                    </Button>
-                </div>
-
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
                 <div className="grid gap-4 md:grid-cols-2">
                     <Card>
                         <CardHeader className="flex flex-row items-center gap-4">

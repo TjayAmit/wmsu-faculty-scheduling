@@ -33,11 +33,12 @@ class SemesterController extends Controller
 
     public function create()
     {
-        return Inertia::render('semesters/create', [
+        return Inertia::render('settings/semesters', [
             'semesterTypes' => collect(SemesterType::cases())->map(fn ($case) => [
                 'value' => $case->value,
                 'label' => $case->getLabel(),
             ])->values(),
+            'semesters' => Semester::latest()->get(),
         ]);
     }
 
@@ -49,6 +50,10 @@ class SemesterController extends Controller
         }
 
         $this->service->createFromRequest($request);
+
+        if (str_contains($request->header('Referer', ''), 'settings')) {
+            return redirect()->route('settings.semesters')->with('success', 'Semester created successfully');
+        }
 
         return redirect()->route('semesters.index')->with('success', 'Semester created successfully');
     }

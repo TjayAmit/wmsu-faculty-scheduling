@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['subject_id', 'semester_id', 'time_slots', 'room', 'section', 'is_active'])]
+#[Fillable(['subject_id', 'semester_id', 'classroom_id', 'time_slots', 'room', 'section', 'is_active'])]
 class Schedule extends Model
 {
     /** @use HasFactory<ScheduleFactory> */
@@ -17,6 +17,14 @@ class Schedule extends Model
 
     #[Cast(type: 'boolean')]
     protected $is_active;
+
+    /**
+     * Get the classroom for the schedule.
+     */
+    public function classroom(): BelongsTo
+    {
+        return $this->belongsTo(Classroom::class);
+    }
 
     /**
      * Get the subject for the schedule.

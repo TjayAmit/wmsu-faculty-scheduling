@@ -16,6 +16,7 @@ class ScheduleRequest extends FormRequest
         return [
             'subject_id' => 'required|exists:subjects,id',
             'semester_id' => 'required|exists:semesters,id',
+            'classroom_id' => 'nullable|exists:classrooms,id',
             'time_slots' => 'required|array|min:1|max:3',
             'time_slots.*.day' => 'required|in:monday,tuesday,wednesday,thursday,friday,saturday',
             'time_slots.*.time_slot_id' => 'required|exists:time_slots,id',

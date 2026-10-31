@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { MoreVertical, Pencil, Trash2, Eye, Calendar, CheckCircle, XCircle, Clock, Ban, Plus } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import { TablePageHeader } from '@/components/table-page-header';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -124,51 +125,46 @@ return;
         <>
             <Head title="My Leave Requests" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        My Leave Requests
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Track your submitted leave applications, endorsement status, and approval history.
+                    </p>
+                </div>
+
                 <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+                    <TablePageHeader
+                        count={data.total}
+                        search=""
+                        searchPlaceholder="Search my requests..."
+                        onSearchChange={() => {}}
+                        createHref={leaveRequestsCreate().url}
+                        createLabel="New Request"
+                    >
+                        <Select
+                            value={status}
+                            onValueChange={(value) => {
+                                setStatus(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All statuses</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                    {/* Header */}
-                    <div className="flex flex-col gap-3 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
-                        <div>
-                            <h2 className="text-base font-semibold text-card-foreground">My Leave Requests</h2>
-                            <p className="text-sm text-muted-foreground">{data.total} requests</p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Button asChild size="sm" className="h-9 gap-1.5">
-                                <a href={leaveRequestsCreate().url}>
-                                    <Plus className="h-4 w-4" />
-                                    New Request
-                                </a>
-                            </Button>
-                        </div>
-                    </div>
-
-                    {/* Filters */}
-                    <div className="border-b border-border bg-muted/30 px-6 py-4">
-                        <div className="flex flex-wrap items-end gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="status_filter" className="text-xs">Status</Label>
-                                <Select
-                                    value={status}
-                                    onValueChange={(value) => {
-                                        setStatus(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="status_filter" className="w-[140px]">
-                                        <SelectValue placeholder="All statuses" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All statuses</SelectItem>
-                                        <SelectItem value="pending">Pending</SelectItem>
-                                        <SelectItem value="approved">Approved</SelectItem>
-                                        <SelectItem value="rejected">Rejected</SelectItem>
-                                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
+                        {status !== 'all' && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -176,11 +172,12 @@ return;
                                     setStatus('all');
                                     setTimeout(() => navigate({ status: '', page: 1 }), 0);
                                 }}
+                                className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground"
                             >
                                 Clear filters
                             </Button>
-                        </div>
-                    </div>
+                        )}
+                    </TablePageHeader>
 
                     <Table>
                         <TableHeader>

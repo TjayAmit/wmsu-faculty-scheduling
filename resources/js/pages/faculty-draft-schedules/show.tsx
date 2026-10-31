@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,14 +53,8 @@ export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) 
         <>
             <Head title={`Draft Schedule - ${draftSchedule.schedule.subject.code}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex items-center justify-between">
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={facultyDraftSchedules()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Draft Schedules
-                        </Link>
-                    </Button>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+                <div className="flex items-center justify-end">
                     {draftSchedule.status === 'pending_review' && (
                         <div className="flex items-center gap-2">
                             <Button

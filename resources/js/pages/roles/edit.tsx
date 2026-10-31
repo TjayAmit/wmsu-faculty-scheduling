@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Shield, Check } from 'lucide-react';
+import { Shield, Check } from 'lucide-react';
 import { ChevronDown } from 'lucide-react';
 import type { FormEvent} from 'react';
 import { useState } from 'react';
@@ -66,17 +66,17 @@ acc[module] = [];
         <>
             <Head title={`Edit Role - ${role.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={roles()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
-                    </Button>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Edit Role
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Update authorization role parameters, scope, and assigned system permissions.
+                    </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="mx-auto w-full max-w-2xl">
+                <form onSubmit={handleSubmit} className="w-full">
                     <Card>
                         <CardHeader className="flex flex-row items-center gap-4">
                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">

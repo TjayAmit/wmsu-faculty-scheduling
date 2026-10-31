@@ -114,86 +114,82 @@ return;
         <>
             <Head title="Teaching Histories" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Teaching Histories
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Review faculty teaching track records, historical subject loads, and academic term service.
+                    </p>
+                </div>
 
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Teaching Histories"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search by teacher or subject..."
                         onSearchChange={handleSearchChange}
                         createHref={teachingHistoriesCreate().url}
                         createLabel="New History"
-                    />
+                    >
+                        <Select
+                            value={teacherId}
+                            onValueChange={(value) => {
+                                setTeacherId(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All teachers" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {teachers.map((teacher) => (
+                                    <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                        {teacher.first_name} {teacher.last_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                    {/* Filters */}
-                    <div className="border-b border-border bg-muted/30 px-6 py-4">
-                        <div className="flex flex-wrap items-end gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="teacher_filter" className="text-xs">Teacher</Label>
-                                <Select
-                                    value={teacherId}
-                                    onValueChange={(value) => {
-                                        setTeacherId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="teacher_filter" className="w-[180px]">
-                                        <SelectValue placeholder="All teachers" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {teachers.map((teacher) => (
-                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                                {teacher.first_name} {teacher.last_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={semesterId}
+                            onValueChange={(value) => {
+                                setSemesterId(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All semesters" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {semesters.map((semester) => (
+                                    <SelectItem key={semester.id} value={semester.id.toString()}>
+                                        {semester.name} {semester.year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="semester_filter" className="text-xs">Semester</Label>
-                                <Select
-                                    value={semesterId}
-                                    onValueChange={(value) => {
-                                        setSemesterId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="semester_filter" className="w-[160px]">
-                                        <SelectValue placeholder="All semesters" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {semesters.map((semester) => (
-                                            <SelectItem key={semester.id} value={semester.id.toString()}>
-                                                {semester.name} {semester.year}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={status}
+                            onValueChange={(value) => {
+                                setStatus(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[130px] text-xs">
+                                <SelectValue placeholder="All statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="incomplete">Incomplete</SelectItem>
+                                <SelectItem value="dropped">Dropped</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="status_filter" className="text-xs">Status</Label>
-                                <Select
-                                    value={status}
-                                    onValueChange={(value) => {
-                                        setStatus(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="status_filter" className="w-[140px]">
-                                        <SelectValue placeholder="All statuses" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="completed">Completed</SelectItem>
-                                        <SelectItem value="incomplete">Incomplete</SelectItem>
-                                        <SelectItem value="dropped">Dropped</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
+                        {(teacherId || semesterId || status) && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -203,11 +199,12 @@ return;
                                     setStatus('');
                                     setTimeout(() => navigate({ teacher_id: '', semester_id: '', status: '', page: 1 }), 0);
                                 }}
+                                className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground"
                             >
                                 Clear filters
                             </Button>
-                        </div>
-                    </div>
+                        )}
+                    </TablePageHeader>
 
                     <Table>
                         <TableHeader>

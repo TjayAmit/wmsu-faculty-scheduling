@@ -30,7 +30,9 @@ class TimeSlotController extends Controller
 
     public function create()
     {
-        return Inertia::render('time-slots/create');
+        return Inertia::render('settings/time-slots', [
+            'timeSlots' => TimeSlot::orderBy('start_time')->get(),
+        ]);
     }
 
     public function store(Request $request)
@@ -43,6 +45,10 @@ class TimeSlotController extends Controller
         ]);
 
         $this->service->createFromRequest($request);
+
+        if (str_contains($request->header('Referer', ''), 'settings')) {
+            return redirect()->route('settings.time-slots')->with('success', 'Time slot created successfully');
+        }
 
         return redirect()->route('time-slots.index')->with('success', 'Time slot created successfully');
     }

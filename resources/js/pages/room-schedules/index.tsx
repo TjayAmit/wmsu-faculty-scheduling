@@ -102,80 +102,74 @@ return;
         <>
             <Head title="Room Schedules" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-                        <TablePageHeader
-                            title="Room Schedules"
-                            count={data.total}
-                            search={search}
-                            searchPlaceholder="Search by building or room..."
-                            onSearchChange={handleSearchChange}
-                            createHref={roomSchedulesCreate().url}
-                            createLabel="New Schedule"
-                        />
-                        <Button variant="outline" size="sm" asChild>
-                            <Link href={roomSchedulesCalendar.url()}>
-                                <CalendarDays className="mr-2 h-4 w-4" />
-                                Calendar View
-                            </Link>
-                        </Button>
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1.5">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                            Room Schedules
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            Track classroom space allocations, building availability, and facility schedules.
+                        </p>
                     </div>
+                    <Button variant="outline" size="sm" asChild>
+                        <Link href={roomSchedulesCalendar.url()}>
+                            <CalendarDays className="mr-2 h-4 w-4" />
+                            Calendar View
+                        </Link>
+                    </Button>
+                </div>
 
-                    {/* Filters */}
-                    <div className="border-b border-border bg-muted/30 px-6 py-4">
-                        <div className="flex flex-wrap items-end gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="classroom_filter" className="text-xs">Classroom</Label>
-                                <Select
-                                    value={classroomId}
-                                    onValueChange={(value) => {
-                                        setClassroomId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="classroom_filter" className="w-[200px]">
-                                        <SelectValue placeholder="All classrooms" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {classrooms.map((room) => (
-                                            <SelectItem key={room.id} value={room.id.toString()}>
-                                                {room.building} - {room.room_number}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+                    <TablePageHeader
+                        count={data.total}
+                        search={search}
+                        searchPlaceholder="Search by building or room..."
+                        onSearchChange={handleSearchChange}
+                        createHref={roomSchedulesCreate().url}
+                        createLabel="New Schedule"
+                    >
+                        <Select
+                            value={classroomId}
+                            onValueChange={(value) => {
+                                setClassroomId(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[160px] text-xs">
+                                <SelectValue placeholder="All classrooms" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {classrooms.map((room) => (
+                                    <SelectItem key={room.id} value={room.id.toString()}>
+                                        {room.building} - {room.room_number}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="date_from" className="text-xs">From Date</Label>
-                                <Input
-                                    id="date_from"
-                                    type="date"
-                                    value={dateFrom}
-                                    onChange={(e) => {
-                                        setDateFrom(e.target.value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                    className="w-[160px]"
-                                />
-                            </div>
+                        <Input
+                            type="date"
+                            value={dateFrom}
+                            onChange={(e) => {
+                                setDateFrom(e.target.value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                            className="h-9 w-[130px] text-xs"
+                        />
 
-                            <div className="space-y-2">
-                                <Label htmlFor="date_to" className="text-xs">To Date</Label>
-                                <Input
-                                    id="date_to"
-                                    type="date"
-                                    value={dateTo}
-                                    onChange={(e) => {
-                                        setDateTo(e.target.value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                    className="w-[160px]"
-                                />
-                            </div>
+                        <Input
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => {
+                                setDateTo(e.target.value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                            className="h-9 w-[130px] text-xs"
+                        />
 
+                        {(classroomId || dateFrom || dateTo) && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -185,11 +179,12 @@ return;
                                     setDateTo('');
                                     setTimeout(() => navigate({ classroom_id: '', date_from: '', date_to: '', page: 1 }), 0);
                                 }}
+                                className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground"
                             >
                                 Clear filters
                             </Button>
-                        </div>
-                    </div>
+                        )}
+                    </TablePageHeader>
 
                     <Table>
                         <TableHeader>

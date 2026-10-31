@@ -34,11 +34,28 @@ class CurriculumController extends Controller
                 });
         }
 
+        $totalCurricula = Curriculum::count();
+        $requiredCurricula = Curriculum::where('is_required', true)->count();
+        $electiveCurricula = $totalCurricula - $requiredCurricula;
+        $programsCount = Curriculum::distinct('program_id')->count('program_id');
+        $subjectsCount = Curriculum::distinct('subject_id')->count('subject_id');
+        $withPrerequisites = Curriculum::whereNotNull('prerequisite_subjects')
+            ->where('prerequisite_subjects', '!=', '[]')
+            ->count();
+
         return Inertia::render('curricula/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'per_page']),
             'programs' => Program::active()->select('id', 'code', 'name', 'degree_level')->get(),
             'subjects' => Subject::active()->select('id', 'code', 'title', 'units')->get(),
+            'stats' => [
+                'total' => $totalCurricula,
+                'required' => $requiredCurricula,
+                'elective' => $electiveCurricula,
+                'programs_count' => $programsCount,
+                'subjects_count' => $subjectsCount,
+                'has_prerequisites' => $withPrerequisites,
+            ],
         ]);
     }
 

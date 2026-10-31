@@ -25,9 +25,26 @@ class SubjectController extends Controller
                 ->orWhere('description', 'like', '%'.$search.'%');
         }
 
+        $totalSubjects = Subject::count();
+        $activeSubjects = Subject::where('is_active', true)->count();
+        $inactiveSubjects = $totalSubjects - $activeSubjects;
+        $totalUnits = (float) Subject::sum('units');
+        $avgUnits = $totalSubjects > 0 ? round(Subject::avg('units'), 1) : 0;
+        $scheduledSubjects = Subject::has('schedules')->count();
+        $unscheduledSubjects = max(0, $totalSubjects - $scheduledSubjects);
+
         return Inertia::render('subjects/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'per_page']),
+            'stats' => [
+                'total' => $totalSubjects,
+                'active' => $activeSubjects,
+                'inactive' => $inactiveSubjects,
+                'total_units' => round($totalUnits, 1),
+                'avg_units' => $avgUnits,
+                'scheduled_count' => $scheduledSubjects,
+                'unscheduled_count' => $unscheduledSubjects,
+            ],
         ]);
     }
 

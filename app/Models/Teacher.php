@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['user_id', 'email', 'first_name', 'middle_name', 'last_name', 'employee_id', 'department', 'rank', 'employment_type', 'date_hired', 'phone', 'address', 'is_active'])]
+#[Fillable(['user_id', 'email', 'first_name', 'middle_name', 'last_name', 'employee_id', 'biometric_pin', 'department', 'rank', 'employment_type', 'date_hired', 'phone', 'address', 'is_active'])]
 class Teacher extends Model
 {
     /** @use HasFactory<TeacherFactory> */
@@ -26,6 +26,8 @@ class Teacher extends Model
 
     #[Cast(type: 'boolean')]
     protected $is_active;
+
+    protected $appends = ['full_name'];
 
     /**
      * Get the user associated with the teacher.

@@ -1,5 +1,4 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,19 +23,19 @@ export default function Create() {
         <>
             <Head title="Create User" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={users()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
-                    </Button>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+                <div className="space-y-1">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Create User
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Register a new user account, email address, password, and access credentials.
+                    </p>
                 </div>
 
-                <Card className="max-w-2xl">
+                <Card className="w-full">
                     <CardHeader>
-                        <CardTitle>Create New User</CardTitle>
+                        <CardTitle>User Details</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">

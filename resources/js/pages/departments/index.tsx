@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, Building2 } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, Building2, CheckCircle2, Users, GraduationCap } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
@@ -31,7 +31,7 @@ import {
 } from '@/routes/departments';
 import type { DepartmentsIndexProps } from '@/types';
 
-export default function Index({ data, filters }: DepartmentsIndexProps) {
+export default function Index({ data, filters, stats }: DepartmentsIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -77,11 +77,92 @@ return;
         <>
             <Head title="Departments" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Departments
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage collegiate departments, academic faculties, and organizational units.
+                    </p>
+                </div>
 
+                {/* 2. Summary KPI Cards */}
+                {stats && (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Total Departments
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <Building2 className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.total}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Collegiate academic units
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-emerald-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Active Units
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.active}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {stats.inactive} inactive / archived
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Faculty Members
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                    <Users className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.total_faculty}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Assigned across units
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-purple-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Degree Programs
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                    <GraduationCap className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.total_programs}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Academic program offerings
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Departments"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search departments…"

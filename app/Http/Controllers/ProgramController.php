@@ -29,9 +29,22 @@ class ProgramController extends Controller
             });
         }
 
+        $totalPrograms = Program::count();
+        $activePrograms = Program::where('is_active', true)->count();
+        $inactivePrograms = $totalPrograms - $activePrograms;
+        $undergraduateCount = Program::where('degree_level', 'bachelor')->count();
+        $postgraduateCount = Program::whereIn('degree_level', ['master', 'doctoral'])->count();
+
         return Inertia::render('programs/index', [
             'data' => $query->with('department')->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['search', 'per_page']),
+            'stats' => [
+                'total' => $totalPrograms,
+                'active' => $activePrograms,
+                'inactive' => $inactivePrograms,
+                'undergraduate' => $undergraduateCount,
+                'postgraduate' => $postgraduateCount,
+            ],
         ]);
     }
 

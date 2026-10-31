@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, User, BookOpen, CheckCircle, Trash2 } from 'lucide-react';
+import { User, BookOpen, CheckCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,14 +36,8 @@ export default function Show({ assignment }: AssignSchedulesShowProps) {
         <>
             <Head title={`Assignment - ${assignment.schedule.subject.code}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div className="flex items-center justify-between">
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={assignSchedules()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to Assignments
-                        </Link>
-                    </Button>
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+                <div className="flex items-center justify-end">
                     <Button
                         variant="outline"
                         size="sm"

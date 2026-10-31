@@ -108,14 +108,23 @@ return;
 
     return (
         <>
-            <Head title="Assign Schedule" />
+            <Head title="Request Schedule" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Schedule Requests
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Submit and monitor term schedule proposals, teaching preferences, and review approvals.
+                    </p>
+                </div>
+
                 <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border bg-muted/40 px-6 py-4">
                         <div className="flex items-center gap-4">
-                            <h1 className="text-xl font-semibold">Assign Schedule</h1>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-sm font-medium text-muted-foreground">
                                 {data.total} total
                             </span>
                         </div>

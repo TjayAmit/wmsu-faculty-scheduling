@@ -5,6 +5,8 @@ import AppLogo from '@/components/app-logo';
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { NotificationMenu } from '@/components/notification-menu';
+import { SettingsMenu } from '@/components/settings-menu';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -37,6 +39,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
+import { UserNavMenu } from '@/components/user-nav-menu';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
@@ -290,29 +293,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 ))}
                             </div>
                         </div>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    className="size-10 rounded-full p-1"
-                                >
-                                    <Avatar className="size-8 overflow-hidden rounded-full">
-                                        <AvatarImage
-                                            src={auth.user?.avatar}
-                                            alt={auth.user?.name}
-                                        />
-                                        <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
-                                            {getInitials(auth.user?.name ?? '')}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56" align="end">
-                                {auth.user && (
-                                    <UserMenuContent user={auth.user} />
-                                )}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <NotificationMenu />
+                        <SettingsMenu />
+                        <UserNavMenu />
                     </div>
                 </div>
             </div>

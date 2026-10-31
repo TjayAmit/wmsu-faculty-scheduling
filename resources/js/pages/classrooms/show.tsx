@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,16 +36,7 @@ export default function Show({ classroom }: ClassroomsShowProps) {
         <>
             <Head title={`Classrooms - ${classroom.full_identifier || classroom.room_number}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={classrooms()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
-                    </Button>
-                </div>
-
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0">
                         <div className="flex items-center gap-3">
@@ -115,6 +106,31 @@ export default function Show({ classroom }: ClassroomsShowProps) {
                                 </div>
                             </div>
                         )}
+
+                        <div className="grid gap-1">
+                            <p className="text-sm font-medium text-muted-foreground">Bound ZKTeco Biometric Device</p>
+                            {(classroom as { zkteco_device?: { id: number; device_name: string; ip_address: string; port: number; status: string } | null }).zkteco_device ? (
+                                <div className="flex items-center gap-2">
+                                    <Link
+                                        href={`/zkteco-devices/${(classroom as { zkteco_device?: { id: number } }).zkteco_device?.id}`}
+                                        className="font-semibold text-primary hover:underline"
+                                    >
+                                        {(classroom as { zkteco_device?: { device_name: string } }).zkteco_device?.device_name}
+                                    </Link>
+                                    <Badge variant="outline">
+                                        {(classroom as { zkteco_device?: { ip_address: string; port: number } }).zkteco_device?.ip_address}:
+                                        {(classroom as { zkteco_device?: { port: number } }).zkteco_device?.port}
+                                    </Badge>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm text-muted-foreground">No ZKTeco terminal bound to this room</span>
+                                    <Button asChild variant="outline" size="sm">
+                                        <Link href="/zkteco-devices/create">Assign Device</Link>
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
 
                         <div className="grid gap-1">
                             <p className="text-sm font-medium text-muted-foreground">Created At</p>

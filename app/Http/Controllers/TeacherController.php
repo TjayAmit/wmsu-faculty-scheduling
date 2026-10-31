@@ -62,7 +62,7 @@ class TeacherController extends Controller
 
     public function show(Teacher $teacher)
     {
-        $teacher->load('user');
+        $teacher->load('user.roles');
 
         return Inertia::render('teachers/show', [
             'teacher' => $teacher,

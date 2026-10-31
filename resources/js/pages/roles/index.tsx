@@ -84,11 +84,19 @@ return;
         <>
             <Head title="Roles" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Roles & Permissions
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Define role-based access controls, administrative policies, and system permissions.
+                    </p>
+                </div>
 
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Roles"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search roles..."

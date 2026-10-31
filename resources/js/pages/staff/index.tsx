@@ -61,8 +61,8 @@ export default function Index({ data, filters }: StaffIndexProps) {
 
     const handleDelete = () => {
         if (!deleteId) {
-return;
-}
+            return;
+        }
 
         setIsDeleting(true);
         router.delete(staffDestroy(deleteId), {
@@ -77,11 +77,21 @@ return;
         <>
             <Head title="Faculty Staff" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            {/* Standard full-width canvas */}
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Title & Description OUTSIDE the table card */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Faculty Staff
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage academic staff members, contact records, and system accounts.
+                    </p>
+                </div>
 
+                {/* 2. Unified Surface Card */}
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Faculty Staff"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search faculty staff…"
@@ -100,7 +110,7 @@ return;
                                     Email
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
-                                    Date
+                                    Date Added
                                 </TableHead>
                                 <TableHead className="h-11 w-12 py-0 pl-4 pr-6">
                                     <span className="sr-only">Actions</span>

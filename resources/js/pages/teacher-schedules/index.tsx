@@ -174,12 +174,12 @@ interface SubjectsViewProps {
 
 function SubjectsView({ subjects }: SubjectsViewProps) {
     return (
-        <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6">
+        <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
             {/* page header */}
-            <div>
-                <h1 className="text-xl font-semibold">My Schedule</h1>
-                <p className="text-sm text-muted-foreground mt-0.5">
-                    {subjects.length} {subjects.length === 1 ? 'subject' : 'subjects'}
+            <div className="space-y-1.5">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">My Schedule</h1>
+                <p className="text-sm text-muted-foreground">
+                    {subjects.length} {subjects.length === 1 ? 'subject' : 'subjects'} enrolled for this academic term.
                 </p>
             </div>
 
@@ -335,7 +335,7 @@ function SessionsView({ sessions, subject, filters }: SessionsViewProps) {
     }, []);
 
     return (
-        <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
+        <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
             {/* back button */}
             <div>
                 <Button

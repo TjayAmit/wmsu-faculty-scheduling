@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, DoorOpen } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, DoorOpen, Fingerprint, CheckCircle2, Users } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
@@ -31,7 +31,7 @@ import {
 } from '@/routes/classrooms';
 import type { ClassroomsIndexProps } from '@/types';
 
-export default function Index({ data, filters }: ClassroomsIndexProps) {
+export default function Index({ data, filters, stats }: ClassroomsIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -77,11 +77,95 @@ return;
         <>
             <Head title="Classrooms" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Classrooms
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage academic rooms, lecture halls, computer laboratories, and seating capacities.
+                    </p>
+                </div>
 
+                {/* 2. Summary KPI Cards */}
+                {stats && (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Total Rooms
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <DoorOpen className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.total}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Across {stats.total_buildings} {stats.total_buildings === 1 ? 'building' : 'buildings'}
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-emerald-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Active Rooms
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.active}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {stats.inactive} inactive / maintenance
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Total Capacity
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                    <Users className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 flex items-baseline gap-2">
+                                <span className="text-2xl font-bold tracking-tight text-foreground">
+                                    {stats.total_capacity.toLocaleString()}
+                                </span>
+                                <span className="text-xs text-muted-foreground">Seats</span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Avg {stats.avg_capacity} seats per room
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-purple-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Biometric Terminals
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                    <Fingerprint className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.with_device}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {stats.without_device} without device assigned
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Classrooms"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search classrooms…"
@@ -104,6 +188,9 @@ return;
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     Capacity
+                                </TableHead>
+                                <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
+                                    ZKTeco Device (1:1)
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     Status
@@ -164,6 +251,17 @@ return;
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
                                             {item.capacity}
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3.5">
+                                            {(item as { zkteco_device?: { id: number; device_name: string; ip_address: string } | null }).zkteco_device ? (
+                                                <Badge variant="outline" className="gap-1.5 font-medium">
+                                                    <Fingerprint className="h-3 w-3 text-primary" />
+                                                    {(item as { zkteco_device?: { device_name: string } }).zkteco_device?.device_name}
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground">No device bound</span>
+                                            )}
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5">

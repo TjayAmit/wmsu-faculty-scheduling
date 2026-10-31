@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,16 +36,7 @@ export default function Show({ user }: UsersShowProps) {
         <>
             <Head title={`Users - ${user.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={users()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
-                    </Button>
-                </div>
-
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0">
                         <div className="flex items-center gap-3">

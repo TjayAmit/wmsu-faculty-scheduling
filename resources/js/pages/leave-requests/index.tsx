@@ -44,6 +44,7 @@ import {
 import type { LeaveRequestsIndexProps } from '@/types';
 
 export default function Index({ data, filters, teachers }: LeaveRequestsIndexProps) {
+    const [search, setSearch] = useState(filters.search || '');
     const [status, setStatus] = useState(filters.status || 'all');
     const [teacherId, setTeacherId] = useState(filters.teacher_id?.toString() || 'all');
     const [leaveType, setLeaveType] = useState(filters.leave_type || 'all');
@@ -58,6 +59,7 @@ export default function Index({ data, filters, teachers }: LeaveRequestsIndexPro
         router.get(
             leaveRequests(),
             {
+                search: search,
                 status: status === 'all' ? '' : status,
                 teacher_id: teacherId === 'all' ? '' : teacherId,
                 leave_type: leaveType === 'all' ? '' : leaveType,
@@ -68,6 +70,14 @@ export default function Index({ data, filters, teachers }: LeaveRequestsIndexPro
             },
             { preserveState: true, preserveScroll: true },
         );
+    };
+
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        clearTimeout(searchTimeout.current);
+        searchTimeout.current = setTimeout(() => {
+            navigate({ search: value, page: 1 });
+        }, 350);
     };
 
     const handleFilterChange = () => {
@@ -144,92 +154,88 @@ return;
         <>
             <Head title="Leave Requests" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Leave Requests
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage faculty leave applications, absence approvals, and leave endorsements.
+                    </p>
+                </div>
 
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Leave Requests"
                         count={data.total}
-                        search=""
+                        search={search}
                         searchPlaceholder="Search leave requests..."
-                        onSearchChange={() => {}}
+                        onSearchChange={handleSearchChange}
                         createHref={leaveRequestsCreate().url}
                         createLabel="New Request"
-                    />
+                    >
+                        <Select
+                            value={status}
+                            onValueChange={(value) => {
+                                setStatus(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[130px] text-xs">
+                                <SelectValue placeholder="All statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All statuses</SelectItem>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="approved">Approved</SelectItem>
+                                <SelectItem value="rejected">Rejected</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                    {/* Filters */}
-                    <div className="border-b border-border bg-muted/30 px-6 py-4">
-                        <div className="flex flex-wrap items-end gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="status_filter" className="text-xs">Status</Label>
-                                <Select
-                                    value={status}
-                                    onValueChange={(value) => {
-                                        setStatus(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="status_filter" className="w-[140px]">
-                                        <SelectValue placeholder="All statuses" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All statuses</SelectItem>
-                                        <SelectItem value="pending">Pending</SelectItem>
-                                        <SelectItem value="approved">Approved</SelectItem>
-                                        <SelectItem value="rejected">Rejected</SelectItem>
-                                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={teacherId}
+                            onValueChange={(value) => {
+                                setTeacherId(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All teachers" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All teachers</SelectItem>
+                                {teachers.map((teacher) => (
+                                    <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                        {teacher.first_name} {teacher.last_name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="teacher_filter" className="text-xs">Teacher</Label>
-                                <Select
-                                    value={teacherId}
-                                    onValueChange={(value) => {
-                                        setTeacherId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="teacher_filter" className="w-[180px]">
-                                        <SelectValue placeholder="All teachers" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All teachers</SelectItem>
-                                        {teachers.map((teacher) => (
-                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                                {teacher.first_name} {teacher.last_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={leaveType}
+                            onValueChange={(value) => {
+                                setLeaveType(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[130px] text-xs">
+                                <SelectValue placeholder="All types" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All types</SelectItem>
+                                <SelectItem value="sick">Sick Leave</SelectItem>
+                                <SelectItem value="vacation">Vacation Leave</SelectItem>
+                                <SelectItem value="personal">Personal Leave</SelectItem>
+                                <SelectItem value="emergency">Emergency Leave</SelectItem>
+                                <SelectItem value="maternity">Maternity Leave</SelectItem>
+                                <SelectItem value="paternity">Paternity Leave</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="leave_type_filter" className="text-xs">Leave Type</Label>
-                                <Select
-                                    value={leaveType}
-                                    onValueChange={(value) => {
-                                        setLeaveType(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="leave_type_filter" className="w-[160px]">
-                                        <SelectValue placeholder="All types" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All types</SelectItem>
-                                        <SelectItem value="sick">Sick Leave</SelectItem>
-                                        <SelectItem value="vacation">Vacation Leave</SelectItem>
-                                        <SelectItem value="personal">Personal Leave</SelectItem>
-                                        <SelectItem value="emergency">Emergency Leave</SelectItem>
-                                        <SelectItem value="maternity">Maternity Leave</SelectItem>
-                                        <SelectItem value="paternity">Paternity Leave</SelectItem>
-                                        <SelectItem value="other">Other</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
+                        {(status !== 'all' || teacherId !== 'all' || leaveType !== 'all') && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -241,11 +247,12 @@ return;
                                     setDateTo('');
                                     setTimeout(() => navigate({ status: '', teacher_id: '', leave_type: '', date_from: '', date_to: '', page: 1 }), 0);
                                 }}
+                                className="h-9 px-2 text-xs text-muted-foreground hover:text-foreground"
                             >
                                 Clear filters
                             </Button>
-                        </div>
-                    </div>
+                        )}
+                    </TablePageHeader>
 
                     <Table>
                         <TableHeader>

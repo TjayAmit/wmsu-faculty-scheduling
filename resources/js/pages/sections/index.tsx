@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, Users, ToggleLeft, ToggleRight } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, Users, ToggleLeft, ToggleRight, CheckCircle2, GraduationCap, Building2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
@@ -40,7 +40,7 @@ import {
 } from '@/routes/sections';
 import type { SectionsIndexProps } from '@/types';
 
-export default function Index({ data, filters, programs, semesters }: SectionsIndexProps) {
+export default function Index({ data, filters, programs, semesters, stats }: SectionsIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [programId, setProgramId] = useState(filters.program_id?.toString() || '');
@@ -110,107 +110,179 @@ return;
         <>
             <Head title="Sections" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6">
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* 1. Page Header (OUTSIDE table card) */}
+                <div className="space-y-1.5">
+                    <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                        Class Sections
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                        Organize student class sections, cohorts, academic year levels, and program tracks.
+                    </p>
+                </div>
 
+                {/* 2. Summary KPI Cards */}
+                {stats && (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Total Sections
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                    <Users className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.total}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Active cohort units & classes
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-emerald-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Active Sections
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                    <CheckCircle2 className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                                {stats.active}
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {stats.inactive} inactive / archived
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Total Enrolled
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                    <GraduationCap className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 flex items-baseline gap-2">
+                                <span className="text-2xl font-bold tracking-tight text-foreground">
+                                    {stats.total_enrolled}
+                                </span>
+                                <span className="text-xs text-muted-foreground">Students</span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                {stats.utilization_rate}% capacity filled
+                            </p>
+                        </div>
+
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-purple-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Student Capacity
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                    <Building2 className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 flex items-baseline gap-2">
+                                <span className="text-2xl font-bold tracking-tight text-foreground">
+                                    {stats.total_capacity}
+                                </span>
+                                <span className="text-xs text-muted-foreground">Max Seats</span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                                Combined class seat limit
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
                     <TablePageHeader
-                        title="Sections"
                         count={data.total}
                         search={search}
                         searchPlaceholder="Search by section code or program..."
                         onSearchChange={handleSearchChange}
                         createHref={sectionsCreate().url}
                         createLabel="New Section"
-                    />
+                    >
+                        <Select
+                            value={programId}
+                            onValueChange={(value) => {
+                                setProgramId(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All programs" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {programs.map((program) => (
+                                    <SelectItem key={program.id} value={program.id.toString()}>
+                                        {program.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                    {/* Filters */}
-                    <div className="border-b border-border bg-muted/30 px-6 py-4">
-                        <div className="flex flex-wrap items-end gap-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="program_filter" className="text-xs">Program</Label>
-                                <Select
-                                    value={programId}
-                                    onValueChange={(value) => {
-                                        setProgramId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="program_filter" className="w-[180px]">
-                                        <SelectValue placeholder="All programs" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {programs.map((program) => (
-                                            <SelectItem key={program.id} value={program.id.toString()}>
-                                                {program.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={semesterId}
+                            onValueChange={(value) => {
+                                setSemesterId(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[140px] text-xs">
+                                <SelectValue placeholder="All semesters" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {semesters.map((semester) => (
+                                    <SelectItem key={semester.id} value={semester.id.toString()}>
+                                        {semester.name} {semester.year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="semester_filter" className="text-xs">Semester</Label>
-                                <Select
-                                    value={semesterId}
-                                    onValueChange={(value) => {
-                                        setSemesterId(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="semester_filter" className="w-[160px]">
-                                        <SelectValue placeholder="All semesters" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {semesters.map((semester) => (
-                                            <SelectItem key={semester.id} value={semester.id.toString()}>
-                                                {semester.name} {semester.year}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={yearLevel}
+                            onValueChange={(value) => {
+                                setYearLevel(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[110px] text-xs">
+                                <SelectValue placeholder="All years" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[1, 2, 3, 4, 5].map((year) => (
+                                    <SelectItem key={year} value={year.toString()}>
+                                        Year {year}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="year_level_filter" className="text-xs">Year Level</Label>
-                                <Select
-                                    value={yearLevel}
-                                    onValueChange={(value) => {
-                                        setYearLevel(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="year_level_filter" className="w-[130px]">
-                                        <SelectValue placeholder="All years" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {[1, 2, 3, 4, 5].map((year) => (
-                                            <SelectItem key={year} value={year.toString()}>
-                                                Year {year}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                        <Select
+                            value={isActive}
+                            onValueChange={(value) => {
+                                setIsActive(value);
+                                setTimeout(() => handleFilterChange(), 0);
+                            }}
+                        >
+                            <SelectTrigger className="h-9 w-[110px] text-xs">
+                                <SelectValue placeholder="All statuses" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="true">Active</SelectItem>
+                                <SelectItem value="false">Inactive</SelectItem>
+                            </SelectContent>
+                        </Select>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="status_filter" className="text-xs">Status</Label>
-                                <Select
-                                    value={isActive}
-                                    onValueChange={(value) => {
-                                        setIsActive(value);
-                                        setTimeout(() => handleFilterChange(), 0);
-                                    }}
-                                >
-                                    <SelectTrigger id="status_filter" className="w-[130px]">
-                                        <SelectValue placeholder="All statuses" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="true">Active</SelectItem>
-                                        <SelectItem value="false">Inactive</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
+                        {(programId || semesterId || yearLevel || isActive) && (
                             <Button
                                 variant="ghost"
                                 size="sm"
@@ -221,11 +293,12 @@ return;
                                     setIsActive('');
                                     setTimeout(() => navigate({ program_id: '', semester_id: '', year_level: '', is_active: '', page: 1 }), 0);
                                 }}
+                                className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground"
                             >
                                 Clear filters
                             </Button>
-                        </div>
-                    </div>
+                        )}
+                    </TablePageHeader>
 
                     <Table>
                         <TableHeader>

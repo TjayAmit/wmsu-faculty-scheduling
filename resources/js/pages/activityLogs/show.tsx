@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -66,16 +66,7 @@ return 'N/A';
         <>
             <Head title={`Activity Log - ${activityLog.description.substring(0, 50)}...`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4">
-                <div>
-                    <Button variant="ghost" size="sm" asChild>
-                        <Link href={activityLogs()}>
-                            <ArrowLeft className="mr-2 h-4 w-4" />
-                            Back to list
-                        </Link>
-                    </Button>
-                </div>
-
+            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0">
                         <div className="flex flex-col gap-2">

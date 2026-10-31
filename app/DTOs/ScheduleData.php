@@ -10,6 +10,7 @@ readonly class ScheduleData
     public function __construct(
         public ?int $subject_id = null,
         public ?int $semester_id = null,
+        public ?int $classroom_id = null,
         public ?array $time_slots = null,
         public ?string $room = null,
         public ?string $section = null,
@@ -21,6 +22,7 @@ readonly class ScheduleData
         return new self(
             subject_id: $request->input('subject_id'),
             semester_id: $request->input('semester_id'),
+            classroom_id: $request->input('classroom_id') ? (int) $request->input('classroom_id') : null,
             time_slots: $request->input('time_slots'),
             room: $request->input('room'),
             section: $request->input('section'),
@@ -33,6 +35,7 @@ readonly class ScheduleData
         return new self(
             subject_id: $schedule->subject_id,
             semester_id: $schedule->semester_id,
+            classroom_id: $schedule->classroom_id,
             time_slots: $schedule->time_slots,
             room: $schedule->room,
             section: $schedule->section,

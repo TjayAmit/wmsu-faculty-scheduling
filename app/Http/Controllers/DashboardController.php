@@ -15,7 +15,7 @@ class DashboardController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        $teacher = auth()->user()->teacher ?? null;
+        return redirect()->route('instructor.dashboard');
         $teacherId = $teacher?->id ?? 0;
 
         $baseQuery = fn () => TeacherSchedule::with(['subject', 'semester'])

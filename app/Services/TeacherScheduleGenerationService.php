@@ -214,6 +214,7 @@ class TeacherScheduleGenerationService
             section: $section,
             isHoliday: $isHoliday,
             holidayName: $holidayName,
+            classroomId: $teacherAssignment->schedule->classroom_id,
         );
 
         return $this->repository->create($data->toArray());
