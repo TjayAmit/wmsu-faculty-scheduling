@@ -534,314 +534,307 @@ export default function KioskScannerPage({
     }
 
     // ---------------------------------------------------------------------------
-    // STATE 2: REGISTERED & AUTHORIZED CLASSROOM QR KIOSK TERMINAL
+    // STATE 2: REGISTERED & AUTHORIZED CLASSROOM QR KIOSK TERMINAL (CENTERED DESIGN)
     // ---------------------------------------------------------------------------
     return (
         <>
             <Head title={`QR Kiosk — ${kiosk?.classroom?.full_label || 'Classroom Scanner'}`} />
 
-            <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
-                {/* 1. Kiosk Header Bar */}
-                <header className="border-b border-slate-800 bg-slate-900/80 px-6 py-4">
-                    <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4">
-                        <div className="flex items-center gap-3.5">
-                            <div className="flex size-11 items-center justify-center rounded-xl bg-red-900 text-white shadow-md">
-                                <QrCode className="size-6" />
+            <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between px-4 py-6 sm:px-6">
+                {/* Top Minimal Bar */}
+                <header className="mx-auto flex w-full max-w-2xl items-center justify-between border-b border-slate-800/80 pb-4">
+                    <div className="flex items-center gap-3">
+                        <div className="flex size-10 items-center justify-center rounded-xl bg-red-900 text-white shadow-md">
+                            <QrCode className="size-5" />
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-sm font-bold tracking-tight text-white sm:text-base">
+                                    WMSU Classroom QR Clock-In Kiosk
+                                </h1>
+                                <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 gap-1 text-[10px]">
+                                    <ShieldCheck className="size-3" />
+                                    Registered
+                                </Badge>
                             </div>
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <h1 className="text-base font-bold tracking-tight text-white sm:text-lg">
-                                        WMSU Classroom QR Clock-In Kiosk
-                                    </h1>
-                                    <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 gap-1 text-[10px]">
-                                        <ShieldCheck className="size-3" />
-                                        Registered Browser
-                                    </Badge>
-                                </div>
-                                <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 mt-0.5">
-                                    <span className="inline-flex items-center gap-1 font-semibold text-amber-300">
-                                        <DoorOpen className="size-3.5" />
-                                        {kiosk?.classroom?.full_label}
-                                        {kiosk?.classroom?.room_name ? ` (${kiosk.classroom.room_name})` : ''}
-                                    </span>
-                                    <span>&bull;</span>
-                                    <span>{kiosk?.kiosk_name}</span>
-                                    <span>&bull;</span>
-                                    <span>Single Scan = Present (No Time-Out Required)</span>
-                                </div>
+                            <p className="text-[11px] text-slate-400">
+                                Single Scan = Present (No Time-Out Required)
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                        <div className="text-right">
+                            <div className="font-mono text-base font-bold text-white tracking-tight sm:text-lg">
+                                {currentTime.toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    second: '2-digit',
+                                })}
+                            </div>
+                            <div className="text-[10px] text-slate-400">
+                                {currentTime.toLocaleDateString('en-US', {
+                                    weekday: 'short',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                })}
                             </div>
                         </div>
 
-                        {/* Live Clock & Controls */}
-                        <div className="flex items-center gap-4">
-                            <div className="text-right">
-                                <div className="font-mono text-xl font-bold text-white tracking-tight">
-                                    {currentTime.toLocaleTimeString('en-US', {
-                                        hour: 'numeric',
-                                        minute: '2-digit',
-                                        second: '2-digit',
-                                    })}
-                                </div>
-                                <div className="text-[11px] text-slate-400">
-                                    {currentTime.toLocaleDateString('en-US', {
-                                        weekday: 'long',
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric',
-                                    })}
-                                </div>
-                            </div>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="size-8 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"
+                            onClick={() => setSoundEnabled((prev) => !prev)}
+                            title={soundEnabled ? 'Mute Beep Sound' : 'Enable Beep Sound'}
+                        >
+                            {soundEnabled ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
+                        </Button>
 
+                        {isAdminLoggedIn && (
                             <Button
-                                type="button"
+                                asChild
                                 variant="outline"
-                                size="icon"
-                                className="size-9 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700"
-                                onClick={() => setSoundEnabled((prev) => !prev)}
-                                title={soundEnabled ? 'Mute Beep Sound' : 'Enable Beep Sound'}
+                                size="sm"
+                                className="h-8 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 text-xs gap-1.5"
                             >
-                                {soundEnabled ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+                                <Link href="/qr-kiosks">
+                                    <Settings className="size-3.5" />
+                                    <span className="hidden sm:inline">Manage</span>
+                                </Link>
                             </Button>
-
-                            {isAdminLoggedIn && (
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-9 border-slate-700 bg-slate-800 text-slate-200 hover:bg-slate-700 text-xs gap-1.5"
-                                >
-                                    <Link href="/qr-kiosks">
-                                        <Settings className="size-3.5" />
-                                        Manage Kiosks
-                                    </Link>
-                                </Button>
-                            )}
-                        </div>
+                        )}
                     </div>
                 </header>
 
-                {/* 2. Main Split Content */}
-                <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-6 p-6 lg:grid-cols-12">
-                    {/* LEFT COLUMN: Camera QR Scanner + USB/Manual Input + Instant Feedback (7 cols) */}
-                    <div className="flex flex-col gap-5 lg:col-span-7">
-                        {/* Instant Scan Feedback Banner */}
-                        {feedback ? (
-                            <div
-                                className={`rounded-2xl border p-5 shadow-lg transition-all ${
-                                    feedback.success
-                                        ? feedback.already_present
-                                            ? 'border-sky-500/40 bg-sky-950/40 text-sky-100'
-                                            : 'border-emerald-500/50 bg-emerald-950/50 text-emerald-100'
-                                        : 'border-red-500/50 bg-red-950/50 text-red-100'
-                                }`}
-                            >
-                                <div className="flex items-start justify-between gap-4">
-                                    <div className="flex items-start gap-3.5">
-                                        <div
-                                            className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${
-                                                feedback.success
-                                                    ? feedback.already_present
-                                                        ? 'bg-sky-500/20 text-sky-400'
-                                                        : 'bg-emerald-500/20 text-emerald-400'
-                                                    : 'bg-red-500/20 text-red-400'
-                                            }`}
-                                        >
-                                            {feedback.success ? (
-                                                <CheckCircle2 className="size-7" />
-                                            ) : (
-                                                <AlertTriangle className="size-7" />
-                                            )}
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <h2 className="text-lg font-bold text-white">
-                                                    {feedback.title}
-                                                </h2>
-                                                <span className="text-xs font-mono opacity-75">
-                                                    {feedback.timestamp}
-                                                </span>
-                                            </div>
-                                            <p className="text-xs leading-relaxed opacity-90">
-                                                {feedback.message}
-                                            </p>
-
-                                            {feedback.teacher && (
-                                                <div className="mt-3 flex flex-wrap items-center gap-2 pt-2 border-t border-white/10 text-xs">
-                                                    <Badge className="bg-white/15 text-white border-white/20">
-                                                        {feedback.teacher.full_name} ({feedback.teacher.employee_id})
-                                                    </Badge>
-                                                    {feedback.session && (
-                                                        <>
-                                                            <Badge className="bg-white/15 text-white border-white/20">
-                                                                {feedback.session.subject_code}
-                                                                {feedback.session.section
-                                                                    ? ` • Sec ${feedback.session.section}`
-                                                                    : ''}
-                                                            </Badge>
-                                                            <Badge className="bg-emerald-500/30 text-emerald-200 border-emerald-400/30">
-                                                                Clocked In: {feedback.session.clock_in_time}
-                                                            </Badge>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-10 items-center justify-center rounded-xl bg-red-900/30 text-red-400">
-                                        <UserCheck className="size-5" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-sm font-semibold text-white">
-                                            Ready for Faculty QR Clock-In
-                                        </h2>
-                                        <p className="text-xs text-slate-400">
-                                            Hold your WMSU Faculty QR Pass in front of the camera or scan with a reader. Clock in once only to be marked Present.
-                                        </p>
-                                    </div>
-                                </div>
-                                <Badge variant="outline" className="border-slate-700 text-slate-300 font-mono text-xs shrink-0">
-                                    {scansCount} Total Scans
-                                </Badge>
-                            </div>
-                        )}
-
-                        {/* Camera Viewport Card */}
-                        <div className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden shadow-xl">
-                            <div className="flex items-center justify-between border-b border-slate-800 px-5 py-3.5">
-                                <div className="flex items-center gap-2">
-                                    <Camera className="size-4 text-red-400" />
-                                    <span className="text-xs font-semibold uppercase tracking-wider text-slate-200">
-                                        Optical QR Camera Scanner
-                                    </span>
-                                </div>
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    variant={cameraActive ? 'destructive' : 'default'}
-                                    className={`h-8 text-xs gap-1.5 ${
-                                        !cameraActive ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''
-                                    }`}
-                                    onClick={() => (cameraActive ? stopCamera() : startCamera())}
-                                >
-                                    {cameraActive ? (
-                                        <>
-                                            <CameraOff className="size-3.5" />
-                                            Stop Camera
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Camera className="size-3.5" />
-                                            Start Camera Scanner
-                                        </>
-                                    )}
-                                </Button>
-                            </div>
-
-                            <div className="relative flex aspect-video w-full items-center justify-center bg-slate-950">
-                                <video
-                                    ref={videoRef}
-                                    className={`h-full w-full object-cover ${cameraActive ? 'block' : 'hidden'}`}
-                                    playsInline
-                                    muted
-                                />
-                                <canvas ref={canvasRef} className="hidden" />
-
-                                {cameraActive && (
-                                    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                                        <div className="relative size-56 rounded-2xl border-2 border-emerald-400/80 shadow-[0_0_0_9999px_rgba(2,6,23,0.45)]">
-                                            <div className="absolute inset-x-2 top-1/2 h-0.5 -translate-y-1/2 bg-emerald-400/90 shadow-[0_0_12px_#34d399] animate-pulse" />
-                                        </div>
-                                    </div>
-                                )}
-
-                                {!cameraActive && (
-                                    <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
-                                        <div className="flex size-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-800 text-slate-400">
-                                            <QrCode className="size-8" />
-                                        </div>
-                                        <div className="space-y-1 max-w-md">
-                                            <p className="text-sm font-semibold text-slate-200">
-                                                Camera Scanner Standby
-                                            </p>
-                                            <p className="text-xs text-slate-400">
-                                                Click <strong>Start Camera Scanner</strong> above to scan QR passes using this device&apos;s webcam, or use the USB scanner / token input below.
-                                            </p>
-                                        </div>
-                                        {cameraError && (
-                                            <p className="text-xs text-amber-400 bg-amber-950/40 border border-amber-500/30 rounded-lg px-3 py-2 max-w-md">
-                                                {cameraError}
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Hardware USB Scanner / Manual Token Input Bar */}
-                            <form
-                                onSubmit={handleManualSubmit}
-                                className="border-t border-slate-800 bg-slate-900/90 p-4 flex flex-col gap-2 sm:flex-row sm:items-center"
-                            >
-                                <div className="relative flex-1">
-                                    <Keyboard className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
-                                    <Input
-                                        value={manualCode}
-                                        onChange={(e) => setManualCode(e.target.value)}
-                                        placeholder="USB QR Scanner input or paste QR Token / Employee ID (e.g. WMSU-QR:... or EMP-0001)"
-                                        className="pl-9 h-10 text-xs bg-slate-950 border-slate-700 text-white placeholder:text-slate-500"
-                                        autoFocus
-                                    />
-                                </div>
-                                <Button
-                                    type="submit"
-                                    disabled={isSubmitting || !manualCode.trim()}
-                                    className="h-10 bg-red-800 hover:bg-red-700 text-white font-semibold text-xs px-5 gap-2 shrink-0"
-                                >
-                                    {isSubmitting ? (
-                                        <Loader2 className="size-4 animate-spin" />
-                                    ) : (
-                                        <KeyRound className="size-4" />
-                                    )}
-                                    Clock In (Present)
-                                </Button>
-                            </form>
+                {/* Centered Kiosk Container */}
+                <main className="mx-auto my-auto flex w-full max-w-2xl flex-col gap-4 py-6">
+                    {/* Centered Classroom Identity Banner */}
+                    <div className="text-center space-y-1.5">
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3.5 py-1 text-xs font-semibold text-amber-300">
+                            <DoorOpen className="size-3.5" />
+                            <span>
+                                {kiosk?.classroom?.full_label}
+                                {kiosk?.classroom?.room_name ? ` (${kiosk.classroom.room_name})` : ''}
+                            </span>
                         </div>
+                        <p className="text-xs text-slate-400">
+                            Hold your Faculty QR Pass in front of the camera or scan via reader to record attendance.
+                        </p>
                     </div>
 
-                    {/* RIGHT COLUMN: Today's Classroom Schedule & Recent Scans (5 cols) */}
-                    <div className="flex flex-col gap-5 lg:col-span-5">
-                        {/* Today's Scheduled Classes in This Classroom */}
-                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-xl space-y-4">
-                            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                    {/* Instant Scan Feedback Banner */}
+                    {feedback ? (
+                        <div
+                            className={`rounded-2xl border p-4 shadow-lg transition-all ${
+                                feedback.success
+                                    ? feedback.already_present
+                                        ? 'border-sky-500/40 bg-sky-950/40 text-sky-100'
+                                        : 'border-emerald-500/50 bg-emerald-950/50 text-emerald-100'
+                                    : 'border-red-500/50 bg-red-950/50 text-red-100'
+                            }`}
+                        >
+                            <div className="flex items-start gap-3.5">
+                                <div
+                                    className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${
+                                        feedback.success
+                                            ? feedback.already_present
+                                                ? 'bg-sky-500/20 text-sky-400'
+                                                : 'bg-emerald-500/20 text-emerald-400'
+                                            : 'bg-red-500/20 text-red-400'
+                                    }`}
+                                >
+                                    {feedback.success ? (
+                                        <CheckCircle2 className="size-6" />
+                                    ) : (
+                                        <AlertTriangle className="size-6" />
+                                    )}
+                                </div>
+
+                                <div className="flex-1 space-y-1">
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                        <h2 className="text-base font-bold text-white">
+                                            {feedback.title}
+                                        </h2>
+                                        <span className="text-xs font-mono opacity-75">
+                                            {feedback.timestamp}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs leading-relaxed opacity-90">
+                                        {feedback.message}
+                                    </p>
+
+                                    {feedback.teacher && (
+                                        <div className="mt-2.5 flex flex-wrap items-center gap-2 pt-2 border-t border-white/10 text-xs">
+                                            <Badge className="bg-white/15 text-white border-white/20">
+                                                {feedback.teacher.full_name} ({feedback.teacher.employee_id})
+                                            </Badge>
+                                            {feedback.session && (
+                                                <>
+                                                    <Badge className="bg-white/15 text-white border-white/20">
+                                                        {feedback.session.subject_code}
+                                                        {feedback.session.section
+                                                            ? ` • Sec ${feedback.session.section}`
+                                                            : ''}
+                                                    </Badge>
+                                                    <Badge className="bg-emerald-500/30 text-emerald-200 border-emerald-400/30">
+                                                        Present at {feedback.session.clock_in_time}
+                                                    </Badge>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="flex size-9 items-center justify-center rounded-xl bg-red-900/30 text-red-400">
+                                    <UserCheck className="size-4" />
+                                </div>
                                 <div>
-                                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                                        <Clock className="size-4 text-amber-400" />
-                                        Today&apos;s Schedule in {kiosk?.classroom?.building} {kiosk?.classroom?.room_number}
-                                    </h3>
-                                    <p className="text-[11px] text-slate-400 mt-0.5">
-                                        Classes scheduled for this room today and their clock-in status
+                                    <h2 className="text-xs font-semibold text-white">
+                                        Ready for Faculty QR Clock-In
+                                    </h2>
+                                    <p className="text-[11px] text-slate-400">
+                                        {kiosk?.kiosk_name}
                                     </p>
                                 </div>
-                                <Badge variant="outline" className="border-slate-700 text-slate-300 text-xs">
+                            </div>
+                            <Badge variant="outline" className="border-slate-700 text-slate-300 font-mono text-[11px] shrink-0">
+                                {scansCount} Total Scans
+                            </Badge>
+                        </div>
+                    )}
+
+                    {/* Centered Camera Viewport & Scanner Card */}
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden shadow-2xl">
+                        <div className="flex items-center justify-between border-b border-slate-800 px-5 py-3">
+                            <div className="flex items-center gap-2">
+                                <Camera className="size-4 text-red-400" />
+                                <span className="text-xs font-semibold uppercase tracking-wider text-slate-200">
+                                    Optical QR Camera Scanner
+                                </span>
+                            </div>
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant={cameraActive ? 'destructive' : 'default'}
+                                className={`h-8 text-xs gap-1.5 ${
+                                    !cameraActive ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : ''
+                                }`}
+                                onClick={() => (cameraActive ? stopCamera() : startCamera())}
+                            >
+                                {cameraActive ? (
+                                    <>
+                                        <CameraOff className="size-3.5" />
+                                        Stop Camera
+                                    </>
+                                ) : (
+                                    <>
+                                        <Camera className="size-3.5" />
+                                        Start Camera Scanner
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+
+                        <div className="relative flex aspect-video w-full items-center justify-center bg-slate-950">
+                            <video
+                                ref={videoRef}
+                                className={`h-full w-full object-cover ${cameraActive ? 'block' : 'hidden'}`}
+                                playsInline
+                                muted
+                            />
+                            <canvas ref={canvasRef} className="hidden" />
+
+                            {cameraActive && (
+                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                    <div className="relative size-56 rounded-2xl border-2 border-emerald-400/80 shadow-[0_0_0_9999px_rgba(2,6,23,0.45)]">
+                                        <div className="absolute inset-x-2 top-1/2 h-0.5 -translate-y-1/2 bg-emerald-400/90 shadow-[0_0_12px_#34d399] animate-pulse" />
+                                    </div>
+                                </div>
+                            )}
+
+                            {!cameraActive && (
+                                <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
+                                    <div className="flex size-16 items-center justify-center rounded-2xl bg-slate-900 border border-slate-800 text-slate-400">
+                                        <QrCode className="size-8" />
+                                    </div>
+                                    <div className="space-y-1 max-w-md">
+                                        <p className="text-sm font-semibold text-slate-200">
+                                            Camera Scanner Standby
+                                        </p>
+                                        <p className="text-xs text-slate-400">
+                                            Click <strong>Start Camera Scanner</strong> above to scan QR passes using this device&apos;s webcam, or use the USB scanner / token input below.
+                                        </p>
+                                    </div>
+                                    {cameraError && (
+                                        <p className="text-xs text-amber-400 bg-amber-950/40 border border-amber-500/30 rounded-lg px-3 py-2 max-w-md">
+                                            {cameraError}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Hardware USB Scanner / Manual Token Input Bar */}
+                        <form
+                            onSubmit={handleManualSubmit}
+                            className="border-t border-slate-800 bg-slate-900/90 p-3.5 flex flex-col gap-2 sm:flex-row sm:items-center"
+                        >
+                            <div className="relative flex-1">
+                                <Keyboard className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
+                                <Input
+                                    value={manualCode}
+                                    onChange={(e) => setManualCode(e.target.value)}
+                                    placeholder="USB QR Scanner input or paste QR Token / Employee ID"
+                                    className="pl-9 h-10 text-xs bg-slate-950 border-slate-700 text-white placeholder:text-slate-500"
+                                    autoFocus
+                                />
+                            </div>
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting || !manualCode.trim()}
+                                className="h-10 bg-red-800 hover:bg-red-700 text-white font-semibold text-xs px-5 gap-2 shrink-0"
+                            >
+                                {isSubmitting ? (
+                                    <Loader2 className="size-4 animate-spin" />
+                                ) : (
+                                    <KeyRound className="size-4" />
+                                )}
+                                Clock In (Present)
+                            </Button>
+                        </form>
+                    </div>
+
+                    {/* Compact Centered Room Schedule & Recent Scans */}
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        {/* Today's Scheduled Classes in This Classroom */}
+                        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-3">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                                <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <Clock className="size-3.5 text-amber-400" />
+                                    Room Schedule Today
+                                </h3>
+                                <Badge variant="outline" className="border-slate-700 text-slate-300 text-[10px]">
                                     {sessions.length} {sessions.length === 1 ? 'Class' : 'Classes'}
                                 </Badge>
                             </div>
 
                             {sessions.length === 0 ? (
-                                <div className="py-8 text-center text-xs text-slate-500">
-                                    No scheduled classes assigned to {kiosk?.classroom?.full_label} for today.
+                                <div className="py-4 text-center text-[11px] text-slate-500">
+                                    No scheduled classes in this room today.
                                 </div>
                             ) : (
-                                <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                                <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
                                     {sessions.map((session) => (
                                         <div
                                             key={session.id}
-                                            className={`rounded-xl border p-3.5 transition-all ${
+                                            className={`rounded-xl border p-2.5 text-xs ${
                                                 session.is_present
                                                     ? 'border-emerald-500/30 bg-emerald-950/20'
                                                     : session.is_live_window
@@ -850,32 +843,27 @@ export default function KioskScannerPage({
                                             }`}
                                         >
                                             <div className="flex items-start justify-between gap-2">
-                                                <div>
-                                                    <div className="font-semibold text-xs text-white">
-                                                        {session.subject_code} — {session.subject_title}
-                                                    </div>
-                                                    <div className="text-[11px] text-slate-400 mt-0.5">
-                                                        Instructor: <strong className="text-slate-200">{session.teacher_name}</strong>
-                                                        {session.section ? ` • Sec ${session.section}` : ''}
-                                                    </div>
+                                                <div className="font-semibold text-white truncate">
+                                                    {session.subject_code}
                                                 </div>
-
                                                 {session.is_present ? (
-                                                    <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px] shrink-0 gap-1">
-                                                        <CheckCircle2 className="size-3" />
-                                                        Present {session.clock_in_time ? `(${session.clock_in_time})` : ''}
+                                                    <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[9px] shrink-0">
+                                                        Present
                                                     </Badge>
                                                 ) : session.is_live_window ? (
-                                                    <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[10px] shrink-0">
-                                                        Open for Scan
+                                                    <Badge className="bg-amber-500/20 text-amber-300 border-amber-500/30 text-[9px] shrink-0">
+                                                        Open
                                                     </Badge>
                                                 ) : (
-                                                    <Badge variant="outline" className="border-slate-700 text-slate-400 text-[10px] shrink-0">
+                                                    <Badge variant="outline" className="border-slate-700 text-slate-400 text-[9px] shrink-0">
                                                         Scheduled
                                                     </Badge>
                                                 )}
                                             </div>
-                                            <div className="mt-2 text-[11px] font-mono text-slate-400">
+                                            <div className="text-[11px] text-slate-400 truncate mt-0.5">
+                                                {session.teacher_name}
+                                            </div>
+                                            <div className="text-[10px] font-mono text-slate-500 mt-1">
                                                 {session.start_time} – {session.end_time}
                                             </div>
                                         </div>
@@ -885,52 +873,47 @@ export default function KioskScannerPage({
                         </div>
 
                         {/* Recent Scans at This Kiosk Today */}
-                        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5 shadow-xl space-y-4 flex-1">
-                            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                                <div>
-                                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                                        <Laptop className="size-4 text-emerald-400" />
-                                        Today&apos;s Kiosk Clock-In Log
-                                    </h3>
-                                    <p className="text-[11px] text-slate-400 mt-0.5">
-                                        Real-time audit feed for this classroom browser terminal
-                                    </p>
-                                </div>
+                        <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-4 space-y-3">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                                <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <Laptop className="size-3.5 text-emerald-400" />
+                                    Today&apos;s Clock-In Log
+                                </h3>
+                                <Badge variant="outline" className="border-slate-700 text-slate-300 text-[10px]">
+                                    {logs.length}
+                                </Badge>
                             </div>
 
                             {logs.length === 0 ? (
-                                <div className="py-8 text-center text-xs text-slate-500">
-                                    No QR scans recorded at this terminal today yet.
+                                <div className="py-4 text-center text-[11px] text-slate-500">
+                                    No QR scans recorded today yet.
                                 </div>
                             ) : (
-                                <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                                <div className="space-y-2 max-h-44 overflow-y-auto pr-1">
                                     {logs.map((log) => (
                                         <div
                                             key={log.id}
-                                            className="rounded-xl border border-slate-800 bg-slate-950/60 p-3 flex items-start justify-between gap-3 text-xs"
+                                            className="rounded-xl border border-slate-800 bg-slate-950/60 p-2.5 flex items-start justify-between gap-2 text-xs"
                                         >
-                                            <div className="space-y-0.5 min-w-0">
-                                                <div className="font-semibold text-white truncate">
-                                                    {log.teacher_name}{' '}
-                                                    <span className="font-mono text-[10px] text-slate-400">
-                                                        ({log.employee_id})
-                                                    </span>
+                                            <div className="min-w-0">
+                                                <div className="font-semibold text-white truncate text-[11px]">
+                                                    {log.teacher_name}
                                                 </div>
-                                                <p className="text-[11px] text-slate-400 line-clamp-2">
+                                                <p className="text-[10px] text-slate-400 truncate">
                                                     {log.message}
                                                 </p>
                                             </div>
-                                            <div className="text-right shrink-0 space-y-1">
+                                            <div className="text-right shrink-0">
                                                 <Badge
                                                     className={
                                                         log.is_matched
-                                                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]'
-                                                            : 'bg-red-500/20 text-red-300 border-red-500/30 text-[10px]'
+                                                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[9px]'
+                                                            : 'bg-red-500/20 text-red-300 border-red-500/30 text-[9px]'
                                                     }
                                                 >
                                                     {log.is_matched ? 'Present' : 'Rejected'}
                                                 </Badge>
-                                                <div className="text-[10px] font-mono text-slate-500">
+                                                <div className="text-[9px] font-mono text-slate-500 mt-0.5">
                                                     {log.punch_time}
                                                 </div>
                                             </div>
@@ -941,6 +924,11 @@ export default function KioskScannerPage({
                         </div>
                     </div>
                 </main>
+
+                {/* Footer */}
+                <footer className="text-center text-[11px] text-slate-600">
+                    WMSU Faculty Scheduling &amp; Room-Verified Attendance System
+                </footer>
             </div>
         </>
     );
