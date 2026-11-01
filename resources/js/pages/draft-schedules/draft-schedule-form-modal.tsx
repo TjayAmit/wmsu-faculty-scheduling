@@ -1,8 +1,7 @@
 import { useForm } from '@inertiajs/react';
-import { Loader2, UserCheck } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import InputError from '@/components/input-error';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -152,33 +151,12 @@ export function DraftScheduleFormModal({
                     </DialogHeader>
 
                     <div className="p-6 space-y-4">
-                        {/* 1. Teacher Selector or Readonly Self Profile */}
+                        {/* 1. Teacher Selector for Admins (hidden for Teacher role) */}
                         {isTeacherRole ? (
-                            <div className="space-y-1.5">
-                                <Label className="text-xs font-semibold text-foreground">
-                                    Requesting Teacher
-                                </Label>
-                                <div className="flex items-center justify-between rounded-lg border border-border/80 bg-muted/40 px-3.5 py-2.5 text-xs">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
-                                            <UserCheck className="size-4" />
-                                        </div>
-                                        <div>
-                                            <span className="font-semibold text-foreground block">
-                                                {currentTeacher?.name || 'Your Profile'}
-                                            </span>
-                                            <span className="text-[11px] text-muted-foreground">
-                                                Logged in as Faculty Instructor
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <Badge variant="outline" className="h-5 text-[10px] bg-primary/5 text-primary border-primary/25 font-semibold">
-                                        Your Profile
-                                    </Badge>
-                                </div>
+                            <>
                                 <input type="hidden" name="teacher_id" value={data.teacher_id} />
-                                <InputError message={errors.teacher_id} />
-                            </div>
+                                {errors.teacher_id && <InputError message={errors.teacher_id} />}
+                            </>
                         ) : (
                             <div className="space-y-1.5">
                                 <Label htmlFor="modal_teacher_id" className="text-xs font-semibold text-foreground">
