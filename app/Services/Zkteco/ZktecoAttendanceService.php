@@ -16,6 +16,7 @@ use App\Models\TimeSlot;
 use App\Models\ZktecoAttendanceLog;
 use App\Models\ZktecoDevice;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -42,12 +43,12 @@ class ZktecoAttendanceService
     public function processPunch(
         ZktecoDevice $device,
         string $biometricPin,
-        Carbon|string $punchTime,
+        CarbonInterface|string $punchTime,
         string $verifyType = 'fingerprint',
         string $punchType = 'auto',
         ?array $rawPayload = null
     ): ZktecoAttendanceLog {
-        $punchCarbon = $punchTime instanceof Carbon ? $punchTime->copy() : Carbon::parse($punchTime);
+        $punchCarbon = $punchTime instanceof CarbonInterface ? Carbon::instance($punchTime) : Carbon::parse($punchTime);
         $device->loadMissing('classroom');
         $deviceClassroom = $device->classroom;
 
@@ -345,7 +346,7 @@ class ZktecoAttendanceService
      * Ensure that if a teacher has active TeacherAssignments or approved DraftSchedules
      * covering the given date's day-of-week, corresponding TeacherSchedule session rows exist.
      */
-    public function ensureTeacherSchedulesForDate(Teacher $teacher, Carbon $date): void
+    public function ensureTeacherSchedulesForDate(Teacher $teacher, CarbonInterface $date): void
     {
         $dayName = strtolower($date->format('l'));
 

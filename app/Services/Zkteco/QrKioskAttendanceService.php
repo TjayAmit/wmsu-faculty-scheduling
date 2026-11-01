@@ -12,6 +12,7 @@ use App\Models\Teacher;
 use App\Models\TeacherSchedule;
 use App\Models\ZktecoAttendanceLog;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -102,11 +103,11 @@ class QrKioskAttendanceService
     public function processQrScan(
         QrKiosk $kiosk,
         string $qrPayload,
-        Carbon|string|null $scanTime = null
+        CarbonInterface|string|null $scanTime = null
     ): array {
-        $scanCarbon = $scanTime instanceof Carbon
-            ? $scanTime->copy()
-            : ($scanTime ? Carbon::parse($scanTime) : now());
+        $scanCarbon = $scanTime instanceof CarbonInterface
+            ? Carbon::instance($scanTime)
+            : ($scanTime ? Carbon::parse($scanTime) : Carbon::now());
 
         $kiosk->loadMissing('classroom');
         $kioskClassroom = $kiosk->classroom;
@@ -388,9 +389,9 @@ class QrKioskAttendanceService
     /**
      * Get today's scheduled classes for a specific classroom so the Kiosk can display live room status.
      */
-    public function getTodayClassroomSessions(Classroom $classroom, ?Carbon $date = null): Collection
+    public function getTodayClassroomSessions(Classroom $classroom, ?CarbonInterface $date = null): Collection
     {
-        $targetDate = $date ?? now();
+        $targetDate = $date ? Carbon::instance($date) : Carbon::now();
 
         // Ensure all active teachers have their schedules materialized for today
         $activeTeachers = Teacher::active()->get();
