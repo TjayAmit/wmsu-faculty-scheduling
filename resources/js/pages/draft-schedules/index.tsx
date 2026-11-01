@@ -1,17 +1,10 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, CheckCircle, XCircle, Send } from 'lucide-react';
+import { Pencil, Trash2, CheckCircle, XCircle, Send } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
     Select,
     SelectContent,
@@ -172,7 +165,8 @@ return;
                                 data.data.map((item: DraftSchedule) => (
                                     <TableRow
                                         key={item.id}
-                                        className="border-b border-border transition-colors hover:bg-muted/30"
+                                        onClick={() => router.get(draftSchedulesShow(item.id).url)}
+                                        className="border-b border-border transition-colors hover:bg-muted/40 cursor-pointer"
                                     >
                                         <TableCell className="py-3.5 pl-6 pr-4">
                                             <div className="flex flex-col">
@@ -203,69 +197,74 @@ return;
                                                 {fmtDate(item.submitted_at)}
                                             </span>
                                         </TableCell>
-                                        <TableCell className="py-3.5 pl-4 pr-6 text-right">
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
+                                        <TableCell
+                                            className="py-3.5 pl-4 pr-6 text-right"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            <div className="flex items-center justify-end gap-1">
+                                                {item.status === 'draft' && (
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8"
+                                                        className="h-8 w-8 text-primary hover:bg-primary/10 hover:text-primary"
+                                                        onClick={() => handleSubmit(item.id)}
                                                         disabled={processingId === item.id}
+                                                        title="Submit for Review"
                                                     >
-                                                        <MoreVertical className="h-4 w-4" />
-                                                        <span className="sr-only">Open menu</span>
+                                                        <Send className="h-4 w-4" />
+                                                        <span className="sr-only">Submit for Review</span>
                                                     </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-48">
-                                                    <DropdownMenuItem asChild>
-                                                        <a href={draftSchedulesShow(item.id).url}>
-                                                            <Eye className="mr-2 h-4 w-4" />
-                                                            View
-                                                        </a>
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem asChild>
-                                                        <a href={draftSchedulesEdit(item.id).url}>
-                                                            <Pencil className="mr-2 h-4 w-4" />
-                                                            Edit
-                                                        </a>
-                                                    </DropdownMenuItem>
-                                                    {item.status === 'draft' && (
-                                                        <DropdownMenuItem
-                                                            onClick={() => handleSubmit(item.id)}
+                                                )}
+
+                                                {item.status === 'pending_review' && (
+                                                    <>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/40"
+                                                            onClick={() => handleApprove(item.id)}
                                                             disabled={processingId === item.id}
+                                                            title="Approve"
                                                         >
-                                                            <Send className="mr-2 h-4 w-4" />
-                                                            Submit for Review
-                                                        </DropdownMenuItem>
-                                                    )}
-                                                    {item.status === 'pending_review' && (
-                                                        <>
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleApprove(item.id)}
-                                                                disabled={processingId === item.id}
-                                                            >
-                                                                <CheckCircle className="mr-2 h-4 w-4" />
-                                                                Approve
-                                                            </DropdownMenuItem>
-                                                            <DropdownMenuItem
-                                                                onClick={() => handleReject(item.id)}
-                                                                disabled={processingId === item.id}
-                                                            >
-                                                                <XCircle className="mr-2 h-4 w-4" />
-                                                                Reject
-                                                            </DropdownMenuItem>
-                                                        </>
-                                                    )}
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        onClick={() => setDeleteId(item.id)}
-                                                        className="text-destructive focus:text-destructive"
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                                            <CheckCircle className="h-4 w-4" />
+                                                            <span className="sr-only">Approve</span>
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                                            onClick={() => handleReject(item.id)}
+                                                            disabled={processingId === item.id}
+                                                            title="Reject"
+                                                        >
+                                                            <XCircle className="h-4 w-4" />
+                                                            <span className="sr-only">Reject</span>
+                                                        </Button>
+                                                    </>
+                                                )}
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                    onClick={() => router.get(draftSchedulesEdit(item.id).url)}
+                                                    title="Edit"
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                    <span className="sr-only">Edit</span>
+                                                </Button>
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                                    onClick={() => setDeleteId(item.id)}
+                                                    title="Delete"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    <span className="sr-only">Delete</span>
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))
