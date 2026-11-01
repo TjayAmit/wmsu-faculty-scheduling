@@ -14,85 +14,124 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
                 />
             </Head>
 
-            <div className="relative grid min-h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
-                {/* ── LEFT PANEL — WMSU Collegiate Crimson Theme & Campus Visual ── */}
-                <div className="relative hidden h-full w-full flex-col justify-between overflow-hidden bg-[#4a0208] p-10 lg:flex select-none">
+            <div className="relative grid min-h-dvh flex-col items-center justify-center lg:max-w-none lg:grid-cols-12 lg:px-0">
+                {/* ── LEFT PANEL — WMSU College of Education Collegiate Visual Hero (7 cols on lg) ── */}
+                <div className="relative hidden h-full w-full flex-col justify-between overflow-hidden bg-[#400207] p-8 lg:col-span-7 lg:flex xl:p-12 select-none">
                     {/* Architectural Background Image */}
                     <img
                         src="/wmsu_college_of_education.jpg"
                         alt="WMSU College of Education"
-                        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-85 brightness-105 saturate-110"
+                        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center brightness-105 saturate-110"
                     />
 
-                    {/* WMSU University Maroon Theme Gradients */}
-                    {/* Rich Crimson horizontal gradient: vibrant maroon on the left for identity & text clarity, softly fading to reveal the sunny building */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#5a0008]/90 via-[#800000]/50 to-transparent" />
+                    {/* Smooth, multi-stop collegiate crimson atmospheric wash:
+                        - Deep rich maroon on the left for text contrast
+                        - Translucent warm middle transition
+                        - Transparent right edge revealing the sunlit building and sky */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#4d0108]/95 via-[#5c030d]/70 via-[#800000]/30 to-transparent" />
                     
-                    {/* Subtle vertical grounding gradient in deep crimson */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#380005]/65 via-transparent to-[#2b0004]/75" />
+                    {/* Soft vertical grounding vignette */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#2e0004]/60 via-transparent to-[#1f0003]/80" />
 
-                    {/* Ambient warm university crimson glow */}
-                    <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[#800000]/40 blur-3xl" />
+                    {/* Subtle ambient warm glow */}
+                    <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[#800000]/35 blur-3xl" />
 
                     {/* ── Top Header: University & College Identity ── */}
                     <Link href={home()} className="relative z-20 flex items-center gap-3.5 w-fit group">
-                        {/* Direct Logo (Standalone mark, no wrapper container) */}
-                        <AppLogoIcon className="h-12 w-12 shrink-0 drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)] transition-transform group-hover:scale-105" />
+                        <AppLogoIcon className="h-13 w-13 shrink-0 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] transition-transform group-hover:scale-105" />
                         <div className="flex flex-col drop-shadow-sm">
-                            <span className="text-[11px] font-bold uppercase tracking-wider text-rose-300">
+                            <span className="text-[11px] font-bold uppercase tracking-widest text-rose-300">
                                 College of Education
                             </span>
-                            <span className="text-xl font-bold tracking-tight text-white leading-tight">
+                            <span className="text-xl font-extrabold tracking-tight text-white leading-tight">
                                 Faculty Management
                             </span>
-                            <span className="text-xs text-rose-100/90 font-medium">
+                            <span className="text-xs text-rose-100/90 font-medium tracking-wide">
                                 Western Mindanao State University
                             </span>
                         </div>
                     </Link>
 
-                    {/* ── Center Content: Clean typography in university color palette ── */}
-                    <div className="relative z-20 my-auto max-w-lg py-12">
-                        <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+                    {/* ── Center Content: Dignified, balanced academic typography ── */}
+                    <div className="relative z-20 my-auto max-w-xl py-10">
+                        {/* Institutional Badge */}
+                        <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-rose-300/30 bg-[#800000]/65 px-3 py-1 text-xs font-semibold text-rose-100 shadow-sm backdrop-blur-md">
+                            <span className="h-1.5 w-1.5 rounded-full bg-rose-300 animate-pulse" />
+                            Official Faculty Portal
+                        </div>
+
+                        <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-[2.75rem] leading-[1.12] drop-shadow-[0_2px_10px_rgba(0,0,0,0.7)]">
                             Faculty Scheduling <br />
                             <span className="font-light text-rose-200">Management System</span>
-                        </h2>
+                        </h1>
 
                         <div className="mt-5 border-l-2 border-rose-400/80 pl-4">
-                            <p className="text-base leading-relaxed text-rose-50/95 font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
-                                Empowering academic excellence through organized faculty timetables, streamlined room assignments, and conflict-free collegiate scheduling.
+                            <p className="max-w-lg text-sm sm:text-base leading-relaxed text-rose-50/95 font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.7)]">
+                                Streamlining academic timetables, collegiate room allocations, and faculty workload coordination with institutional confidence.
                             </p>
+                        </div>
+
+                        {/* Subtle Key Highlights */}
+                        <div className="mt-7 flex flex-wrap items-center gap-2 text-xs">
+                            <span className="rounded-lg border border-white/15 bg-black/30 px-3 py-1 text-rose-100 backdrop-blur-xs font-medium shadow-xs">
+                                Automated Conflict Detection
+                            </span>
+                            <span className="rounded-lg border border-white/15 bg-black/30 px-3 py-1 text-rose-100 backdrop-blur-xs font-medium shadow-xs">
+                                Room & Lab Optimization
+                            </span>
+                            <span className="rounded-lg border border-white/15 bg-black/30 px-3 py-1 text-rose-100 backdrop-blur-xs font-medium shadow-xs">
+                                Workload Analytics
+                            </span>
                         </div>
                     </div>
 
-                    {/* ── Footer: Institutional Attribution ── */}
-                    <div className="relative z-20 flex items-center justify-between border-t border-rose-400/25 pt-6 text-xs text-rose-100/90 font-medium drop-shadow-xs">
-                        <p>
+                    {/* ── Footer: Clean institutional attribution ── */}
+                    <div className="relative z-20 flex items-center justify-between border-t border-rose-400/20 pt-5 text-xs text-rose-100/90 font-medium">
+                        <p className="drop-shadow-xs">
                             &copy; {new Date().getFullYear()} Western Mindanao State University
                         </p>
-                        <span className="text-[11px] font-mono tracking-wide text-rose-200/90">
-                            Baliwasan Campus • Zamboanga City
+                        <span className="text-[11px] font-mono tracking-wide text-rose-200/90 drop-shadow-xs">
+                            Baliwasan, Zamboanga City
                         </span>
                     </div>
                 </div>
 
-                {/* ── RIGHT PANEL — Login Form Area ── */}
-                <div className="w-full lg:p-8">
-                    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                        {/* Mobile logo */}
+                {/* ── RIGHT PANEL — Polished, Centered Login Form (5 cols on lg) ── */}
+                <div className="flex h-full w-full items-center justify-center p-6 sm:p-10 lg:col-span-5 lg:p-12 xl:p-16 bg-background">
+                    <div className="w-full max-w-sm space-y-6">
+                        {/* Mobile logo header */}
                         <Link
                             href={home()}
-                            className="relative z-20 flex items-center justify-center lg:hidden"
+                            className="relative z-20 mb-2 flex items-center justify-center gap-2.5 lg:hidden"
                         >
-                            <AppLogoIcon className="h-10 fill-current text-black sm:h-12 dark:text-white" />
+                            <AppLogoIcon className="h-11 w-11" />
+                            <div className="flex flex-col text-left">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                                    College of Education
+                                </span>
+                                <span className="text-base font-bold tracking-tight text-foreground">
+                                    Faculty Management
+                                </span>
+                            </div>
                         </Link>
 
-                        <div className="flex flex-col items-start gap-1 text-left sm:items-center sm:text-center">
-                            <h1 className="text-xl font-semibold tracking-tight">{title}</h1>
-                            <p className="text-sm text-balance text-muted-foreground">{description}</p>
+                        <div className="flex flex-col space-y-1.5 text-left">
+                            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                                {title || 'Welcome back'}
+                            </h2>
+                            <p className="text-sm text-muted-foreground">
+                                {description || 'Sign in with your institutional account to continue'}
+                            </p>
                         </div>
 
                         {children}
+
+                        {/* Subtle Security Badge */}
+                        <div className="border-t pt-4 text-center">
+                            <p className="text-[11px] text-muted-foreground">
+                                Western Mindanao State University • Secure Academic Portal
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
