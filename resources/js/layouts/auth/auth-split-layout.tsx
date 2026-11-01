@@ -18,105 +18,102 @@ export default function AuthSplitLayout({ children, title, description }: AuthLa
 
             <div className="relative grid h-dvh flex-col items-center justify-center px-8 sm:px-0 lg:max-w-none lg:grid-cols-2 lg:px-0">
                 {/* ── LEFT PANEL — WMSU College of Education visual banner ── */}
-                <div className="relative hidden h-full flex-col justify-between overflow-hidden bg-zinc-950 p-10 lg:flex select-none">
-                    {/* Architectural Background Image */}
+                <div className="relative hidden h-full flex-col justify-between overflow-hidden bg-gradient-to-br from-[#5c000c] via-[#3d0007] to-[#1f0003] p-10 lg:flex select-none">
+                    {/* Architectural Background Image (Bright, vivid, clearly visible) */}
                     <img
                         src="/wmsu_college_of_education.jpg"
                         alt="WMSU College of Education"
-                        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-35 brightness-90 contrast-110"
+                        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-85 brightness-105 contrast-105"
                     />
 
-                    {/* Gradient overlays for crisp contrast & atmosphere */}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/75 to-zinc-950/80" />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/50 to-zinc-950/80" />
+                    {/* Warm University Maroon & Sunlight Overlays */}
+                    {/* 1. Subtle Crimson wash for collegiate identity */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#800000]/45 via-[#500008]/40 to-[#250004]/60 mix-blend-multiply" />
 
-                    {/* Dot grid texture */}
-                    <div
-                        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-                        style={{
-                            backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)',
-                            backgroundSize: '24px 24px',
-                        }}
-                    />
+                    {/* 2. Soft horizontal vignette: darker on the left to protect text, clear on the right to show the building */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent" />
 
-                    {/* Ambient university brand glows */}
-                    <div className="pointer-events-none absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-primary/20 blur-[100px]" />
-                    <div className="pointer-events-none absolute -top-20 -left-20 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+                    {/* 3. Subtle bottom & top edge shading for header and footer contrast */}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/35" />
+
+                    {/* Ambient warm crimson glow accent */}
+                    <div className="pointer-events-none absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-[#800000]/30 blur-[100px]" />
 
                     {/* ── Header: Logo & Brand ── */}
                     <Link href={home()} className="relative z-20 flex items-center gap-3 w-fit group">
-                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/20 ring-1 ring-primary/30 backdrop-blur-md transition-transform group-hover:scale-105">
-                            <AppLogoIcon className="w-12" />
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/30 backdrop-blur-md shadow-lg transition-transform group-hover:scale-105">
+                            <AppLogoIcon className="w-12 drop-shadow-md" />
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] uppercase tracking-widest text-zinc-400 font-semibold">
+                        <div className="flex flex-col drop-shadow-sm">
+                            <span className="text-[11px] uppercase tracking-wider text-rose-200 font-semibold">
                                 College of Education
                             </span>
-                            <span className="font-bold text-white text-base leading-tight tracking-tight">
+                            <span className="font-bold text-white text-lg leading-tight tracking-tight">
                                 {name as string}
                             </span>
-                            <span className="text-[10px] italic text-zinc-400">
+                            <span className="text-[11px] text-zinc-200 font-medium">
                                 Western Mindanao State University
                             </span>
                         </div>
                     </Link>
 
                     {/* ── Main Copy & Value Propositions ── */}
-                    <div className="relative z-20 my-auto py-10">
-                        <div className="mb-8">
-                            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary/20 px-3 py-1 text-xs font-semibold text-primary ring-1 ring-primary/30 backdrop-blur-md">
-                                <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-                                Faculty Scheduling System
-                            </span>
-
-                            <h2 className="mb-4 text-3xl font-bold leading-tight text-white lg:text-4xl tracking-tight">
-                                Manage Schedules
-                                <span className="mt-1 block text-zinc-300 font-normal">
-                                    with Confidence
+                    <div className="relative z-20 my-auto max-w-lg py-8">
+                        <div className="rounded-2xl border border-white/15 bg-black/30 p-7 backdrop-blur-md shadow-2xl">
+                            <div className="mb-6">
+                                <span className="mb-3.5 inline-flex items-center gap-2 rounded-full border border-rose-300/30 bg-[#800000]/70 px-3.5 py-1 text-xs font-semibold text-white shadow-xs backdrop-blur-md">
+                                    <span className="h-2 w-2 rounded-full bg-rose-400 animate-pulse" />
+                                    Faculty Scheduling System
                                 </span>
-                            </h2>
 
-                            <p className="max-w-sm text-sm leading-relaxed text-zinc-400">
-                                Organize faculty loads, assign subject schedules, and catch conflicts before they become problems.
-                            </p>
-                        </div>
-
-                        {/* Feature check list */}
-                        <ul className="flex flex-col gap-3.5 max-w-sm">
-                            {[
-                                'Automatic conflict detection',
-                                'Room & time slot optimization',
-                                'Faculty teaching load monitoring',
-                                'Printable schedule reports',
-                            ].map((item) => (
-                                <li key={item} className="flex items-center gap-3">
-                                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/25 text-primary ring-1 ring-primary/30">
-                                        <svg
-                                            className="h-3 w-3"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2.5}
-                                                d="M5 13l4 4L19 7"
-                                            />
-                                        </svg>
+                                <h2 className="mb-3 text-3xl font-bold leading-tight text-white lg:text-4xl tracking-tight drop-shadow-sm">
+                                    Manage Schedules
+                                    <span className="mt-1 block text-rose-100 font-normal">
+                                        with Confidence
                                     </span>
-                                    <span className="text-sm font-medium text-zinc-200">{item}</span>
-                                </li>
-                            ))}
-                        </ul>
+                                </h2>
+
+                                <p className="text-sm leading-relaxed text-zinc-100/90 font-normal">
+                                    Organize faculty loads, assign subject schedules, and catch conflicts before they become problems.
+                                </p>
+                            </div>
+
+                            {/* Feature check list */}
+                            <ul className="flex flex-col gap-3">
+                                {[
+                                    'Automatic conflict detection',
+                                    'Room & time slot optimization',
+                                    'Faculty teaching load monitoring',
+                                    'Printable schedule reports',
+                                ].map((item) => (
+                                    <li key={item} className="flex items-center gap-3">
+                                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#800000] text-white shadow-xs ring-1 ring-white/30">
+                                            <svg
+                                                className="h-3 w-3 stroke-[3]"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    d="M5 13l4 4L19 7"
+                                                />
+                                            </svg>
+                                        </span>
+                                        <span className="text-sm font-medium text-white drop-shadow-xs">{item}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
 
                     {/* ── Footer ── */}
-                    <div className="relative z-20 border-t border-zinc-800/80 pt-5 flex items-center justify-between text-xs text-zinc-400">
-                        <p>
+                    <div className="relative z-20 flex items-center justify-between border-t border-white/15 pt-5 text-xs text-zinc-200">
+                        <p className="font-medium drop-shadow-xs">
                             &copy; {new Date().getFullYear()} Western Mindanao State University
                         </p>
-                        <span className="text-[11px] font-mono text-zinc-400">
+                        <span className="text-[11px] font-mono font-medium text-zinc-200/90 drop-shadow-xs">
                             WMSU • Baliwasan Campus
                         </span>
                     </div>
