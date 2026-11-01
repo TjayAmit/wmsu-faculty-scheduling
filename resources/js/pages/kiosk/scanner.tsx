@@ -481,14 +481,14 @@ export default function KioskScannerPage({
                     </div>
 
                     {/* 2. Mode Switcher Tabs: Scan QR Code vs Teacher ID */}
-                    <div className="grid grid-cols-2 gap-1.5 rounded-xl bg-muted p-1">
+                    <div className="grid grid-cols-2 gap-1.5 rounded-xl border border-border bg-muted/60 p-1">
                         <button
                             type="button"
                             onClick={() => handleTabChange('qr')}
                             className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all ${
                                 activeTab === 'qr'
-                                    ? 'bg-background text-foreground shadow-xs'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                    ? 'bg-red-800 text-white shadow-sm'
+                                    : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'
                             }`}
                         >
                             <QrCode className="size-3.5" />
@@ -499,8 +499,8 @@ export default function KioskScannerPage({
                             onClick={() => handleTabChange('id')}
                             className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all ${
                                 activeTab === 'id'
-                                    ? 'bg-background text-foreground shadow-xs'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                    ? 'bg-red-800 text-white shadow-sm'
+                                    : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'
                             }`}
                         >
                             <Keyboard className="size-3.5" />
@@ -649,16 +649,16 @@ export default function KioskScannerPage({
 
                             {/* Keyboard Mode Switch (Numbers vs Letters) */}
                             <div className="flex items-center justify-between">
-                                <span className="text-[11px] text-muted-foreground">
+                                <span className="text-[11px] font-medium text-muted-foreground">
                                     On-Screen Keypad
                                 </span>
-                                <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
+                                <div className="inline-flex rounded-lg border border-border bg-muted/60 p-0.5 gap-0.5">
                                     <button
                                         type="button"
                                         onClick={() => setKeyboardLayout('num')}
-                                        className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                                        className={`rounded-md px-3 py-1 text-[11px] font-semibold transition-all ${
                                             keyboardLayout === 'num'
-                                                ? 'bg-background text-foreground shadow-2xs'
+                                                ? 'bg-red-800 text-white shadow-xs'
                                                 : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
@@ -667,9 +667,9 @@ export default function KioskScannerPage({
                                     <button
                                         type="button"
                                         onClick={() => setKeyboardLayout('alpha')}
-                                        className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                                        className={`rounded-md px-3 py-1 text-[11px] font-semibold transition-all ${
                                             keyboardLayout === 'alpha'
-                                                ? 'bg-background text-foreground shadow-2xs'
+                                                ? 'bg-red-800 text-white shadow-xs'
                                                 : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                     >
