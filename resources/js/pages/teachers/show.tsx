@@ -240,7 +240,7 @@ export default function Show({
                                 </div>
                                 <div className="flex items-center gap-2 pt-1 flex-wrap">
                                     {getEmploymentTypeBadge(teacher.employment_type)}
-                                    {teacher.has_user_account ? (
+                                    {Boolean(teacher.has_user_account || teacher.user_id || teacher.user) ? (
                                         <Badge
                                             variant="outline"
                                             className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 gap-1 text-xs"
@@ -661,7 +661,7 @@ export default function Show({
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-5 space-y-4">
-                                    {teacher.has_user_account && teacher.user ? (
+                                    {Boolean(teacher.has_user_account || teacher.user_id || teacher.user) && teacher.user ? (
                                         <div className="space-y-4">
                                             <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/40 p-3">
                                                 <div className="rounded-full bg-primary/10 p-2 text-primary">

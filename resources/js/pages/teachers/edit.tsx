@@ -334,7 +334,7 @@ export default function Edit({ teacher, employmentTypes, departments = [], userD
                                     </CardDescription>
                                 </CardHeader>
                                 <CardContent className="pt-5 space-y-3">
-                                    {teacher?.has_user_account ? (
+                                    {Boolean(teacher?.has_user_account || teacher?.user_id || teacher?.user) ? (
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <Badge

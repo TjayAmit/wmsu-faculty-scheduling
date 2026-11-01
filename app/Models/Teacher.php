@@ -27,7 +27,7 @@ class Teacher extends Model
     #[Cast(type: 'boolean')]
     protected $is_active;
 
-    protected $appends = ['full_name'];
+    protected $appends = ['full_name', 'has_user_account'];
 
     /**
      * Get the user associated with the teacher.
@@ -107,6 +107,14 @@ class Teacher extends Model
     public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * Get whether the teacher has a linked user account.
+     */
+    public function getHasUserAccountAttribute(): bool
+    {
+        return ! is_null($this->user_id);
     }
 
     /**

@@ -470,7 +470,7 @@ export default function Index({ data, filters, employmentTypes, stats }: Teacher
                                             </TableCell>
 
                                             <TableCell className="px-4 py-3.5">
-                                                {item.has_user_account ? (
+                                                {Boolean(item.has_user_account || item.user_id || item.user) ? (
                                                     <div className="flex items-center space-x-1">
                                                         <Badge variant="default" className="text-xs">
                                                             <UserPlus className="w-3 h-3 mr-1" />
@@ -525,7 +525,7 @@ export default function Index({ data, filters, employmentTypes, stats }: Teacher
 
                                                         <DropdownMenuSeparator />
 
-                                                        {!item.has_user_account ? (
+                                                        {!Boolean(item.has_user_account || item.user_id || item.user) ? (
                                                             <DropdownMenuItem onClick={() => createUserAccount(item.id)}>
                                                                 <UserPlus className="mr-2 h-4 w-4" />
                                                                 Create Account
