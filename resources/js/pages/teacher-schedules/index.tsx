@@ -184,10 +184,15 @@ function TeacherCalendarGrid({
             </div>
 
             {/* Calendar Days Matrix */}
-            <div className="grid grid-cols-7 gap-y-1">
+            <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {cells.map((day, i) => {
                     if (!day) {
-                        return <div key={`empty-${i}`} className="h-11" />;
+                        return (
+                            <div
+                                key={`empty-${i}`}
+                                className="min-h-[58px] sm:min-h-[66px] rounded-xl border border-dashed border-border/30 bg-muted/5 opacity-25"
+                            />
+                        );
                     }
 
                     const date = new Date(year, month, day);
@@ -198,53 +203,74 @@ function TeacherCalendarGrid({
                     const isHoliday = holidayDates.has(dateStr);
 
                     return (
-                        <div key={`day-${day}`} className="flex flex-col items-center py-0.5">
-                            <button
-                                type="button"
-                                onClick={() => onSelectDate(date)}
-                                className={cn(
-                                    'relative flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-all',
-                                    isSel
-                                        ? 'bg-[#800000] text-white shadow-sm ring-2 ring-[#800000]/30'
-                                        : isToday
-                                        ? 'ring-2 ring-[#800000] text-[#800000] dark:text-primary font-bold hover:bg-muted'
-                                        : 'text-foreground hover:bg-muted/60',
-                                )}
-                                aria-label={`Select ${dateStr}`}
-                            >
-                                {day}
-                                {classCount > 0 && !isSel && (
-                                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary/10 px-1 text-[9px] font-bold text-primary">
-                                        {classCount}
-                                    </span>
-                                )}
-                            </button>
+                        <button
+                            key={`day-${day}`}
+                            type="button"
+                            onClick={() => onSelectDate(date)}
+                            className={cn(
+                                'group relative flex min-h-[58px] sm:min-h-[66px] flex-col justify-between rounded-xl border p-2 text-left transition-all duration-150',
+                                isSel
+                                    ? 'border-[#800000] bg-[#800000]/5 ring-2 ring-[#800000]/25 shadow-xs dark:bg-[#800000]/10'
+                                    : isToday
+                                    ? 'border-primary/50 bg-primary/[0.03] hover:border-primary hover:bg-muted/40'
+                                    : 'border-border/70 bg-card hover:border-primary/40 hover:bg-muted/40 hover:shadow-2xs',
+                            )}
+                            aria-label={`Select ${dateStr}`}
+                        >
+                            {/* Day Header */}
+                            <div className="flex items-center justify-between w-full">
+                                <span
+                                    className={cn(
+                                        'flex size-6 items-center justify-center rounded-full text-xs font-semibold',
+                                        isSel
+                                            ? 'bg-[#800000] text-white shadow-xs'
+                                            : isToday
+                                            ? 'bg-primary/10 text-primary font-bold'
+                                            : 'text-foreground group-hover:text-primary',
+                                    )}
+                                >
+                                    {day}
+                                </span>
 
-                            {/* Dot Indicators */}
-                            <div className="mt-1 flex h-2 items-center justify-center gap-1">
-                                {classCount > 0 && (
-                                    <span
-                                        className={cn(
-                                            'h-1.5 w-1.5 rounded-full',
-                                            isSel ? 'bg-primary' : 'bg-primary/80',
-                                        )}
-                                        title={`${classCount} classes scheduled`}
-                                    />
-                                )}
-                                {isHoliday && (
-                                    <span
-                                        className="h-1.5 w-1.5 rounded-full bg-amber-500"
-                                        title="Holiday"
-                                    />
+                                {isToday && !isSel && (
+                                    <span className="text-[10px] font-bold text-primary tracking-tight">Today</span>
                                 )}
                             </div>
-                        </div>
+
+                            {/* Class Pills & Indicator */}
+                            <div className="mt-1 space-y-0.5">
+                                {classCount > 0 ? (
+                                    <div
+                                        className={cn(
+                                            'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold truncate max-w-full',
+                                            isSel
+                                                ? 'bg-[#800000]/15 text-[#800000] dark:text-rose-300'
+                                                : 'bg-primary/10 text-primary',
+                                        )}
+                                        title={`${classCount} classes scheduled`}
+                                    >
+                                        <Clock className="size-2.5 shrink-0" />
+                                        <span className="truncate">{classCount} {classCount === 1 ? 'class' : 'classes'}</span>
+                                    </div>
+                                ) : isHoliday ? (
+                                    <div
+                                        className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400 truncate max-w-full"
+                                        title="Holiday"
+                                    >
+                                        <span className="size-1.5 rounded-full bg-amber-500 shrink-0" />
+                                        <span className="truncate">Holiday</span>
+                                    </div>
+                                ) : (
+                                    <div className="h-4" />
+                                )}
+                            </div>
+                        </button>
                     );
                 })}
             </div>
 
             {/* Legend */}
-            <div className="mt-auto flex items-center justify-between border-t border-border/70 pt-3 text-[11px] text-muted-foreground flex-wrap gap-2">
+            <div className="mt-4 flex items-center justify-between border-t border-border/70 pt-3 text-[11px] text-muted-foreground flex-wrap gap-2">
                 <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1.5">
                         <span className="h-2 w-2 rounded-full bg-primary" />
@@ -254,8 +280,12 @@ function TeacherCalendarGrid({
                         <span className="h-2 w-2 rounded-full bg-amber-500" />
                         Holiday
                     </span>
+                    <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full border border-primary/50 bg-primary/20" />
+                        Today
+                    </span>
                 </div>
-                <span>Click any date to view daily timetable</span>
+                <span className="italic">Click any date to inspect classes</span>
             </div>
         </div>
     );
@@ -266,9 +296,17 @@ function TeacherCalendarGrid({
 function SelectedDaySchedulePanel({
     selectedDate,
     schedules,
+    onSelectDate,
+    nextDateWithClasses,
+    onPrevDay,
+    onNextDay,
 }: {
     selectedDate: Date;
     schedules: CalendarScheduleItem[];
+    onSelectDate: (d: Date) => void;
+    nextDateWithClasses?: string | null;
+    onPrevDay: () => void;
+    onNextDay: () => void;
 }) {
     const today = new Date();
     const isToday = sameDay(selectedDate, today);
@@ -280,8 +318,15 @@ function SelectedDaySchedulePanel({
         year: 'numeric',
     }).format(selectedDate);
 
+    const nextDateFormatted = useMemo(() => {
+        if (!nextDateWithClasses) return null;
+        const [y, m, d] = nextDateWithClasses.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }, [nextDateWithClasses]);
+
     return (
-        <div className="flex flex-col h-full space-y-3">
+        <div className="flex flex-col h-full space-y-4">
             {/* Header */}
             <div className="flex items-start justify-between border-b border-border/70 pb-3 gap-2">
                 <div>
@@ -300,26 +345,43 @@ function SelectedDaySchedulePanel({
                     </h3>
                 </div>
 
-                <Badge variant="secondary" className="font-mono text-xs h-6 px-2 shrink-0">
-                    {schedules.length} {schedules.length === 1 ? 'class' : 'classes'}
-                </Badge>
+                <div className="flex items-center gap-1.5">
+                    <Badge variant="secondary" className="font-mono text-xs h-6 px-2 shrink-0">
+                        {schedules.length} {schedules.length === 1 ? 'class' : 'classes'}
+                    </Badge>
+                </div>
             </div>
 
-            {/* Schedule List */}
+            {/* Schedule List or Empty State */}
             {schedules.length === 0 ? (
-                <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center text-muted-foreground">
+                <div className="flex flex-1 flex-col items-center justify-center gap-3 py-12 px-4 text-center text-muted-foreground bg-card/60 rounded-xl border border-dashed border-border/80">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
                         <Calendar className="h-6 w-6 text-muted-foreground/40" />
                     </div>
                     <div className="space-y-1">
                         <p className="text-sm font-semibold text-foreground">No Classes Scheduled</p>
-                        <p className="text-xs text-muted-foreground max-w-[240px]">
+                        <p className="text-xs text-muted-foreground max-w-[260px]">
                             You have no teaching sessions assigned on {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.
                         </p>
                     </div>
+
+                    {nextDateWithClasses && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                const [y, m, d] = nextDateWithClasses.split('-').map(Number);
+                                onSelectDate(new Date(y, m - 1, d));
+                            }}
+                            className="mt-2 text-xs font-medium text-primary border-primary/30 hover:bg-primary/10 gap-1.5"
+                        >
+                            <span>Jump to Next Class ({nextDateFormatted})</span>
+                            <ArrowRight className="size-3.5" />
+                        </Button>
+                    )}
                 </div>
             ) : (
-                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
                     {schedules.map((item) => {
                         const statusVariant = getTeacherScheduleStatusVariant(item.status);
                         const statusLabel = getTeacherScheduleStatusLabel(item.status);
@@ -394,6 +456,40 @@ function SelectedDaySchedulePanel({
                     })}
                 </div>
             )}
+
+            {/* Quick Day Stepper Footer */}
+            <div className="mt-auto flex items-center justify-between border-t border-border/70 pt-3 text-xs">
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onPrevDay}
+                    className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1 px-2"
+                >
+                    <ChevronLeft className="size-3.5" />
+                    <span>Previous Day</span>
+                </Button>
+
+                {!isToday && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onSelectDate(today)}
+                        className="h-7 text-[11px] text-primary hover:underline px-2"
+                    >
+                        Today
+                    </Button>
+                )}
+
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onNextDay}
+                    className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1 px-2"
+                >
+                    <span>Next Day</span>
+                    <ChevronRight className="size-3.5" />
+                </Button>
+            </div>
         </div>
     );
 }
@@ -458,6 +554,30 @@ function TeacherCalendarView({
         [schedulesByDate, selectedDateStr],
     );
 
+    // Today's classes
+    const todayStr = toDateStr(today);
+    const todayClasses = useMemo(
+        () => schedulesByDate.get(todayStr) || [],
+        [schedulesByDate, todayStr],
+    );
+
+    // Next upcoming session
+    const nextUpcomingSession = useMemo(() => {
+        const future = calendarSchedules
+            .filter((s) => s.scheduled_date >= todayStr && s.status !== 'cancelled' && !s.is_holiday)
+            .sort((a, b) => a.scheduled_date.localeCompare(b.scheduled_date) || a.start_time.localeCompare(b.start_time));
+        return future[0] || null;
+    }, [calendarSchedules, todayStr]);
+
+    // Next date with classes relative to selectedDate
+    const nextDateWithClasses = useMemo(() => {
+        const selStr = toDateStr(selectedDate);
+        const futureDates = Array.from(datesWithClasses.keys())
+            .filter((d) => d > selStr && (datesWithClasses.get(d) ?? 0) > 0)
+            .sort();
+        return futureDates[0] || null;
+    }, [selectedDate, datesWithClasses]);
+
     const handlePrevMonth = () => {
         setViewMonth((prev) => {
             if (prev.month === 0) {
@@ -483,35 +603,141 @@ function TeacherCalendarView({
         setSelectedDate(today);
     };
 
-    return (
-        <Card className="gap-0 py-0 overflow-hidden shadow-xs border-border">
-            <CardContent className="p-0">
-                <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-12 lg:divide-x lg:divide-y-0">
-                    {/* Left Pane (Calendar): 7 Columns on Desktop */}
-                    <div className="p-5 lg:col-span-7">
-                        <TeacherCalendarGrid
-                            year={viewMonth.year}
-                            month={viewMonth.month}
-                            selectedDate={selectedDate}
-                            datesWithClasses={datesWithClasses}
-                            holidayDates={holidayDates}
-                            onSelectDate={setSelectedDate}
-                            onPrevMonth={handlePrevMonth}
-                            onNextMonth={handleNextMonth}
-                            onToday={handleToday}
-                        />
-                    </div>
+    const handleSelectDate = (d: Date) => {
+        setSelectedDate(d);
+        if (d.getMonth() !== viewMonth.month || d.getFullYear() !== viewMonth.year) {
+            setViewMonth({ year: d.getFullYear(), month: d.getMonth() });
+        }
+    };
 
-                    {/* Right Pane (Daily Schedule): 5 Columns on Desktop */}
-                    <div className="bg-muted/10 p-5 lg:col-span-5">
-                        <SelectedDaySchedulePanel
-                            selectedDate={selectedDate}
-                            schedules={selectedDaySchedules}
-                        />
+    const handlePrevDay = () => {
+        const prev = new Date(selectedDate);
+        prev.setDate(prev.getDate() - 1);
+        handleSelectDate(prev);
+    };
+
+    const handleNextDay = () => {
+        const next = new Date(selectedDate);
+        next.setDate(next.getDate() + 1);
+        handleSelectDate(next);
+    };
+
+    return (
+        <div className="space-y-6">
+            {/* 1. Overview Metric Cards */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-xl border border-[#800000] bg-[#800000]/5 ring-1 ring-[#800000]/20 dark:bg-[#800000]/10 p-4 shadow-sm transition-all">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Enrolled Subjects
+                        </span>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <BookOpen className="h-4 w-4" />
+                        </div>
                     </div>
+                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                        {subjects.length}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        Active teaching load
+                    </p>
                 </div>
-            </CardContent>
-        </Card>
+
+                <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Term Sessions
+                        </span>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                            <CalendarDays className="h-4 w-4" />
+                        </div>
+                    </div>
+                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                        {calendarSchedules.length}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        Scheduled across semester
+                    </p>
+                </div>
+
+                <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-purple-500/40 transition-colors">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Today's Classes
+                        </span>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                            <Clock className="h-4 w-4" />
+                        </div>
+                    </div>
+                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                        {todayClasses.length}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                        {todayClasses.length > 0
+                            ? `${todayClasses.length} sessions scheduled today`
+                            : 'No classes scheduled today'}
+                    </p>
+                </div>
+
+                <div className={cn(
+                    'rounded-xl border p-4 shadow-sm transition-all',
+                    nextUpcomingSession
+                        ? 'border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-500/50'
+                        : 'border-border bg-card'
+                )}>
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Upcoming Class
+                        </span>
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                            <CheckCircle2 className="h-4 w-4" />
+                        </div>
+                    </div>
+                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground truncate">
+                        {nextUpcomingSession ? formatShortDate(nextUpcomingSession.scheduled_date) : 'Term Done'}
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground truncate">
+                        {nextUpcomingSession
+                            ? `${nextUpcomingSession.subject_code} • ${formatTime(nextUpcomingSession.start_time)}`
+                            : 'All sessions completed'}
+                    </p>
+                </div>
+            </div>
+
+            {/* 2. Interactive Calendar & Timetable Split Card */}
+            <Card className="gap-0 py-0 overflow-hidden shadow-xs border-border">
+                <CardContent className="p-0">
+                    <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-12 lg:divide-x lg:divide-y-0">
+                        {/* Left Pane (Calendar): 7 Columns on Desktop */}
+                        <div className="p-5 lg:col-span-7">
+                            <TeacherCalendarGrid
+                                year={viewMonth.year}
+                                month={viewMonth.month}
+                                selectedDate={selectedDate}
+                                datesWithClasses={datesWithClasses}
+                                holidayDates={holidayDates}
+                                onSelectDate={handleSelectDate}
+                                onPrevMonth={handlePrevMonth}
+                                onNextMonth={handleNextMonth}
+                                onToday={handleToday}
+                            />
+                        </div>
+
+                        {/* Right Pane (Daily Schedule): 5 Columns on Desktop */}
+                        <div className="bg-muted/10 p-5 lg:col-span-5 flex flex-col justify-between">
+                            <SelectedDaySchedulePanel
+                                selectedDate={selectedDate}
+                                schedules={selectedDaySchedules}
+                                onSelectDate={handleSelectDate}
+                                nextDateWithClasses={nextDateWithClasses}
+                                onPrevDay={handlePrevDay}
+                                onNextDay={handleNextDay}
+                            />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     );
 }
 
