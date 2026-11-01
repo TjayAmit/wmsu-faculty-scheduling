@@ -6,17 +6,16 @@ import {
     CameraOff,
     CheckCircle2,
     Cookie,
+    Delete,
     DoorOpen,
-    KeyRound,
     Keyboard,
     Loader2,
     LogIn,
     QrCode,
-    Settings,
     ShieldAlert,
     Sparkles,
-    Volume2,
-    VolumeX,
+    UserCheck,
+    X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -90,6 +89,19 @@ interface ScannerPageProps {
     detectedBrowser: string;
 }
 
+const KEYPAD_NUM_ROWS = [
+    ['1', '2', '3'],
+    ['4', '5', '6'],
+    ['7', '8', '9'],
+    ['-', '0', 'BACKSPACE'],
+];
+
+const KEYPAD_ALPHA_ROWS = [
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+    ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '-', 'BACKSPACE'],
+];
+
 export default function KioskScannerPage({
     isAuthorized,
     isDisabledKiosk,
@@ -99,13 +111,14 @@ export default function KioskScannerPage({
     detectedBrowser,
 }: ScannerPageProps) {
     const [currentTime, setCurrentTime] = useState<Date>(new Date());
+    const [activeTab, setActiveTab] = useState<'qr' | 'id'>('qr');
+    const [keyboardLayout, setKeyboardLayout] = useState<'num' | 'alpha'>('num');
 
     // Camera & QR state
     const [cameraActive, setCameraActive] = useState<boolean>(false);
     const [cameraError, setCameraError] = useState<string | null>(null);
-    const [manualCode, setManualCode] = useState<string>('');
+    const [teacherIdInput, setTeacherIdInput] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
     const [feedback, setFeedback] = useState<ScanFeedback | null>(null);
 
     const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -128,49 +141,14 @@ export default function KioskScannerPage({
         return () => clearInterval(timer);
     }, []);
 
-    // Web Audio API Beep for Kiosk Feedback
-    const playBeep = useCallback(
-        (type: 'success' | 'info' | 'error') => {
-            if (!soundEnabled) return;
-            try {
-                const AudioCtx =
-                    window.AudioContext ||
-                    (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-                const ctx = new AudioCtx();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+    // Auto-clear feedback banner after 8 seconds
+    useEffect(() => {
+        if (!feedback) return;
+        const timer = setTimeout(() => setFeedback(null), 8000);
+        return () => clearTimeout(timer);
+    }, [feedback]);
 
-                if (type === 'success') {
-                    osc.frequency.setValueAtTime(880, ctx.currentTime);
-                    osc.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.1);
-                    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.35);
-                } else if (type === 'info') {
-                    osc.frequency.setValueAtTime(659.25, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.25);
-                } else {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(220, ctx.currentTime);
-                    gain.gain.setValueAtTime(0.18, ctx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-                    osc.start();
-                    osc.stop(ctx.currentTime + 0.4);
-                }
-            } catch {
-                // Ignore audio errors if blocked by browser autoplay policy
-            }
-        },
-        [soundEnabled],
-    );
-
-    const submitQrCode = useCallback(
+    const submitClockIn = useCallback(
         async (rawCode: string) => {
             const code = rawCode.trim();
             if (!code || isSubmitting) return;
@@ -216,9 +194,7 @@ export default function KioskScannerPage({
                 });
 
                 if (json.success) {
-                    playBeep(json.already_present ? 'info' : 'success');
-                } else {
-                    playBeep('error');
+                    setTeacherIdInput('');
                 }
             } catch {
                 setFeedback({
@@ -228,12 +204,11 @@ export default function KioskScannerPage({
                     message: 'Unable to reach the attendance server. Please check your network connection.',
                     timestamp: new Date().toLocaleTimeString(),
                 });
-                playBeep('error');
             } finally {
                 setIsSubmitting(false);
             }
         },
-        [isSubmitting, playBeep],
+        [isSubmitting],
     );
 
     // Stop Camera Stream
@@ -265,7 +240,7 @@ export default function KioskScannerPage({
             setCameraActive(true);
         } catch {
             setCameraError(
-                'Camera access was denied or no camera was detected. Use a USB QR scanner or enter the token below.',
+                'Camera unavailable or permission denied. You can switch to the Teacher ID tab to clock in.',
             );
             setCameraActive(false);
         }
@@ -297,7 +272,7 @@ export default function KioskScannerPage({
                             now - lastScannedCodeRef.current.time > 5000
                         ) {
                             lastScannedCodeRef.current = { code: code.data, time: now };
-                            submitQrCode(code.data);
+                            submitClockIn(code.data);
                         }
                     }
                 }
@@ -313,7 +288,7 @@ export default function KioskScannerPage({
                 cancelAnimationFrame(animFrameRef.current);
             }
         };
-    }, [cameraActive, submitQrCode]);
+    }, [cameraActive, submitClockIn]);
 
     useEffect(() => {
         return () => {
@@ -321,12 +296,27 @@ export default function KioskScannerPage({
         };
     }, [stopCamera]);
 
+    const handleTabChange = (tab: 'qr' | 'id') => {
+        setActiveTab(tab);
+        if (tab === 'id' && cameraActive) {
+            stopCamera();
+        }
+    };
+
+    const handleKeyPress = (key: string) => {
+        if (key === 'BACKSPACE') {
+            setTeacherIdInput((prev) => prev.slice(0, -1));
+        } else if (key === 'CLEAR') {
+            setTeacherIdInput('');
+        } else {
+            setTeacherIdInput((prev) => (prev.length < 24 ? prev + key : prev));
+        }
+    };
+
     const handleManualSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!manualCode.trim()) return;
-        const codeToSubmit = manualCode.trim();
-        setManualCode('');
-        submitQrCode(codeToSubmit);
+        if (!teacherIdInput.trim()) return;
+        submitClockIn(teacherIdInput.trim());
     };
 
     const handleInlineRegister = (e: React.FormEvent) => {
@@ -342,7 +332,7 @@ export default function KioskScannerPage({
             <>
                 <Head title="Unregistered Classroom QR Kiosk" />
 
-                <div className="flex min-h-svh items-center justify-center bg-background p-4 text-foreground">
+                <div className="flex min-h-svh items-center justify-center bg-muted/30 p-4 text-foreground">
                     <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-sm">
                         <div className="flex flex-col items-center text-center space-y-3">
                             <div className="flex size-12 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600">
@@ -445,89 +435,88 @@ export default function KioskScannerPage({
     }
 
     // ---------------------------------------------------------------------------
-    // STATE 2: REGISTERED CLASSROOM QR KIOSK (COMPACT CENTERED CARD)
+    // STATE 2: REGISTERED CLASSROOM QR KIOSK
     // ---------------------------------------------------------------------------
     return (
         <>
             <Head title={`QR Kiosk — ${kiosk?.classroom?.full_label || 'Classroom Scanner'}`} />
 
-            <div className="flex min-h-svh items-center justify-center bg-background p-4 text-foreground">
-                <div className="w-full max-w-lg rounded-2xl border border-border bg-card shadow-sm overflow-hidden">
-                    {/* 1. Compact Header: Classroom Info + Live Clock + Camera Toggle */}
-                    <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-red-800 text-white">
-                                <QrCode className="size-4" />
+            <div className="flex min-h-svh items-center justify-center bg-muted/30 p-4 text-foreground">
+                <div className="w-full max-w-md rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
+                    {/* 1. Header: Classroom Identity & Live Time */}
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-red-800 text-white shadow-xs">
+                                <QrCode className="size-5" />
                             </div>
                             <div className="min-w-0">
-                                <div className="flex items-center gap-1.5">
-                                    <span className="truncate text-sm font-bold text-foreground">
-                                        {kiosk?.classroom?.full_label || 'Classroom QR Kiosk'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground truncate">
+                                <h1 className="truncate text-sm font-bold text-foreground">
+                                    {kiosk?.classroom?.full_label || 'Classroom Kiosk'}
+                                </h1>
+                                <p className="flex items-center gap-1 text-xs text-muted-foreground truncate">
                                     <DoorOpen className="size-3 shrink-0 text-red-800" />
                                     <span className="truncate">
-                                        {kiosk?.classroom?.room_name || kiosk?.kiosk_name || 'QR Clock-In Terminal'}
+                                        {kiosk?.classroom?.room_name || 'Faculty Attendance Terminal'}
                                     </span>
-                                </div>
+                                </p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
-                            <div className="text-right mr-1">
-                                <div className="font-mono text-sm font-bold text-foreground leading-none">
-                                    {currentTime.toLocaleTimeString('en-US', {
-                                        hour: 'numeric',
-                                        minute: '2-digit',
-                                        second: '2-digit',
-                                    })}
-                                </div>
-                                <div className="text-[10px] text-muted-foreground mt-0.5">
-                                    {currentTime.toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                        year: 'numeric',
-                                    })}
-                                </div>
+                        <div className="text-right shrink-0">
+                            <div className="font-mono text-sm font-bold text-foreground">
+                                {currentTime.toLocaleTimeString('en-US', {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    second: '2-digit',
+                                })}
                             </div>
-
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                className="size-8"
-                                onClick={() => setSoundEnabled((prev) => !prev)}
-                                title={soundEnabled ? 'Mute Beep' : 'Unmute Beep'}
-                            >
-                                {soundEnabled ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
-                            </Button>
-
-                            {isAdminLoggedIn && (
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="icon"
-                                    className="size-8"
-                                    title="Manage QR Kiosks"
-                                >
-                                    <Link href="/qr-kiosks">
-                                        <Settings className="size-3.5" />
-                                    </Link>
-                                </Button>
-                            )}
+                            <div className="text-[11px] text-muted-foreground">
+                                {currentTime.toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                })}
+                            </div>
                         </div>
                     </div>
 
-                    {/* 2. Instant Scan Result Banner (shown when a QR scan is processed) */}
+                    {/* 2. Mode Switcher Tabs: Scan QR Code vs Teacher ID */}
+                    <div className="grid grid-cols-2 gap-1.5 rounded-xl bg-muted p-1">
+                        <button
+                            type="button"
+                            onClick={() => handleTabChange('qr')}
+                            className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all ${
+                                activeTab === 'qr'
+                                    ? 'bg-background text-foreground shadow-xs'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            <QrCode className="size-3.5" />
+                            Scan QR Code
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => handleTabChange('id')}
+                            className={`flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-semibold transition-all ${
+                                activeTab === 'id'
+                                    ? 'bg-background text-foreground shadow-xs'
+                                    : 'text-muted-foreground hover:text-foreground'
+                            }`}
+                        >
+                            <Keyboard className="size-3.5" />
+                            Teacher ID
+                        </button>
+                    </div>
+
+                    {/* 3. Instant Scan / Clock-In Result Alert */}
                     {feedback && (
                         <div
-                            className={`border-b px-4 py-3 text-xs ${
+                            className={`rounded-xl border p-3.5 text-xs ${
                                 feedback.success
                                     ? feedback.already_present
-                                        ? 'border-sky-500/30 bg-sky-500/10 text-sky-900 dark:text-sky-200'
-                                        : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200'
-                                    : 'border-red-500/30 bg-red-500/10 text-red-900 dark:text-red-200'
+                                        ? 'border-sky-500/30 bg-sky-500/10 text-sky-950 dark:text-sky-100'
+                                        : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-950 dark:text-emerald-100'
+                                    : 'border-red-500/30 bg-red-500/10 text-red-950 dark:text-red-100'
                             }`}
                         >
                             <div className="flex items-start gap-2.5">
@@ -539,11 +528,17 @@ export default function KioskScannerPage({
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between gap-2">
                                         <span className="font-bold">{feedback.title}</span>
-                                        <span className="font-mono text-[10px] opacity-75">{feedback.timestamp}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFeedback(null)}
+                                            className="opacity-60 hover:opacity-100"
+                                        >
+                                            <X className="size-3.5" />
+                                        </button>
                                     </div>
                                     <p className="mt-0.5 text-[11px] leading-snug opacity-90">{feedback.message}</p>
                                     {feedback.teacher && (
-                                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                                        <div className="mt-2 flex flex-wrap items-center gap-1.5">
                                             <Badge variant="secondary" className="text-[10px] h-5">
                                                 {feedback.teacher.full_name} ({feedback.teacher.employee_id})
                                             </Badge>
@@ -559,95 +554,191 @@ export default function KioskScannerPage({
                         </div>
                     )}
 
-                    {/* 3. Optical QR Camera Viewport */}
-                    <div className="relative flex aspect-[16/10] w-full items-center justify-center bg-muted/40">
-                        <video
-                            ref={videoRef}
-                            className={`h-full w-full object-cover ${cameraActive ? 'block' : 'hidden'}`}
-                            playsInline
-                            muted
-                        />
-                        <canvas ref={canvasRef} className="hidden" />
+                    {/* 4A. TAB 1: QR CAMERA SCANNER */}
+                    {activeTab === 'qr' && (
+                        <div className="space-y-3">
+                            <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-xl border border-border bg-muted/40">
+                                <video
+                                    ref={videoRef}
+                                    className={`h-full w-full object-cover ${cameraActive ? 'block' : 'hidden'}`}
+                                    playsInline
+                                    muted
+                                />
+                                <canvas ref={canvasRef} className="hidden" />
 
-                        {cameraActive && (
-                            <>
-                                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                                    <div className="relative size-44 rounded-2xl border-2 border-emerald-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]">
-                                        <div className="absolute inset-x-2 top-1/2 h-0.5 -translate-y-1/2 bg-emerald-400 animate-pulse" />
+                                {/* Clean Corner-Only Viewfinder (No Horizontal Center Line, No Overflowing Shadow) */}
+                                {cameraActive && (
+                                    <>
+                                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                            <div className="relative size-48">
+                                                <span className="absolute top-0 left-0 size-7 rounded-tl-xl border-t-3 border-l-3 border-white/90" />
+                                                <span className="absolute top-0 right-0 size-7 rounded-tr-xl border-t-3 border-r-3 border-white/90" />
+                                                <span className="absolute bottom-0 left-0 size-7 rounded-bl-xl border-b-3 border-l-3 border-white/90" />
+                                                <span className="absolute bottom-0 right-0 size-7 rounded-br-xl border-b-3 border-r-3 border-white/90" />
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="secondary"
+                                            className="absolute bottom-3 right-3 h-8 text-xs gap-1.5 bg-background/90 hover:bg-background text-foreground shadow-sm"
+                                            onClick={stopCamera}
+                                        >
+                                            <CameraOff className="size-3.5" />
+                                            Stop Camera
+                                        </Button>
+                                    </>
+                                )}
+
+                                {!cameraActive && (
+                                    <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
+                                        <div className="flex size-14 items-center justify-center rounded-2xl border border-border bg-card text-muted-foreground shadow-xs">
+                                            <QrCode className="size-7" />
+                                        </div>
+                                        <div className="space-y-1 max-w-xs">
+                                            <p className="text-sm font-semibold text-foreground">
+                                                QR Pass Scanner
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                Position your Faculty QR Pass in front of the camera to clock in as Present.
+                                            </p>
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            onClick={startCamera}
+                                            className="h-9 bg-red-800 hover:bg-red-900 text-white text-xs font-semibold gap-2 px-4"
+                                        >
+                                            <Camera className="size-4" />
+                                            Start Camera
+                                        </Button>
+                                        {cameraError && (
+                                            <p className="text-[11px] text-amber-700 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-1.5 max-w-xs">
+                                                {cameraError}
+                                            </p>
+                                        )}
                                     </div>
-                                </div>
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="destructive"
-                                    className="absolute top-3 right-3 h-7 text-[11px] gap-1 px-2.5 shadow"
-                                    onClick={stopCamera}
-                                >
-                                    <CameraOff className="size-3" />
-                                    Stop Camera
-                                </Button>
-                            </>
-                        )}
-
-                        {!cameraActive && (
-                            <div className="flex flex-col items-center justify-center p-6 text-center space-y-2.5">
-                                <div className="flex size-12 items-center justify-center rounded-2xl border border-border bg-background text-muted-foreground shadow-xs">
-                                    <QrCode className="size-6" />
-                                </div>
-                                <div className="space-y-0.5 max-w-xs">
-                                    <p className="text-xs font-semibold text-foreground">
-                                        QR Camera Scanner Ready
-                                    </p>
-                                    <p className="text-[11px] text-muted-foreground">
-                                        Scan your Faculty QR Pass to clock in as Present.
-                                    </p>
-                                </div>
-                                <Button
-                                    type="button"
-                                    size="sm"
-                                    className="h-8 bg-red-800 hover:bg-red-900 text-white text-xs gap-1.5 mt-1"
-                                    onClick={startCamera}
-                                >
-                                    <Camera className="size-3.5" />
-                                    Start Camera Scanner
-                                </Button>
-                                {cameraError && (
-                                    <p className="text-[11px] text-amber-700 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-1.5 max-w-xs">
-                                        {cameraError}
-                                    </p>
                                 )}
                             </div>
-                        )}
-                    </div>
-
-                    {/* 4. Direct USB Scanner / Token Input */}
-                    <form
-                        onSubmit={handleManualSubmit}
-                        className="border-t border-border bg-card p-3 flex items-center gap-2"
-                    >
-                        <div className="relative flex-1">
-                            <Keyboard className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" />
-                            <Input
-                                value={manualCode}
-                                onChange={(e) => setManualCode(e.target.value)}
-                                placeholder="Scan or enter QR Token / Employee ID..."
-                                className="pl-8 h-9 text-xs"
-                                autoFocus
-                            />
                         </div>
-                        <Button
-                            type="submit"
-                            disabled={isSubmitting || !manualCode.trim()}
-                            className="h-9 bg-red-800 hover:bg-red-900 text-white font-semibold text-xs px-4 gap-1.5 shrink-0"
-                        >
-                            {isSubmitting ? (
-                                <Loader2 className="size-3.5 animate-spin" />
+                    )}
+
+                    {/* 4B. TAB 2: TEACHER ID / PIN INPUT WITH ON-SCREEN KEYBOARD */}
+                    {activeTab === 'id' && (
+                        <form onSubmit={handleManualSubmit} className="space-y-3">
+                            {/* Display Input */}
+                            <div className="relative">
+                                <Input
+                                    value={teacherIdInput}
+                                    onChange={(e) => setTeacherIdInput(e.target.value.toUpperCase())}
+                                    placeholder="Enter Employee ID or PIN (e.g. COED-T001)"
+                                    className="h-11 pr-9 text-center font-mono text-base font-bold tracking-wider uppercase"
+                                    autoFocus
+                                />
+                                {teacherIdInput && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setTeacherIdInput('')}
+                                        className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        title="Clear"
+                                    >
+                                        <X className="size-4" />
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Keyboard Mode Switch (Numbers vs Letters) */}
+                            <div className="flex items-center justify-between">
+                                <span className="text-[11px] text-muted-foreground">
+                                    On-Screen Keypad
+                                </span>
+                                <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
+                                    <button
+                                        type="button"
+                                        onClick={() => setKeyboardLayout('num')}
+                                        className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                                            keyboardLayout === 'num'
+                                                ? 'bg-background text-foreground shadow-2xs'
+                                                : 'text-muted-foreground hover:text-foreground'
+                                        }`}
+                                    >
+                                        123 / PIN
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setKeyboardLayout('alpha')}
+                                        className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition-all ${
+                                            keyboardLayout === 'alpha'
+                                                ? 'bg-background text-foreground shadow-2xs'
+                                                : 'text-muted-foreground hover:text-foreground'
+                                        }`}
+                                    >
+                                        ABC
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Numeric Keypad */}
+                            {keyboardLayout === 'num' ? (
+                                <div className="grid grid-cols-3 gap-2">
+                                    {KEYPAD_NUM_ROWS.flat().map((key) => (
+                                        <Button
+                                            key={key}
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => handleKeyPress(key)}
+                                            className="h-11 font-mono text-sm font-bold active:scale-95 transition-transform"
+                                        >
+                                            {key === 'BACKSPACE' ? (
+                                                <Delete className="size-4 text-muted-foreground" />
+                                            ) : (
+                                                key
+                                            )}
+                                        </Button>
+                                    ))}
+                                </div>
                             ) : (
-                                <KeyRound className="size-3.5" />
+                                /* Alpha Keyboard (QWERTY) */
+                                <div className="space-y-1.5">
+                                    {KEYPAD_ALPHA_ROWS.map((row, rowIdx) => (
+                                        <div key={rowIdx} className="flex justify-center gap-1">
+                                            {row.map((key) => (
+                                                <Button
+                                                    key={key}
+                                                    type="button"
+                                                    variant="outline"
+                                                    onClick={() => handleKeyPress(key)}
+                                                    className={`h-9 px-0 font-mono text-xs font-bold active:scale-95 transition-transform ${
+                                                        key === 'BACKSPACE' ? 'w-12' : 'flex-1 max-w-9'
+                                                    }`}
+                                                >
+                                                    {key === 'BACKSPACE' ? (
+                                                        <Delete className="size-3.5 text-muted-foreground" />
+                                                    ) : (
+                                                        key
+                                                    )}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    ))}
+                                </div>
                             )}
-                            Clock In
-                        </Button>
-                    </form>
+
+                            {/* Submit Button */}
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting || !teacherIdInput.trim()}
+                                className="w-full h-10 bg-red-800 hover:bg-red-900 text-white font-semibold text-xs gap-2"
+                            >
+                                {isSubmitting ? (
+                                    <Loader2 className="size-4 animate-spin" />
+                                ) : (
+                                    <UserCheck className="size-4" />
+                                )}
+                                Clock In as Present
+                            </Button>
+                        </form>
+                    )}
                 </div>
             </div>
         </>
