@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Trash2, Mail, Shield, CheckCircle2, Clock, UserCheck, XCircle } from 'lucide-react';
+import { Pencil, Trash2, Mail, Shield, CheckCircle2, Clock, UserCheck, XCircle, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -132,7 +132,13 @@ export default function Show({ user }: StaffShowProps) {
                         </div>
 
                         {/* Quick Highlights Summary with Formatted Dates */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 md:pl-6 text-sm">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 md:pl-6 text-sm">
+                            <div>
+                                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Department</p>
+                                <p className="font-semibold text-foreground mt-1 truncate">
+                                    {user.department ? `${user.department.code}` : 'Unassigned'}
+                                </p>
+                            </div>
                             <div>
                                 <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Account Role</p>
                                 <p className="font-semibold text-foreground mt-1">Faculty Staff</p>
@@ -201,6 +207,23 @@ export default function Show({ user }: StaffShowProps) {
                                         <Shield className="size-3 text-muted-foreground" />
                                         Faculty Staff
                                     </Badge>
+                                </div>
+
+                                <div className="flex items-center justify-between py-3.5">
+                                    <span className="text-sm text-muted-foreground">Assigned Department</span>
+                                    {user.department ? (
+                                        <Badge
+                                            variant="outline"
+                                            className="border-primary/20 bg-primary/5 text-primary text-xs gap-1"
+                                        >
+                                            <Building2 className="size-3" />
+                                            {user.department.code} - {user.department.name}
+                                        </Badge>
+                                    ) : (
+                                        <span className="text-sm text-muted-foreground italic">
+                                            No department assigned
+                                        </span>
+                                    )}
                                 </div>
                             </CardContent>
                         </Card>

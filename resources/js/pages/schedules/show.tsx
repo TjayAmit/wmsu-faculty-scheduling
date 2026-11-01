@@ -277,9 +277,9 @@ export default function Show({ schedule }: SchedulesShowProps) {
                                             <div className="space-y-0.5">
                                                 <p className="text-sm font-semibold text-foreground">{teacher.name}</p>
                                                 <p className="text-xs text-muted-foreground">{teacher.email}</p>
-                                                {teacherProfile?.department?.name && (
+                                                {teacherProfile?.department && (
                                                     <p className="text-xs text-muted-foreground">
-                                                        Dept: {teacherProfile.department.name}
+                                                        Dept: {typeof teacherProfile.department === 'string' ? teacherProfile.department : teacherProfile.department.name}
                                                     </p>
                                                 )}
                                             </div>

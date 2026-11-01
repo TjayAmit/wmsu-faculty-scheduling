@@ -2,6 +2,7 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import { Save, User, Building2, Phone, Briefcase } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -14,14 +15,14 @@ import AppLayout from '@/layouts/app-layout';
 import { index as teachers, store as teachersStore } from '@/routes/teachers';
 import type { TeachersFormProps } from '@/types';
 
-export default function Create({ employmentTypes }: TeachersFormProps) {
+export default function Create({ employmentTypes, departments = [], userDepartment }: TeachersFormProps) {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         first_name: '',
         last_name: '',
         employee_id: '',
         biometric_pin: '',
-        department: '',
+        department: userDepartment?.name || '',
         rank: '',
         employment_type: 'full_time',
         date_hired: '',
@@ -201,17 +202,61 @@ export default function Create({ employmentTypes }: TeachersFormProps) {
                                     </div>
 
                                     <div className="grid gap-4 sm:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="department">Department</Label>
-                                            <Input
-                                                id="department"
-                                                value={data.department}
-                                                onChange={(e) => setData('department', e.target.value)}
-                                                placeholder="e.g. College of Computing Studies"
-                                                aria-invalid={!!errors.department}
-                                            />
-                                            <InputError message={errors.department} />
-                                        </div>
+                                        {userDepartment ? (
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center justify-between">
+                                                    <Label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                                                        <Building2 className="size-3.5 text-primary" />
+                                                        Department
+                                                    </Label>
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="border-primary/30 text-primary bg-primary/5 text-[10px] gap-1 px-1.5 py-0"
+                                                    >
+                                                        Auto-Assigned
+                                                    </Badge>
+                                                </div>
+                                                <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+                                                    <p className="text-xs font-semibold text-foreground">
+                                                        {userDepartment.name}
+                                                    </p>
+                                                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                                                        Registered under your departmental jurisdiction ({userDepartment.code}).
+                                                    </p>
+                                                </div>
+                                                <input type="hidden" name="department" value={data.department} />
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                <Label htmlFor="department">Department</Label>
+                                                {departments.length > 0 ? (
+                                                    <Select
+                                                        value={data.department}
+                                                        onValueChange={(val) => setData('department', val)}
+                                                    >
+                                                        <SelectTrigger id="department">
+                                                            <SelectValue placeholder="Select department" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {departments.map((dept) => (
+                                                                <SelectItem key={dept.id} value={dept.name}>
+                                                                    {dept.code} - {dept.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                ) : (
+                                                    <Input
+                                                        id="department"
+                                                        value={data.department}
+                                                        onChange={(e) => setData('department', e.target.value)}
+                                                        placeholder="e.g. College of Education"
+                                                        aria-invalid={!!errors.department}
+                                                    />
+                                                )}
+                                                <InputError message={errors.department} />
+                                            </div>
+                                        )}
 
                                         <div className="space-y-2">
                                             <Label htmlFor="rank">Academic Rank</Label>

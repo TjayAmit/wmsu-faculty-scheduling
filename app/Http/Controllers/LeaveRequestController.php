@@ -46,10 +46,30 @@ class LeaveRequestController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $teachers = Teacher::query()
+            ->with(['department:id,name,code'])
+            ->where('is_active', true)
+            ->orderBy('last_name')
+            ->get(['id', 'first_name', 'last_name', 'academic_rank', 'department_id', 'user_id', 'email']);
+
+        $user = $request->user();
+        $currentTeacher = null;
+        $isTeacherRole = false;
+
+        if ($user) {
+            $isTeacherRole = $user->hasRole('teacher') || $user->hasRole('instructor');
+            $currentTeacher = Teacher::where('user_id', $user->id)->first();
+            if (! $currentTeacher && $user->email) {
+                $currentTeacher = Teacher::where('email', $user->email)->first();
+            }
+        }
+
         return Inertia::render('leave-requests/create', [
-            'teachers' => Teacher::all(['id', 'first_name', 'last_name']),
+            'teachers' => $teachers,
+            'currentTeacherId' => $currentTeacher?->id,
+            'isTeacherRole' => $isTeacherRole && $currentTeacher !== null,
         ]);
     }
 

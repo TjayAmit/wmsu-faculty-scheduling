@@ -201,38 +201,72 @@ export default function ZktecoLogsIndex({ data, filters, stats, devices }: Props
 
                 {/* 2. KPI Cards */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Total Biometric Punches
-                        </span>
-                        <div className="mt-2 text-2xl font-bold text-foreground">{stats.total}</div>
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Total Punch Logs
+                            </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Fingerprint className="h-4 w-4" />
+                            </div>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                            {stats.total}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Biometric logs captured
+                        </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Verified Present (Right Room)
-                        </span>
-                        <div className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-emerald-500/40 transition-colors">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Verified Present
+                            </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                <CheckCircle2 className="h-4 w-4" />
+                            </div>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
                             {stats.matched}
                         </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Right room & scheduled time
+                        </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            Wrong Classroom Rejected
-                        </span>
-                        <div className="mt-2 text-2xl font-bold text-destructive">
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-destructive/40 transition-colors">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Wrong Classroom
+                            </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+                                <ShieldAlert className="h-4 w-4" />
+                            </div>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
                             {stats.mismatched_room}
                         </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Non-scheduled room rejected
+                        </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-                        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                            No Schedule / Unmatched
-                        </span>
-                        <div className="mt-2 text-2xl font-bold text-foreground">
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-amber-500/40 transition-colors">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Unscheduled / Unknown
+                            </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                                <AlertTriangle className="h-4 w-4" />
+                            </div>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
                             {stats.no_scheduled_class + stats.teacher_not_found}
                         </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            {stats.no_scheduled_class} no schedule • {stats.teacher_not_found} unknown PIN
+                        </p>
                     </div>
                 </div>
 

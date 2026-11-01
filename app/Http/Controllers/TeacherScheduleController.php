@@ -90,10 +90,30 @@ class TeacherScheduleController extends Controller
                 ]);
             }
 
-            // Mode 1: subject-grouped cards
+            // Mode 1: Calendar view (default) and subject-grouped cards
             $sessions = TeacherSchedule::with(['subject', 'semester'])
                 ->where('teacher_id', $teacherId)
+                ->orderBy('scheduled_date')
+                ->orderBy('start_time')
                 ->get();
+
+            $calendarSchedules = $sessions->map(fn ($s) => [
+                'id' => $s->id,
+                'scheduled_date' => $s->scheduled_date->toDateString(),
+                'day_of_week' => $s->day_of_week,
+                'subject_code' => $s->subject->code ?? '',
+                'subject_title' => $s->subject->title ?? '',
+                'section' => $s->section,
+                'room' => $s->room,
+                'start_time' => $s->start_time instanceof \DateTimeInterface ? $s->start_time->format('H:i:s') : (string) $s->start_time,
+                'end_time' => $s->end_time instanceof \DateTimeInterface ? $s->end_time->format('H:i:s') : (string) $s->end_time,
+                'status' => $s->status instanceof \BackedEnum ? $s->status->value : $s->status,
+                'notes' => $s->notes,
+                'is_holiday' => (bool) $s->is_holiday,
+                'holiday_name' => $s->holiday_name,
+                'semester_name' => $s->semester->name ?? '',
+                'academic_year' => $s->semester->academic_year ?? '',
+            ])->values();
 
             $grouped = $sessions->groupBy(fn ($s) => $s->subject_id.'-'.$s->semester_id)
                 ->map(function ($group) {
@@ -115,8 +135,8 @@ class TeacherScheduleController extends Controller
                         'academic_year' => $first->semester->academic_year ?? '',
                         'section' => $first->section,
                         'room' => $first->room,
-                        'start_time' => $first->start_time->format('H:i:s'),
-                        'end_time' => $first->end_time->format('H:i:s'),
+                        'start_time' => $first->start_time instanceof \DateTimeInterface ? $first->start_time->format('H:i:s') : (string) $first->start_time,
+                        'end_time' => $first->end_time instanceof \DateTimeInterface ? $first->end_time->format('H:i:s') : (string) $first->end_time,
                         'days' => $days,
                         'total' => $group->count(),
                         'scheduled' => $group->filter(fn ($s) => ($s->status instanceof \BackedEnum ? $s->status->value : $s->status) === 'scheduled')->count(),
@@ -128,7 +148,8 @@ class TeacherScheduleController extends Controller
                 })->values();
 
             return Inertia::render('teacher-schedules/index', [
-                'mode' => 'subjects',
+                'mode' => 'calendar',
+                'calendar_schedules' => $calendarSchedules,
                 'subjects' => $grouped,
                 'filters' => [],
             ]);

@@ -8,17 +8,18 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['name', 'start_time', 'end_time', 'is_active'])]
 class TimeSlot extends Model
 {
-    /** @use HasFa, SoftDeletesctory<TimeSlotFactory> */
-    use HasFactory;
+    /** @use HasFactory<TimeSlotFactory> */
+    use HasFactory, SoftDeletes;
 
-    #[Cast(type: 'datetime')]
+    #[Cast(type: 'datetime:H:i')]
     protected $start_time;
 
-    #[Cast(type: 'datetime')]
+    #[Cast(type: 'datetime:H:i')]
     protected $end_time;
 
     #[Cast(type: 'boolean')]
@@ -46,8 +47,8 @@ class TimeSlot extends Model
     protected function casts(): array
     {
         return [
-            'start_time' => 'datetime',
-            'end_time' => 'datetime',
+            'start_time' => 'datetime:H:i',
+            'end_time' => 'datetime:H:i',
             'is_active' => 'boolean',
         ];
     }

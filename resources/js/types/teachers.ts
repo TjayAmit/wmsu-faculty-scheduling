@@ -57,12 +57,52 @@ export interface LinkUserAccountRequest {
     roles?: string[];
 }
 
+export interface TeacherActiveAssignment {
+    id: number;
+    draft_schedule_id?: number;
+    schedule_id: number;
+    subject_code: string;
+    subject_title: string;
+    units: number;
+    section: string;
+    room: string;
+    semester: string;
+    time_slots: Array<{ day: string; start?: string; end?: string; start_time?: string; end_time?: string }>;
+    assigned_at?: string;
+}
+
+export interface TeacherWeeklySession {
+    assignment_id: number;
+    draft_schedule_id?: number;
+    schedule_id: number;
+    subject_code: string;
+    subject_title: string;
+    section: string;
+    room: string;
+    start_time: string;
+    end_time: string;
+    semester: string;
+}
+
+export interface TeacherAvailableSchedule {
+    id: number;
+    name: string;
+    subject_code: string;
+    subject_title: string;
+    units: number;
+    section: string;
+    room?: string;
+    time_slots: Array<{ day: string; start?: string; end?: string }>;
+    semester: string;
+}
+
 export interface TeacherFilters {
     search?: string;
     without_user?: boolean;
     is_active?: boolean;
     department?: string;
     employment_type?: string;
+    workload?: string;
 }
 
 export interface TeachersIndexProps {
@@ -82,6 +122,12 @@ export interface TeachersIndexProps {
     };
     filters: TeacherFilters;
     employmentTypes: Array<{ value: string; label: string }>;
+    stats?: {
+        total_teachers: number;
+        assigned_teachers: number;
+        unassigned_teachers: number;
+        total_course_offerings: number;
+    };
 }
 
 export interface TeachersFormProps {
@@ -92,12 +138,22 @@ export interface TeachersFormProps {
         email: string;
     }[];
     employmentTypes: Array<{ value: string; label: string }>;
+    departments?: Array<{ id: number; code: string; name: string }>;
+    userDepartment?: { id: number; code: string; name: string } | null;
     availableRoles?: Role[];
     availableUsers?: Array<{ id: number; name: string; email: string }>;
 }
 
 export interface TeachersShowProps {
     teacher: Teacher;
-    availableRoles?: Role[];
+    activeAssignments?: TeacherActiveAssignment[];
+    weeklySchedule?: Record<string, TeacherWeeklySession[]>;
+    workload?: {
+        total_courses: number;
+        total_units: number;
+        total_weekly_hours: number;
+    };
+    availableSchedules?: TeacherAvailableSchedule[];
+    availableRoles?: Role[] | string[];
     availableUsers?: Array<{ id: number; name: string; email: string }>;
 }

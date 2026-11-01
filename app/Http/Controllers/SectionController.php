@@ -71,8 +71,8 @@ class SectionController extends Controller
     public function create()
     {
         return Inertia::render('sections/create', [
-            'programs' => Program::all(['id', 'name']),
-            'semesters' => Semester::all(['id', 'name', 'academic_year']),
+            'programs' => Program::all(['id', 'code', 'name']),
+            'semesters' => Semester::all(['id', 'name', 'academic_year', 'is_current']),
             'teachers' => Teacher::all(['id', 'first_name', 'last_name']),
         ]);
     }
@@ -86,7 +86,7 @@ class SectionController extends Controller
 
     public function show(Section $section)
     {
-        $section->load(['program', 'semester', 'adviser', 'teacherSchedules']);
+        $section->load(['program', 'semester', 'adviser', 'teacherSchedules.subject', 'teacherSchedules.teacher']);
 
         return Inertia::render('sections/show', [
             'section' => $section,
@@ -99,8 +99,8 @@ class SectionController extends Controller
 
         return Inertia::render('sections/edit', [
             'section' => $section,
-            'programs' => Program::all(['id', 'name']),
-            'semesters' => Semester::all(['id', 'name', 'academic_year']),
+            'programs' => Program::all(['id', 'code', 'name']),
+            'semesters' => Semester::all(['id', 'name', 'academic_year', 'is_current']),
             'teachers' => Teacher::all(['id', 'first_name', 'last_name']),
         ]);
     }

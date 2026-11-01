@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['program_id', 'subject_id', 'year_level', 'semester_type', 'is_required', 'prerequisite_subjects', 'units_override'])]
@@ -24,6 +25,21 @@ class Curriculum extends Model
     public function program(): BelongsTo
     {
         return $this->belongsTo(Program::class);
+    }
+
+    /**
+     * Get the department that owns the program/curriculum item via Program.
+     */
+    public function department(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            Department::class,
+            Program::class,
+            'id',
+            'id',
+            'program_id',
+            'department_id'
+        );
     }
 
     /**

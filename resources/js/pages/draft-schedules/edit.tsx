@@ -63,7 +63,7 @@ export default function Edit({ draftSchedule, teachers, schedules }: DraftSchedu
                                     <SelectContent>
                                         {teachers.map((teacher) => (
                                             <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                                {teacher.user.name}
+                                                {teacher.full_name || teacher.user?.name || `${teacher.first_name ?? ''} ${teacher.last_name ?? ''}`.trim() || `Teacher #${teacher.id}`}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -83,7 +83,7 @@ export default function Edit({ draftSchedule, teachers, schedules }: DraftSchedu
                                     <SelectContent>
                                         {schedules.map((schedule) => (
                                             <SelectItem key={schedule.id} value={schedule.id.toString()}>
-                                                {schedule.subject.code} - {schedule.subject.title} ({schedule.semester.name})
+                                                {schedule.subject?.code ?? 'N/A'} - {schedule.subject?.title ?? 'No title'} ({schedule.semester?.name ?? 'No semester'}{schedule.section ? ` • Section ${schedule.section}` : ''})
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

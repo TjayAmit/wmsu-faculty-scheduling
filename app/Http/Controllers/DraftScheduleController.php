@@ -52,10 +52,43 @@ class DraftScheduleController extends Controller
 
     public function show(DraftSchedule $draftSchedule)
     {
-        $draftSchedule->load(['teacher.user', 'schedule.subject', 'schedule.semester', 'reviewer', 'teacherAssignment']);
+        $draftSchedule->load([
+            'teacher.user',
+            'schedule.subject',
+            'schedule.semester',
+            'schedule.classroom',
+            'reviewer',
+            'teacherAssignment.assignedBy',
+        ]);
+
+        $timeSlotIds = collect($draftSchedule->schedule?->time_slots ?? [])
+            ->pluck('time_slot_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $timeSlotsMap = \App\Models\TimeSlot::whereIn('id', $timeSlotIds)->get()->keyBy('id');
+
+        $resolvedTimeSlots = collect($draftSchedule->schedule?->time_slots ?? [])->map(function ($slot) use ($timeSlotsMap) {
+            $ts = isset($slot['time_slot_id']) ? $timeSlotsMap->get($slot['time_slot_id']) : null;
+
+            return [
+                'day' => $slot['day'] ?? null,
+                'time_slot_id' => $slot['time_slot_id'] ?? null,
+                'name' => $ts?->name,
+                'start_time' => $ts?->start_time,
+                'end_time' => $ts?->end_time,
+            ];
+        })->values();
+
+        $generatedSessions = \App\Models\TeacherSchedule::where('draft_schedule_id', $draftSchedule->id)
+            ->orderBy('scheduled_date')
+            ->get();
 
         return Inertia::render('draft-schedules/show', [
             'draftSchedule' => $draftSchedule,
+            'resolvedTimeSlots' => $resolvedTimeSlots,
+            'generatedSessions' => $generatedSessions,
         ]);
     }
 

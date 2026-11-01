@@ -10,6 +10,10 @@ import {
     Circle,
     CalendarDays,
     AlertCircle,
+    ExternalLink,
+    Layers,
+    PenLine,
+    Users,
 } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -22,7 +26,9 @@ import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -59,6 +65,7 @@ export default function Edit({
     classrooms = [],
     timeSlots,
     daysOfWeek,
+    sections = [],
 }: SchedulesFormProps & { classrooms?: ClassroomOption[] }) {
     const [timeSlotsForm, setTimeSlotsForm] = useState<TimeSlotItem[]>(
         schedule?.time_slots?.map((slot) => ({
@@ -69,6 +76,11 @@ export default function Edit({
     const [newDay, setNewDay] = useState('');
     const [newTimeSlotId, setNewTimeSlotId] = useState('');
     const [slotError, setSlotError] = useState<string | null>(null);
+
+    const initialIsCustom = schedule?.section
+        ? !sections.some((s) => s.section_code.toLowerCase() === schedule.section.toLowerCase())
+        : false;
+    const [isCustomSection, setIsCustomSection] = useState(initialIsCustom);
 
     const { data, setData, put, processing, errors } = useForm({
         subject_id: schedule?.subject_id.toString() || '',
@@ -85,6 +97,15 @@ export default function Edit({
     const selectedSubject = subjects.find((s) => s.id.toString() === data.subject_id);
     const selectedSemester = semesters.find((s) => s.id.toString() === data.semester_id);
     const selectedClassroom = classrooms.find((c) => String(c.id) === data.classroom_id);
+    const selectedSection = sections.find((s) => s.section_code.toLowerCase() === data.section.trim().toLowerCase());
+
+    // Group available sections by degree program
+    const groupedSections = sections.reduce((acc, s) => {
+        const prog = s.program?.code || 'General';
+        if (!acc[prog]) acc[prog] = [];
+        acc[prog].push(s);
+        return acc;
+    }, {} as Record<string, typeof sections>);
 
     const handleClassroomSelect = (classroomId: string) => {
         const selected = classrooms.find((c) => String(c.id) === classroomId);
@@ -242,34 +263,126 @@ export default function Edit({
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-1.5">
-                                        <Label htmlFor="section" className="text-xs font-medium">
-                                            Section Code <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Input
-                                            id="section"
-                                            value={data.section}
-                                            onChange={(e) => setData('section', e.target.value)}
-                                            placeholder="e.g. BSCS 3-A, BSIT 2-B"
-                                            className="h-9 text-xs"
-                                            required
-                                            aria-invalid={!!errors.section}
-                                        />
+                                        <div className="flex items-center justify-between">
+                                            <Label htmlFor="section" className="text-xs font-medium">
+                                                Section Code <span className="text-destructive">*</span>
+                                            </Label>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsCustomSection(!isCustomSection)}
+                                                className="text-[11px] text-primary hover:underline font-medium inline-flex items-center gap-1"
+                                            >
+                                                {isCustomSection ? (
+                                                    <>
+                                                        <Layers className="size-3" />
+                                                        Choose Registered Section
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <PenLine className="size-3" />
+                                                        Custom Code
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+
+                                        {!isCustomSection && sections.length > 0 ? (
+                                            <Select
+                                                value={data.section}
+                                                onValueChange={(val) => setData('section', val)}
+                                            >
+                                                <SelectTrigger id="section" aria-invalid={!!errors.section} className="h-9 text-xs font-mono">
+                                                    <SelectValue placeholder="Select section from Sections module..." />
+                                                </SelectTrigger>
+                                                <SelectContent className="max-h-72">
+                                                    {Object.entries(groupedSections).map(([progCode, secList]) => (
+                                                        <SelectGroup key={progCode}>
+                                                            <SelectLabel className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40 px-2 py-1">
+                                                                {progCode} Program Sections
+                                                            </SelectLabel>
+                                                            {secList.map((s) => (
+                                                                <SelectItem key={s.id} value={s.section_code} className="cursor-pointer">
+                                                                    <div className="flex items-center justify-between w-full gap-4">
+                                                                        <span className="font-mono font-semibold">{s.section_code}</span>
+                                                                        <span className="text-xs text-muted-foreground">
+                                                                            Year {s.year_level} ({s.max_students || 40} seats)
+                                                                        </span>
+                                                                    </div>
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectGroup>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input
+                                                id="section"
+                                                value={data.section}
+                                                onChange={(e) => setData('section', e.target.value)}
+                                                placeholder="e.g. BEED 3-A, BSED-ENG 2-B"
+                                                className="h-9 text-xs font-mono"
+                                                required
+                                                aria-invalid={!!errors.section}
+                                            />
+                                        )}
+
+                                        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                                            <span>
+                                                {!isCustomSection
+                                                    ? 'Synced with the Sections module database.'
+                                                    : 'Manual entry for unlisted section.'}
+                                            </span>
+                                            <Link
+                                                href="/sections"
+                                                target="_blank"
+                                                className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                                            >
+                                                Sections Module <ExternalLink className="size-2.5" />
+                                            </Link>
+                                        </div>
                                         <InputError message={errors.section} />
                                     </div>
 
-                                    {selectedSubject && (
-                                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-2.5 flex items-center justify-between text-xs">
-                                            <div>
-                                                <span className="font-semibold text-foreground">{selectedSubject.code}</span>
-                                                <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">
-                                                    {selectedSubject.title}
+                                    {/* Right Column: Selected Section or Subject Info Box */}
+                                    <div className="space-y-2 mt-auto">
+                                        {selectedSection ? (
+                                            <div className="rounded-lg border border-primary/20 bg-primary/5 p-2.5 space-y-1">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                                                        <Users className="size-3.5" />
+                                                        Section Details
+                                                    </span>
+                                                    <Badge variant="outline" className="border-primary/30 text-primary bg-background text-[10px] font-mono font-semibold">
+                                                        {selectedSection.section_code}
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-xs font-medium text-foreground truncate">
+                                                    {selectedSection.program?.name || selectedSection.program?.code || 'Academic Degree Program'}
                                                 </p>
+                                                <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-1 border-t border-primary/15">
+                                                    <span>Year {selectedSection.year_level}</span>
+                                                    <span>•</span>
+                                                    <span>Class Capacity: <strong className="text-foreground">{selectedSection.max_students || 40} seats</strong></span>
+                                                </div>
                                             </div>
-                                            <Badge variant="outline" className="text-[10px] bg-background">
-                                                {selectedSubject.units} Units
-                                            </Badge>
-                                        </div>
-                                    )}
+                                        ) : selectedSubject ? (
+                                            <div className="rounded-lg border border-primary/20 bg-primary/5 p-2.5 flex items-center justify-between text-xs">
+                                                <div>
+                                                    <span className="font-semibold text-foreground">{selectedSubject.code}</span>
+                                                    <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">
+                                                        {selectedSubject.title}
+                                                    </p>
+                                                </div>
+                                                <Badge variant="outline" className="text-[10px] bg-background">
+                                                    {selectedSubject.units ?? 3} Units
+                                                </Badge>
+                                            </div>
+                                        ) : (
+                                            <div className="rounded-lg border border-dashed border-border bg-muted/20 p-2.5 text-center text-xs text-muted-foreground">
+                                                Choose a course and registered section to inspect class enrollment limits.
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

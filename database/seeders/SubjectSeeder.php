@@ -39,42 +39,42 @@ class SubjectSeeder extends Seeder
                 'code' => 'GEC 104',
                 'title' => 'Mathematics in the Modern World',
                 'units' => 3.0,
-                'description' => 'Mathematics as a tool for critical thinking, problem solving, and decision-making in the modern world.',
+                'description' => 'Nature of mathematics, appreciation of its practical, intellectual, and aesthetic dimensions, and its application in daily life.',
                 'is_active' => true,
             ],
             [
                 'code' => 'GEC 105',
                 'title' => 'Purposive Communication',
                 'units' => 3.0,
-                'description' => 'Effective communication across various academic and professional contexts, focusing on writing and oral communication.',
+                'description' => 'Writing, speaking, and presenting to different audiences and for various purposes with multicultural awareness.',
                 'is_active' => true,
             ],
             [
                 'code' => 'GEC 106',
                 'title' => 'Art Appreciation',
                 'units' => 3.0,
-                'description' => 'Introduction to the nature of art, its role in human experience and society, and critical appreciation of visual arts, music, and literature.',
+                'description' => 'Develops students ability to appreciate, analyze, and critique works of art through practical and historical lenses.',
                 'is_active' => true,
             ],
             [
                 'code' => 'GEC 107',
-                'title' => 'Science, Technology and Society',
+                'title' => 'Science, Technology, and Society',
                 'units' => 3.0,
-                'description' => 'Relationship between science, technology, and societal change, examining ethical, environmental, and sociocultural implications.',
+                'description' => 'Interaction between science, technology, and society throughout history with emphasis on ethics and human flourishing.',
                 'is_active' => true,
             ],
             [
                 'code' => 'GEC 108',
                 'title' => 'Ethics',
                 'units' => 3.0,
-                'description' => 'Moral philosophy and ethical theories applied to contemporary issues and professional contexts.',
+                'description' => 'Principles of ethical behavior in modern society, moral decision making, and ethical frameworks across cultures.',
                 'is_active' => true,
             ],
             [
                 'code' => 'GEC 109',
-                'title' => 'Life and Works of Rizal',
+                'title' => 'The Life and Works of Jose Rizal',
                 'units' => 3.0,
-                'description' => 'Life, works, and writings of Jose Rizal as required by RA 1425, emphasizing his contributions to Philippine nationalism.',
+                'description' => 'Study of the life, works, and writings of Dr. Jose Rizal pursuant to Republic Act No. 1425.',
                 'is_active' => true,
             ],
 
@@ -83,30 +83,30 @@ class SubjectSeeder extends Seeder
             // ==========================================
             [
                 'code' => 'PATHFIT 1',
-                'title' => 'Physical Activities Towards Health and Fitness 1',
+                'title' => 'Movement Competency Training',
                 'units' => 2.0,
-                'description' => 'Movement competency training and physical activity promotion for overall wellness.',
+                'description' => 'Fundamental movement patterns, core stability, physical fitness testing, and healthy lifestyle development.',
                 'is_active' => true,
             ],
             [
                 'code' => 'PATHFIT 2',
-                'title' => 'Physical Activities Towards Health and Fitness 2',
+                'title' => 'Exercise-based Fitness Activities',
                 'units' => 2.0,
-                'description' => 'Exercise-based fitness activities for health enhancement and lifestyle improvement.',
+                'description' => 'Fitness training regimens, cardiovascular conditioning, resistance training, and aerobic exercises.',
                 'is_active' => true,
             ],
             [
                 'code' => 'PATHFIT 3',
-                'title' => 'Physical Activities Towards Health and Fitness 3',
+                'title' => 'Physical Activity towards Health and Fitness 3 (Dance & Sports)',
                 'units' => 2.0,
-                'description' => 'Sports and recreational activities for physical development, teamwork, and sportsmanship.',
+                'description' => 'Development of individual, dual, and team sports fundamentals and recreational movement forms.',
                 'is_active' => true,
             ],
             [
                 'code' => 'PATHFIT 4',
-                'title' => 'Physical Activities Towards Health and Fitness 4',
+                'title' => 'Physical Activity towards Health and Fitness 4 (Outdoor & Adventure)',
                 'units' => 2.0,
-                'description' => 'Advanced physical activities, fitness testing, and personal wellness planning.',
+                'description' => 'Outdoor education, recreational games, martial arts, and lifelong active living principles.',
                 'is_active' => true,
             ],
 
@@ -114,666 +114,518 @@ class SubjectSeeder extends Seeder
             // NATIONAL SERVICE TRAINING PROGRAM (NSTP)
             // ==========================================
             [
-                'code' => 'NSTP 101',
+                'code' => 'NSTP 1',
                 'title' => 'National Service Training Program 1',
                 'units' => 3.0,
-                'description' => 'First component of NSTP (ROTC, CWTS, or LTS) promoting civic consciousness and defense preparedness among youth.',
+                'description' => 'Civic consciousness, defense preparedness, disaster risk reduction, and community service literacy.',
                 'is_active' => true,
             ],
             [
-                'code' => 'NSTP 102',
+                'code' => 'NSTP 2',
                 'title' => 'National Service Training Program 2',
                 'units' => 3.0,
-                'description' => 'Continuation of NSTP, deepening civic engagement and community service skills.',
+                'description' => 'Community immersion, participatory action projects, community outreach, and civic development implementation.',
                 'is_active' => true,
             ],
 
             // ==========================================
-            // FILIPINO SUBJECTS
+            // FILIPINO MANDATED SUBJECTS
             // ==========================================
             [
                 'code' => 'FIL 101',
-                'title' => 'Komunikasyon sa Akademikong Filipino',
+                'title' => 'Kontekstwalisadong Komunikasyon sa Filipino',
                 'units' => 3.0,
-                'description' => 'Paggamit ng Filipino sa iba\'t ibang situwasyon ng akademikong komunikasyon.',
+                'description' => 'Pagsasanay sa paggamit ng wikang Filipino sa iba\'t ibang konteksto at diskursong pang-akademiko.',
                 'is_active' => true,
             ],
             [
                 'code' => 'FIL 102',
-                'title' => 'Pagbasa at Pagsulat sa Filipino',
+                'title' => 'Filipino sa Iba\'t Ibang Disiplina',
                 'units' => 3.0,
-                'description' => 'Pagpapaunlad ng kasanayang magbasa at magsulat ng iba\'t ibang uri ng teksto sa Filipino.',
+                'description' => 'Pagbasa at pagsulat tungo sa pananaliksik sa iba\'t ibang larangang pang-akademiko gamit ang Filipino.',
                 'is_active' => true,
             ],
 
             // ==========================================
-            // COMMON COMPUTING SUBJECTS (COSC)
-            // Shared between BSCS and BSIT programs
-            // CHED CMO No. 25 s. 2015
-            // ==========================================
-            [
-                'code' => 'COSC 101',
-                'title' => 'Introduction to Computing',
-                'units' => 3.0,
-                'description' => 'Overview of computer hardware, software, and fundamental concepts in computing including basic programming logic.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 102',
-                'title' => 'Computer Programming 1',
-                'units' => 3.0,
-                'description' => 'Fundamentals of programming using a structured programming language; problem solving, algorithms, and program design.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 103',
-                'title' => 'Computer Programming 2',
-                'units' => 3.0,
-                'description' => 'Advanced programming concepts including arrays, functions, file handling, and modular programming techniques.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 104',
-                'title' => 'Data Structures and Algorithms',
-                'units' => 3.0,
-                'description' => 'Study of fundamental data structures and algorithms including arrays, linked lists, stacks, queues, trees, and graphs.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 105',
-                'title' => 'Object-Oriented Programming',
-                'units' => 3.0,
-                'description' => 'Principles of object-oriented programming: encapsulation, inheritance, polymorphism, and abstraction.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 106',
-                'title' => 'Database Management Systems',
-                'units' => 3.0,
-                'description' => 'Concepts of database design, relational model, SQL, normalization, transactions, and database administration.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 107',
-                'title' => 'Computer Networks',
-                'units' => 3.0,
-                'description' => 'Network architectures, protocols, OSI and TCP/IP models, LAN/WAN technologies, and network security fundamentals.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 108',
-                'title' => 'Information Assurance and Security',
-                'units' => 3.0,
-                'description' => 'Principles of information security, cryptography, access control, network security, and ethical hacking concepts.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'COSC 109',
-                'title' => 'Social Issues and Professional Practice',
-                'units' => 3.0,
-                'description' => 'Professional ethics, intellectual property, privacy, security, and social impact of computing technologies.',
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // BS COMPUTER SCIENCE (BSCS) CORE SUBJECTS
-            // CHED CMO No. 25 s. 2015
-            // ==========================================
-            [
-                'code' => 'CS 101',
-                'title' => 'Discrete Mathematics',
-                'units' => 3.0,
-                'description' => 'Mathematical structures used in computer science: logic, sets, relations, functions, combinatorics, and graph theory.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 102',
-                'title' => 'Algorithm Design and Analysis',
-                'units' => 3.0,
-                'description' => 'Design and analysis of algorithms including sorting, searching, dynamic programming, greedy algorithms, and complexity theory.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 103',
-                'title' => 'Computer Architecture and Organization',
-                'units' => 3.0,
-                'description' => 'Digital logic, CPU design, memory organization, instruction sets, pipelining, and computer system components.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 104',
-                'title' => 'Operating Systems',
-                'units' => 3.0,
-                'description' => 'Operating system principles: processes, threads, scheduling, memory management, file systems, and I/O management.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 105',
-                'title' => 'Programming Languages',
-                'units' => 3.0,
-                'description' => 'Concepts of programming language design, syntax, semantics, parsing, and survey of language paradigms.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 106',
-                'title' => 'Automata Theory and Formal Languages',
-                'units' => 3.0,
-                'description' => 'Finite automata, regular expressions, context-free grammars, pushdown automata, and Turing machines.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 107',
-                'title' => 'Software Engineering 1',
-                'units' => 3.0,
-                'description' => 'Software development lifecycle, requirements engineering, software design patterns, and project management.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 108',
-                'title' => 'Software Engineering 2',
-                'units' => 3.0,
-                'description' => 'Software testing, quality assurance, maintenance, refactoring, and advanced software architecture.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 109',
-                'title' => 'Human-Computer Interaction',
-                'units' => 3.0,
-                'description' => 'Principles of usability, user-centered design, interface design methodologies, and evaluation of interactive systems.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 111',
-                'title' => 'Thesis Writing 1',
-                'units' => 3.0,
-                'description' => 'Research proposal development, literature review, and preliminary investigation for the undergraduate CS thesis.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 112',
-                'title' => 'Thesis Writing 2',
-                'units' => 3.0,
-                'description' => 'Implementation, testing, documentation, and oral defense of the undergraduate CS thesis.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 113',
-                'title' => 'CS Practicum',
-                'units' => 6.0,
-                'description' => 'Industry immersion program where students apply computer science knowledge in real-world professional environments.',
-                'is_active' => true,
-            ],
-
-            // BSCS Elective Subjects
-            [
-                'code' => 'CS 201',
-                'title' => 'Artificial Intelligence',
-                'units' => 3.0,
-                'description' => 'Introduction to AI concepts: search algorithms, knowledge representation, machine learning, and natural language processing.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 202',
-                'title' => 'Machine Learning',
-                'units' => 3.0,
-                'description' => 'Supervised and unsupervised learning, neural networks, deep learning, and applications in data analysis.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CS 203',
-                'title' => 'Computer Graphics',
-                'units' => 3.0,
-                'description' => 'Principles of 2D and 3D computer graphics, rendering pipeline, transformations, and graphical interface programming.',
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // BS INFORMATION TECHNOLOGY (BSIT) CORE SUBJECTS
-            // CHED CMO No. 25 s. 2015
-            // ==========================================
-            [
-                'code' => 'IT 101',
-                'title' => 'Web Systems and Technologies 1',
-                'units' => 3.0,
-                'description' => 'Fundamentals of web development including HTML5, CSS3, JavaScript, and client-server architecture.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 102',
-                'title' => 'Web Systems and Technologies 2',
-                'units' => 3.0,
-                'description' => 'Advanced web development with server-side scripting, web frameworks, RESTful APIs, and web application security.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 103',
-                'title' => 'Platform Technologies',
-                'units' => 3.0,
-                'description' => 'Overview of hardware and software platforms including operating systems, virtualization, and cloud environments.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 104',
-                'title' => 'Systems Analysis and Design',
-                'units' => 3.0,
-                'description' => 'Methodologies for analyzing and designing information systems, including structured and object-oriented approaches.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 105',
-                'title' => 'Systems Integration and Architecture',
-                'units' => 3.0,
-                'description' => 'Integration of enterprise systems, service-oriented architecture, middleware, and enterprise application integration.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 106',
-                'title' => 'Application Development and Emerging Technologies',
-                'units' => 3.0,
-                'description' => 'Development of applications using emerging technologies including IoT, AR/VR, and blockchain fundamentals.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 107',
-                'title' => 'Technopreneurship',
-                'units' => 3.0,
-                'description' => 'Technology-based entrepreneurship, startup ecosystem, lean methodology, and IT product development strategies.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 108',
-                'title' => 'Capstone Project 1',
-                'units' => 3.0,
-                'description' => 'Proposal, planning, and initial development of an IT capstone project addressing real-world problems.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 109',
-                'title' => 'Capstone Project 2',
-                'units' => 3.0,
-                'description' => 'Completion, testing, documentation, and oral defense of the IT capstone project.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 110',
-                'title' => 'IT Practicum',
-                'units' => 6.0,
-                'description' => 'Industry immersion where students apply IT knowledge and skills in real-world professional environments.',
-                'is_active' => true,
-            ],
-
-            // BSIT Elective Subjects
-            [
-                'code' => 'IT 201',
-                'title' => 'Mobile Application Development',
-                'units' => 3.0,
-                'description' => 'Development of mobile applications for Android and iOS platforms using modern cross-platform frameworks.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 202',
-                'title' => 'Cloud Computing',
-                'units' => 3.0,
-                'description' => 'Cloud service models (IaaS, PaaS, SaaS), cloud providers, deployment models, and cloud-native application development.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'IT 203',
-                'title' => 'DevOps and Automation',
-                'units' => 3.0,
-                'description' => 'DevOps culture, CI/CD pipelines, containerization with Docker, orchestration with Kubernetes, and infrastructure as code.',
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // MATHEMATICS AND SCIENCES
-            // Primarily used by Engineering and Science programs
-            // ==========================================
-            [
-                'code' => 'MATH 101',
-                'title' => 'Calculus 1',
-                'units' => 3.0,
-                'description' => 'Limits, continuity, derivatives, and their applications including curve sketching and optimization.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'MATH 102',
-                'title' => 'Calculus 2',
-                'units' => 3.0,
-                'description' => 'Integration techniques, applications of integrals, infinite sequences, and power series.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'MATH 103',
-                'title' => 'Differential Equations',
-                'units' => 3.0,
-                'description' => 'Ordinary differential equations, methods of solution, Laplace transforms, and applications in engineering.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'MATH 104',
-                'title' => 'Linear Algebra',
-                'units' => 3.0,
-                'description' => 'Vectors, matrices, systems of linear equations, determinants, eigenvalues, and linear transformations.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'PHYS 101',
-                'title' => 'Physics for Engineers 1',
-                'units' => 3.0,
-                'description' => 'Mechanics, kinematics, dynamics, work, energy, momentum, rotation, and basic thermodynamics.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'PHYS 102',
-                'title' => 'Physics for Engineers 2',
-                'units' => 3.0,
-                'description' => 'Electricity, magnetism, optics, waves, and modern physics for engineering students.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CHEM 101',
-                'title' => 'General Chemistry for Engineers',
-                'units' => 3.0,
-                'description' => 'Fundamental chemistry: atomic structure, chemical bonding, stoichiometry, thermochemistry, and reaction kinetics.',
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // ELECTRICAL ENGINEERING (EE) SUBJECTS
-            // ==========================================
-            [
-                'code' => 'EE 101',
-                'title' => 'Basic Electrical Engineering',
-                'units' => 3.0,
-                'description' => 'Fundamental concepts of electricity, DC and AC circuits, Kirchhoff\'s laws, and basic network theorems.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'EE 102',
-                'title' => 'Circuit Theory',
-                'units' => 3.0,
-                'description' => 'Analysis of electrical circuits using mesh and node analysis, Thevenin, Norton, and superposition theorems.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'EE 103',
-                'title' => 'Electronics 1',
-                'units' => 3.0,
-                'description' => 'Semiconductor devices, diodes, bipolar junction transistors, FETs, amplifiers, and basic electronic circuit analysis.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'EE 104',
-                'title' => 'Electronics 2',
-                'units' => 3.0,
-                'description' => 'Advanced electronic circuits, operational amplifiers, feedback systems, oscillators, and digital electronics.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'EE 105',
-                'title' => 'Power Systems Analysis',
-                'units' => 3.0,
-                'description' => 'Generation, transmission, and distribution of electrical power, per-unit system, load flow, and fault analysis.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'EE 106',
-                'title' => 'Control Systems',
-                'units' => 3.0,
-                'description' => 'Open and closed-loop control systems, transfer functions, root locus, frequency response, and stability analysis.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'EE 107',
-                'title' => 'Electrical Machines',
-                'units' => 3.0,
-                'description' => 'Principles and operation of transformers, DC machines, induction motors, and synchronous generators.',
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // CIVIL ENGINEERING (CE) SUBJECTS
-            // ==========================================
-            [
-                'code' => 'CE 101',
-                'title' => 'Engineering Mechanics - Statics',
-                'units' => 3.0,
-                'description' => 'Principles of statics: force systems, resultants, equilibrium, trusses, frames, and distributed forces.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CE 102',
-                'title' => 'Engineering Mechanics - Dynamics',
-                'units' => 3.0,
-                'description' => 'Kinematics and kinetics of particles and rigid bodies, work-energy, and impulse-momentum methods.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CE 103',
-                'title' => 'Mechanics of Deformable Bodies',
-                'units' => 3.0,
-                'description' => 'Stress, strain, mechanical properties of materials, axial loading, torsion, bending, and beam deflection.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CE 104',
-                'title' => 'Hydraulics and Fluid Mechanics',
-                'units' => 3.0,
-                'description' => 'Properties of fluids, fluid statics, Bernoulli equation, pipe flow, pump selection, and open channel hydraulics.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'CE 105',
-                'title' => 'Structural Analysis',
-                'units' => 3.0,
-                'description' => 'Analysis of statically determinate and indeterminate structures using classical and matrix stiffness methods.',
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // BUSINESS ADMINISTRATION SUBJECTS
-            // ==========================================
-            [
-                'code' => 'BA 101',
-                'title' => 'Principles of Management',
-                'units' => 3.0,
-                'description' => 'Management functions: planning, organizing, leading, and controlling in business organizations.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BA 102',
-                'title' => 'Principles of Marketing',
-                'units' => 3.0,
-                'description' => 'Marketing concepts, consumer behavior, market segmentation, marketing mix, and digital marketing fundamentals.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BA 103',
-                'title' => 'Financial Management',
-                'units' => 3.0,
-                'description' => 'Financial analysis, time value of money, capital budgeting, cost of capital, and working capital management.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BA 104',
-                'title' => 'Operations Management',
-                'units' => 3.0,
-                'description' => 'Production planning, quality management, supply chain, inventory control, and process improvement techniques.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BA 105',
-                'title' => 'Business Economics',
-                'units' => 3.0,
-                'description' => 'Application of economic theories to business decision-making including demand, supply, and market structures.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BA 106',
-                'title' => 'Business Law',
-                'units' => 3.0,
-                'description' => 'Legal framework for business operations including contracts, sales, agency, and business organization laws.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'ACC 101',
-                'title' => 'Financial Accounting 1',
-                'units' => 3.0,
-                'description' => 'Fundamentals of accounting, recording business transactions, and preparation of financial statements.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'ACC 102',
-                'title' => 'Financial Accounting 2',
-                'units' => 3.0,
-                'description' => 'Partnership and corporation accounting, long-term assets, liabilities, and stockholders\' equity.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'ACC 103',
-                'title' => 'Cost Accounting',
-                'units' => 3.0,
-                'description' => 'Job order, process, and standard costing systems; cost-volume-profit analysis, and cost allocation methods.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'ACC 104',
-                'title' => 'Auditing Theory',
-                'units' => 3.0,
-                'description' => 'Principles of auditing, Philippine Standards on Auditing, internal controls, audit evidence, and audit reports.',
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // EDUCATION SUBJECTS
+            // PROFESSIONAL EDUCATION CORE COURSES (EDUC)
+            // CHED CMO No. 74-80 s. 2017
             // ==========================================
             [
                 'code' => 'EDUC 101',
-                'title' => 'Foundations of Education',
+                'title' => 'The Child and Adolescent Learners and Learning Principles',
                 'units' => 3.0,
-                'description' => 'Historical, philosophical, sociological, and legal foundations of education in the Philippine context.',
+                'description' => 'Developmental processes, biological, psychological, cognitive, and social development of child and adolescent learners.',
                 'is_active' => true,
             ],
             [
                 'code' => 'EDUC 102',
-                'title' => 'Child and Adolescent Development',
+                'title' => 'Facilitating Learner-Centered Teaching',
                 'units' => 3.0,
-                'description' => 'Physical, cognitive, social, and emotional development of learners from childhood through adolescence.',
+                'description' => 'Learning theories, metacognition, behavioral, cognitive, constructivist theories, and motivation in teaching-learning.',
                 'is_active' => true,
             ],
             [
                 'code' => 'EDUC 103',
-                'title' => 'The Teacher and the Community',
+                'title' => 'The Teaching Profession',
                 'units' => 3.0,
-                'description' => 'The teacher\'s role in society, school-community relations, and professional ethics for educators.',
+                'description' => 'The teacher as a professional, Code of Ethics, teaching philosophy, historical and legal bases of Philippine education.',
                 'is_active' => true,
             ],
             [
                 'code' => 'EDUC 104',
-                'title' => 'Assessment in Learning',
+                'title' => 'Technology for Teaching and Learning 1',
                 'units' => 3.0,
-                'description' => 'Principles and practices of classroom assessment, test construction, grading systems, and performance evaluation.',
+                'description' => 'ICT integration in education, instructional design models, digital citizenship, and online educational tools.',
                 'is_active' => true,
             ],
             [
                 'code' => 'EDUC 105',
-                'title' => 'Curriculum Development',
+                'title' => 'Assessment in Learning 1',
                 'units' => 3.0,
-                'description' => 'Curriculum design theories, implementation strategies, evaluation methods, and alignment with national standards.',
+                'description' => 'Traditional, objective, and test-based assessment of learning outcomes, item analysis, and psychometric foundations.',
                 'is_active' => true,
             ],
             [
                 'code' => 'EDUC 106',
-                'title' => 'Field Study 1',
-                'units' => 1.0,
-                'description' => 'Classroom observation and analysis of learning environments in cooperating elementary or secondary schools.',
+                'title' => 'Assessment in Learning 2',
+                'units' => 3.0,
+                'description' => 'Authentic assessment, portfolio assessment, rubrics development, performance-based tasks, and affective domain evaluation.',
                 'is_active' => true,
             ],
             [
                 'code' => 'EDUC 107',
-                'title' => 'Field Study 2',
-                'units' => 1.0,
-                'description' => 'Observation and guided participation in instructional planning, delivery, and classroom management.',
+                'title' => 'The Teacher and the School Curriculum',
+                'units' => 3.0,
+                'description' => 'Curriculum development processes, models, implementation, evaluation, and the K-12 Enhanced Basic Education framework.',
                 'is_active' => true,
             ],
             [
                 'code' => 'EDUC 108',
-                'title' => 'Practice Teaching',
+                'title' => 'Building and Enhancing New Literacies Across the Curriculum',
+                'units' => 3.0,
+                'description' => 'Financial literacy, media literacy, digital literacy, eco-literacy, multicultural literacy, and social literacy.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'EDUC 109',
+                'title' => 'The Teacher and the Community, School Culture and Leadership',
+                'units' => 3.0,
+                'description' => 'School-community partnerships, school culture, teacher leadership, organizational dynamics, and educational policies.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'EDUC 110',
+                'title' => 'Foundations of Special and Inclusive Education',
+                'units' => 3.0,
+                'description' => 'Principles, policies, and practices of teaching learners with disabilities, giftedness, and diverse educational needs.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'EDUC 111',
+                'title' => 'Field Study 1: Observations of Teaching-Learning',
+                'units' => 3.0,
+                'description' => 'First experiential learning course focusing on systematic classroom observation in partner basic education schools.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'EDUC 112',
+                'title' => 'Field Study 2: Participation and Teaching Assistantship',
+                'units' => 3.0,
+                'description' => 'Second experiential learning course involving assisting resource teachers in classroom management and lesson preparation.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'EDUC 113',
+                'title' => 'Teaching Internship / Practice Teaching',
                 'units' => 6.0,
-                'description' => 'Supervised full-time teaching experience in CHED-accredited cooperating schools.',
+                'description' => 'Culminating semester-long immersion as a student teacher in accredited public and laboratory basic education schools.',
                 'is_active' => true,
             ],
 
             // ==========================================
-            // NURSING SUBJECTS
-            // CHED CMO No. 14 s. 2009 / CMO No. 15 s. 2017
+            // ELEMENTARY EDUCATION MAJOR SUBJECTS (EED)
             // ==========================================
             [
-                'code' => 'NUR 101',
-                'title' => 'Fundamentals of Nursing',
-                'units' => 5.0,
-                'description' => 'Basic nursing concepts, the nursing process, vital signs, asepsis, and fundamental nursing procedures.',
-                'is_active' => true,
-            ],
-            [
-                'code' => 'NUR 102',
-                'title' => 'Health Assessment',
+                'code' => 'EED 101',
+                'title' => 'Teaching English in the Elementary Grades (Language Arts)',
                 'units' => 3.0,
-                'description' => 'Systematic health history taking, physical examination techniques, and documentation of patient findings.',
+                'description' => 'Methods, materials, and pedagogical strategies for teaching listening, speaking, reading, writing, and viewing to elementary pupils.',
                 'is_active' => true,
             ],
             [
-                'code' => 'NUR 103',
-                'title' => 'Pharmacology',
+                'code' => 'EED 102',
+                'title' => 'Teaching Science in the Elementary Grades (Biology and Chemistry)',
                 'units' => 3.0,
-                'description' => 'Drug classifications, pharmacokinetics, pharmacodynamics, drug interactions, and safe medication administration.',
+                'description' => 'Inquiry-based science instruction, hands-on experimentation, and pedagogical approaches for elementary science.',
                 'is_active' => true,
             ],
             [
-                'code' => 'NUR 104',
-                'title' => 'Medical-Surgical Nursing 1',
-                'units' => 5.0,
-                'description' => 'Nursing care for adult clients with medical-surgical conditions affecting the cardiovascular and respiratory systems.',
+                'code' => 'EED 103',
+                'title' => 'Teaching Social Studies in the Elementary Grades',
+                'units' => 3.0,
+                'description' => 'Content, pedagogy, and civic values education for teaching Araling Panlipunan in Philippine elementary schools.',
                 'is_active' => true,
             ],
             [
-                'code' => 'NUR 105',
-                'title' => 'Community Health Nursing',
-                'units' => 5.0,
-                'description' => 'Public health nursing concepts, community assessment, health promotion, and family nursing care.',
+                'code' => 'EED 104',
+                'title' => 'Teaching Mathematics in Primary Grades',
+                'units' => 3.0,
+                'description' => 'Foundational mathematical concepts, numeracy development, manipulatives, and problem-solving strategies in grades 1 to 3.',
                 'is_active' => true,
             ],
             [
-                'code' => 'NUR 106',
-                'title' => 'Maternal and Newborn Nursing',
-                'units' => 5.0,
-                'description' => 'Nursing care during pregnancy, labor and delivery, postpartum period, and care of the newborn.',
+                'code' => 'EED 105',
+                'title' => 'Teaching Music, Arts, PE, and Health (MAPEH) in Elementary Grades',
+                'units' => 3.0,
+                'description' => 'Integration of artistic expression, musical appreciation, motor skills, and health wellness for young learners.',
                 'is_active' => true,
             ],
             [
-                'code' => 'NUR 107',
-                'title' => 'Pediatric Nursing',
-                'units' => 5.0,
-                'description' => 'Nursing care of children from infancy through adolescence, including growth, development, and pediatric disorders.',
+                'code' => 'EED 106',
+                'title' => 'Content and Pedagogy for the Mother Tongue',
+                'units' => 3.0,
+                'description' => 'Mother Tongue-Based Multilingual Education (MTB-MLE) principles, orthography, and early grade literacy instruction.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // SECONDARY EDUCATION - ENGLISH MAJOR (ENG)
+            // ==========================================
+            [
+                'code' => 'ENG 101',
+                'title' => 'Introduction to Linguistics',
+                'units' => 3.0,
+                'description' => 'Phonetics, phonology, morphology, syntax, semantics, and sociolinguistic foundations of language.',
                 'is_active' => true,
             ],
             [
-                'code' => 'NUR 108',
-                'title' => 'Psychiatric Nursing',
-                'units' => 5.0,
-                'description' => 'Mental health nursing concepts, psychiatric disorders, therapeutic communication, and mental health client care.',
+                'code' => 'ENG 102',
+                'title' => 'Structure of English',
+                'units' => 3.0,
+                'description' => 'Detailed study of English syntax, morphology, grammatical categories, sentence structures, and transformational grammar.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'ENG 103',
+                'title' => 'Teaching and Assessment of Literature Studies',
+                'units' => 3.0,
+                'description' => 'Literary genres, pedagogical methods for literature, analytical criticism, and authentic literature assessment.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'ENG 104',
+                'title' => 'Speech and Theater Arts',
+                'units' => 3.0,
+                'description' => 'Public speaking, oral communication, dramatic performance, stage craft, and reader\'s theater for secondary classrooms.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // SECONDARY EDUCATION - MATHEMATICS MAJOR (MATH)
+            // ==========================================
+            [
+                'code' => 'MATH 101',
+                'title' => 'History of Mathematics',
+                'units' => 3.0,
+                'description' => 'Historical evolution of mathematical ideas, famous mathematicians, and the cultural development of numerical systems.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'MATH 102',
+                'title' => 'College and Advanced Algebra',
+                'units' => 3.0,
+                'description' => 'Polynomial equations, algebraic structures, rational functions, matrices, determinants, and system of equations.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'MATH 103',
+                'title' => 'Plane and Solid Geometry',
+                'units' => 3.0,
+                'description' => 'Euclidean axiomatic system, geometric proofs, triangles, circles, polyhedra, and spatial measurement concepts.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'MATH 104',
+                'title' => 'Trigonometry with Analytic Geometry',
+                'units' => 3.0,
+                'description' => 'Trigonometric functions, identities, conic sections, polar coordinates, and practical applied measurement.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // SECONDARY EDUCATION - SCIENCE MAJOR (SCI)
+            // ==========================================
+            [
+                'code' => 'SCI 101',
+                'title' => 'Earth and Space Science for Teachers',
+                'units' => 3.0,
+                'description' => 'Geology, meteorology, oceanography, astronomy, and planetary systems aligned with secondary science curricula.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SCI 102',
+                'title' => 'Inorganic Chemistry with Laboratory for Teachers',
+                'units' => 4.0,
+                'description' => 'Atomic structure, chemical bonding, stoichiometry, gas laws, solutions, and laboratory safety for educators.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SCI 103',
+                'title' => 'Integrated Biology with Laboratory for Teachers',
+                'units' => 4.0,
+                'description' => 'Cell biology, genetics, evolution, ecology, organismal diversity, and biological microscopy for secondary teachers.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SCI 104',
+                'title' => 'Mechanics, Waves, and Thermodynamics for Teachers',
+                'units' => 4.0,
+                'description' => 'Newtonian mechanics, work and energy, thermal physics, sound, and wave motion pedagogical experiments.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // EARLY CHILDHOOD EDUCATION (ECED)
+            // ==========================================
+            [
+                'code' => 'ECED 101',
+                'title' => 'Child Development and Learning Principles in Early Years',
+                'units' => 3.0,
+                'description' => 'Holistic development of young children covering cognitive, socio-emotional, physical, and language milestones.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'ECED 102',
+                'title' => 'Early Childhood Curriculum and Pedagogical Models',
+                'units' => 3.0,
+                'description' => 'Developmentally appropriate curriculum approaches, emergent curriculum, Montessori, and Reggio Emilia frameworks.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'ECED 103',
+                'title' => 'Play and Creative Learning Environments',
+                'units' => 3.0,
+                'description' => 'Role of play in learning, indoor and outdoor environment design, manipulatives, and sensory learning experiences.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'ECED 104',
+                'title' => 'Emergent Literacy and Language Development',
+                'units' => 3.0,
+                'description' => 'Phonological awareness, oral language acquisition, early storytelling, and shared reading for preschoolers.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'ECED 105',
+                'title' => 'Positive Guidance and Classroom Management for Young Children',
+                'units' => 3.0,
+                'description' => 'Child-centered behavioral guidance, routines, social-emotional competence, and supportive early learning spaces.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'ECED 106',
+                'title' => 'Family, Community, and Early Care Partnerships',
+                'units' => 3.0,
+                'description' => 'Building collaborative relationships with families, community resources, and early childhood health programs.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // SPECIAL NEEDS EDUCATION (SNED)
+            // ==========================================
+            [
+                'code' => 'SNED 101',
+                'title' => 'Introduction to Special Needs and Inclusive Education',
+                'units' => 3.0,
+                'description' => 'Philosophical, historical, and legal foundations of special education and inclusive classroom practices.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SNED 102',
+                'title' => 'Assessment and Identification of Exceptional Learners',
+                'units' => 3.0,
+                'description' => 'Formal and informal diagnostic tools, screening procedures, and multidisciplinary evaluation in special education.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SNED 103',
+                'title' => 'Individualized Education Plan (IEP) Development and Curriculum Adaptation',
+                'units' => 3.0,
+                'description' => 'Designing, writing, implementing, and monitoring IEPs with tailored accommodations and universal design.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SNED 104',
+                'title' => 'Assistive Technology and Adaptive Instructional Resources',
+                'units' => 3.0,
+                'description' => 'Low-tech and high-tech assistive devices, augmentative communication, and software accessibility in special education.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SNED 105',
+                'title' => 'Positive Behavior Interventions and Classroom Supports (PBIS)',
+                'units' => 3.0,
+                'description' => 'Functional behavior assessment, proactive intervention planning, and supporting diverse emotional needs.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SNED 106',
+                'title' => 'Teaching Learners with Autism Spectrum Disorder and Intellectual Disabilities',
+                'units' => 3.0,
+                'description' => 'Evidence-based structured teaching, visual supports, life skills instruction, and social communication strategies.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // CULTURE AND ARTS EDUCATION (CAED)
+            // ==========================================
+            [
+                'code' => 'CAED 101',
+                'title' => 'Foundations of Philippine Arts, Culture, and Heritage',
+                'units' => 3.0,
+                'description' => 'Historical development of Philippine visual arts, music, dance, indigenous traditions, and Mindanao cultural heritage.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'CAED 102',
+                'title' => 'Music and Movement Pedagogy in Cultural Contexts',
+                'units' => 3.0,
+                'description' => 'Kodály, Orff, and Dalcroze approaches integrated with ethnic Philippine musical traditions and folk movement.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'CAED 103',
+                'title' => 'Visual Arts Expression, Design, and Studio Practices',
+                'units' => 3.0,
+                'description' => 'Drawing, painting, printmaking, sculpture, and artistic media exploration for classroom instruction.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'CAED 104',
+                'title' => 'Performing Arts, Theater Arts, and Dance in Education',
+                'units' => 3.0,
+                'description' => 'Drama in education, creative dramatics, Philippine folk dances, choreography, and staging techniques.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'CAED 105',
+                'title' => 'Traditional Crafts, Indigenous Artistry, and Folk Arts',
+                'units' => 3.0,
+                'description' => 'Weaving, pottery, woodcraft, eco-arts, and preservation of local cultural artisan knowledge.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'CAED 106',
+                'title' => 'Arts Production, Exhibition, and Cultural Festival Management',
+                'units' => 3.0,
+                'description' => 'Curation, gallery presentation, school festival coordination, and community arts showcases.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // SECONDARY EDUCATION - FILIPINO MAJOR (FIL)
+            // ==========================================
+            [
+                'code' => 'FIL 103',
+                'title' => 'Estruktura ng Wikang Filipino',
+                'units' => 3.0,
+                'description' => 'Masusing pag-aaral ng ponolohiya, morpolohiya, at sintaksis ng wikang pambansa.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'FIL 104',
+                'title' => 'Introduksyon sa Pag-aaral ng Wika',
+                'units' => 3.0,
+                'description' => 'Mga teorya sa pagkatuto at pagtuturo ng wika, varayti ng wika, at lingguwistikang Filipino.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'FIL 105',
+                'title' => 'Panitikan ng Pilipinas',
+                'units' => 3.0,
+                'description' => 'Pagsusuri sa mga akdang pampanitikan mula sa iba\'t ibang rehiyon at panahon sa kasaysayan ng bansa.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'FIL 106',
+                'title' => 'Pagtuturo at Pagtataya ng Panitikan',
+                'units' => 3.0,
+                'description' => 'Metodolohiya, kagamitang pampagtuturo, at makabagong dulog sa pagsusulit at pagtataya sa panitikan.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // SECONDARY EDUCATION - SOCIAL STUDIES MAJOR (SOCS)
+            // ==========================================
+            [
+                'code' => 'SOCS 101',
+                'title' => 'Geography and Environmental Studies for Educators',
+                'units' => 3.0,
+                'description' => 'Physical and human geography, cartography, climate zones, and human-environment interactions.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SOCS 102',
+                'title' => 'Asian Studies, Culture, and Regional Geopolitics',
+                'units' => 3.0,
+                'description' => 'History, civilization, philosophies, and contemporary economic developments in East, South, and Southeast Asia.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SOCS 103',
+                'title' => 'World History and Contemporary Civilizations',
+                'units' => 3.0,
+                'description' => 'Major world revolutions, political transformations, global conflicts, and inter-civilizational connections.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'SOCS 104',
+                'title' => 'Socio-Cultural Anthropology and Economics for Teachers',
+                'units' => 3.0,
+                'description' => 'Economic theories, market dynamics, poverty alleviation, cultural systems, and social institutions.',
+                'is_active' => true,
+            ],
+
+            // ==========================================
+            // SECONDARY EDUCATION - VALUES EDUCATION MAJOR (VAL)
+            // ==========================================
+            [
+                'code' => 'VAL 101',
+                'title' => 'Foundations of Values Education and Human Dignity',
+                'units' => 3.0,
+                'description' => 'Philosophical, anthropological, and psychological foundations of values formation and personhood.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'VAL 102',
+                'title' => 'Philosophical and Ethical Foundations of Morality',
+                'units' => 3.0,
+                'description' => 'Moral development theories of Kohlberg and Gilligan, ethical systems, and moral dilemma resolution.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'VAL 103',
+                'title' => 'Facilitating Self-Worth and Personal Integrity',
+                'units' => 3.0,
+                'description' => 'Intrapersonal dynamics, self-awareness, emotional intelligence, and interpersonal relationship building.',
+                'is_active' => true,
+            ],
+            [
+                'code' => 'VAL 104',
+                'title' => 'Community Outreach, Peace Education, and Global Citizenship',
+                'units' => 3.0,
+                'description' => 'Conflict resolution, peace-building, interfaith dialogue, social justice, and civic transformation.',
                 'is_active' => true,
             ],
         ];
 
         foreach ($subjects as $subject) {
-            Subject::firstOrCreate(
+            Subject::updateOrCreate(
                 ['code' => $subject['code']],
                 $subject
             );
         }
 
-        $this->command->info('Subjects seeded: '.count($subjects).' WMSU subjects created.');
+        $this->command->info('Subjects seeded: '.count($subjects).' College of Education and GenEd courses.');
     }
 }

@@ -154,7 +154,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
             {auth.unlinked_teachers && auth.unlinked_teachers.length > 0 && (
                 <TeacherProfileSelectDialog teachers={auth.unlinked_teachers} />
             )}
-            <div className="border-b border-sidebar-border/80">
+            <div className="border-b border-sidebar-border/80 bg-background">
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     {/* Mobile Menu */}
                     <div className="lg:hidden">

@@ -46,16 +46,21 @@ class RoomScheduleController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         return Inertia::render('room-schedules/create', [
             'classrooms' => Classroom::active()->get(['id', 'building', 'room_number', 'room_name']),
+            'selectedClassroomId' => $request->query('classroom_id'),
         ]);
     }
 
     public function store(RoomScheduleRequest $request)
     {
         $this->service->createFromRequest($request);
+
+        if ($request->filled('classroom_id')) {
+            return redirect()->route('classrooms.show', $request->classroom_id)->with('success', 'Room schedule reservation created successfully');
+        }
 
         return redirect()->route('room-schedules.index')->with('success', 'Room schedule created successfully');
     }

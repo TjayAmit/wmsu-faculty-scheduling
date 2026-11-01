@@ -69,17 +69,32 @@ export interface AssignSchedulesCreateProps {
     teachers: Array<{
         id: number;
         name: string;
+        rank?: string | null;
+        department?: string | null;
+        employment_type?: string;
+        active_assignments_count?: number;
     }>;
     schedules: Array<{
         id: number;
         name: string;
+        subject_code?: string;
+        subject_title?: string;
+        units?: number;
+        section?: string;
+        room?: string;
         semester: string;
         timeSlots: Array<{
             day: string;
-            start_time: string;
-            end_time: string;
+            start?: string;
+            end?: string;
+            start_time?: string;
+            end_time?: string;
         }>;
+        is_assigned?: boolean;
+        assigned_teacher?: string | null;
     }>;
+    selectedTeacherId?: string | number | null;
+    selectedScheduleId?: string | number | null;
 }
 
 export interface AssignSchedulesShowProps {

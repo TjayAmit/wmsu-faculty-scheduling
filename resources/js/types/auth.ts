@@ -5,6 +5,13 @@ export type User = {
     avatar?: string;
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
+    department_id?: number | null;
+    department?: {
+        id: number;
+        code: string;
+        name: string;
+        [key: string]: unknown;
+    } | null;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;

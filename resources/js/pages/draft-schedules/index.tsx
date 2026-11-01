@@ -176,19 +176,21 @@ return;
                                     >
                                         <TableCell className="py-3.5 pl-6 pr-4">
                                             <div className="flex flex-col">
-                                                <span className="font-medium">{item.teacher.user.name}</span>
+                                                <span className="font-medium">
+                                                    {item.teacher?.full_name || item.teacher?.user?.name || `${item.teacher?.first_name ?? ''} ${item.teacher?.last_name ?? ''}`.trim() || 'Unassigned Teacher'}
+                                                </span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="px-4 py-3.5">
                                             <div className="flex flex-col">
                                                 <span className="font-medium">
-                                                    {item.schedule.subject.code} - {item.schedule.subject.title}
+                                                    {item.schedule?.subject?.code ?? 'N/A'} - {item.schedule?.subject?.title ?? 'No Title'}
                                                 </span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="px-4 py-3.5">
                                             <span className="text-sm text-muted-foreground">
-                                                {item.schedule.semester.name}
+                                                {item.schedule?.semester?.name ?? '—'}
                                             </span>
                                         </TableCell>
                                         <TableCell className="px-4 py-3.5">

@@ -1,5 +1,11 @@
 import type { User } from './auth';
 
+export interface DepartmentOption {
+    id: number;
+    code: string;
+    name: string;
+}
+
 export interface StaffIndexProps {
     data: {
         data: User[];
@@ -17,6 +23,7 @@ export interface StaffIndexProps {
 
 export interface StaffFormProps {
     user?: User;
+    departments?: DepartmentOption[];
 }
 
 export interface StaffShowProps {

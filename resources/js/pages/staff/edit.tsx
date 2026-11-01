@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Save, User, Shield } from 'lucide-react';
+import { Save, User, Shield, Building2 } from 'lucide-react';
 import InputError from '@/components/input-error';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -7,15 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import AppLayout from '@/layouts/app-layout';
 import { index as staff, show as staffShow, update as staffUpdate } from '@/routes/staff';
 import type { StaffFormProps } from '@/types';
 
-export default function Edit({ user }: StaffFormProps) {
+export default function Edit({ user, departments = [] }: StaffFormProps) {
     const { data, setData, put, processing, errors } = useForm({
         name: user?.name || '',
         email: user?.email || '',
+        department_id: user?.department_id ? String(user.department_id) : '',
         password: '',
     });
 
@@ -88,6 +96,38 @@ export default function Edit({ user }: StaffFormProps) {
                                             aria-invalid={!!errors.email}
                                         />
                                         <InputError message={errors.email} />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <Label htmlFor="department_id" className="flex items-center gap-1.5">
+                                                <Building2 className="size-4 text-muted-foreground" />
+                                                Assigned Department
+                                            </Label>
+                                            <span className="text-xs text-muted-foreground">
+                                                Jurisdiction & scheduling scope
+                                            </span>
+                                        </div>
+                                        <Select
+                                            value={data.department_id ? String(data.department_id) : 'none'}
+                                            onValueChange={(val) => setData('department_id', val === 'none' ? '' : val)}
+                                        >
+                                            <SelectTrigger id="department_id">
+                                                <SelectValue placeholder="Select departmental assignment" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="none">No Department (General Academic Office)</SelectItem>
+                                                {departments.map((dept) => (
+                                                    <SelectItem key={dept.id} value={String(dept.id)}>
+                                                        {dept.code} - {dept.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <p className="text-xs text-muted-foreground">
+                                            This staff member registers and manages faculty schedules within this department.
+                                        </p>
+                                        <InputError message={errors.department_id} />
                                     </div>
 
                                     <div className="space-y-2">

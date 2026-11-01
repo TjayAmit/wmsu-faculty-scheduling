@@ -1,4 +1,5 @@
 import type { User } from './auth';
+import type { Teacher } from './teachers';
 
 export interface UsersIndexProps {
     data: {
@@ -15,10 +16,21 @@ export interface UsersIndexProps {
     };
 }
 
+export interface RoleOption {
+    id: number;
+    name: string;
+}
+
 export interface UsersFormProps {
-    user?: User;
+    user?: User & {
+        roles?: RoleOption[];
+    };
+    roles?: RoleOption[];
 }
 
 export interface UsersShowProps {
-    user: User;
+    user: User & {
+        roles?: RoleOption[];
+        teacher?: Teacher | null;
+    };
 }

@@ -2,6 +2,15 @@ export interface LeaveRequestTeacher {
     id: number;
     first_name: string;
     last_name: string;
+    academic_rank?: string | null;
+    department_id?: number | null;
+    department?: {
+        id: number;
+        name: string;
+        code?: string | null;
+    } | null;
+    user_id?: number | null;
+    email?: string | null;
 }
 
 export interface LeaveRequestApprover {
@@ -52,6 +61,8 @@ export interface LeaveRequestsIndexProps {
 export interface LeaveRequestsFormProps {
     leaveRequest?: LeaveRequest;
     teachers: LeaveRequestTeacher[];
+    currentTeacherId?: number | null;
+    isTeacherRole?: boolean;
 }
 
 export interface LeaveRequestsShowProps {

@@ -93,24 +93,6 @@ const navGroups: NavGroup[] = [
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
             {
-                title: 'Draft Schedules',
-                href: facultyDraftSchedules(),
-                icon: FileText,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Assign Schedules',
-                href: assignSchedules(),
-                icon: CalendarDays,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
-                title: 'Room Schedules',
-                href: roomSchedules(),
-                icon: CalendarDays,
-                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
-            },
-            {
                 title: 'Substitute Requests',
                 href: substituteRequests(),
                 icon: Users,

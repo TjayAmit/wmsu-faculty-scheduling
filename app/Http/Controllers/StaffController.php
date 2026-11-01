@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,12 +15,17 @@ class StaffController extends Controller
         $query = User::query()
             ->whereHas('roles', function ($q) {
                 $q->where('name', 'Faculty Staff');
-            });
+            })
+            ->with('department');
 
         if ($request->has('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('email', 'like', '%'.$request->search.'%');
+                    ->orWhere('email', 'like', '%'.$request->search.'%')
+                    ->orWhereHas('department', function ($dq) use ($request) {
+                        $dq->where('name', 'like', '%'.$request->search.'%')
+                            ->orWhere('code', 'like', '%'.$request->search.'%');
+                    });
             });
         }
 
@@ -31,7 +37,9 @@ class StaffController extends Controller
 
     public function create()
     {
-        return Inertia::render('staff/create');
+        return Inertia::render('staff/create', [
+            'departments' => Department::active()->orderBy('name')->get(['id', 'code', 'name']),
+        ]);
     }
 
     public function store(Request $request)
@@ -40,12 +48,14 @@ class StaffController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
+            'department_id' => 'nullable|exists:departments,id',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
+            'department_id' => $validated['department_id'] ?? null,
         ]);
 
         $facultyStaffRole = Role::where('name', 'Faculty Staff')->first();
@@ -58,7 +68,7 @@ class StaffController extends Controller
 
     public function show(User $user)
     {
-        $user->load('roles');
+        $user->load(['roles', 'department']);
 
         return Inertia::render('staff/show', [
             'user' => $user,
@@ -67,10 +77,11 @@ class StaffController extends Controller
 
     public function edit(User $user)
     {
-        $user->load('roles');
+        $user->load(['roles', 'department']);
 
         return Inertia::render('staff/edit', [
             'user' => $user,
+            'departments' => Department::active()->orderBy('name')->get(['id', 'code', 'name']),
         ]);
     }
 
@@ -80,11 +91,13 @@ class StaffController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:8',
+            'department_id' => 'nullable|exists:departments,id',
         ]);
 
         $user->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'department_id' => $validated['department_id'] ?? null,
         ]);
 
         if (! empty($validated['password'])) {

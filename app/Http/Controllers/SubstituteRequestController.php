@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SubstituteRequestRequest;
+use App\Models\Schedule;
 use App\Models\SubstituteRequest;
 use App\Models\Teacher;
 use App\Services\SubstituteRequestService;
@@ -46,10 +47,42 @@ class SubstituteRequestController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
+        $user = auth()->user();
+        $isTeacher = $user && $user->isTeacher() && ! $user->hasRole('admin');
+        $currentTeacher = $user?->teacher;
+
+        $teachers = Teacher::where('is_active', true)->get()->map(fn ($t) => [
+            'id' => $t->id,
+            'name' => $t->full_name,
+            'first_name' => $t->first_name,
+            'last_name' => $t->last_name,
+            'email' => $t->email,
+            'department' => is_string($t->department) ? $t->department : ($t->department?->name ?? 'Faculty of Education'),
+            'rank' => $t->rank ?? 'Instructor',
+        ]);
+
+        $schedules = Schedule::with(['subject', 'semester', 'classroom', 'teacherAssignment.teacher'])
+            ->where('is_active', true)
+            ->get()
+            ->map(fn ($s) => [
+                'id' => $s->id,
+                'subject_code' => $s->subject?->code ?? 'N/A',
+                'subject_title' => $s->subject?->title ?? 'No title',
+                'section' => $s->section,
+                'semester_name' => $s->semester?->name ?? 'Current Semester',
+                'room' => $s->classroom ? ($s->classroom->full_identifier ?? $s->classroom->room_number) : 'TBA',
+                'teacher_id' => $s->teacherAssignment?->teacher_id,
+                'teacher_name' => $s->teacherAssignment?->teacher?->full_name,
+                'display_label' => ($s->subject?->code ?? 'Course').($s->section ? " • {$s->section}" : '').($s->subject ? " - {$s->subject->title}" : ''),
+            ]);
+
         return Inertia::render('substitute-requests/create', [
-            'teachers' => Teacher::all(['id', 'first_name', 'last_name']),
+            'teachers' => $teachers,
+            'schedules' => $schedules,
+            'currentTeacherId' => $currentTeacher?->id,
+            'isTeacherRole' => (bool) $isTeacher,
         ]);
     }
 

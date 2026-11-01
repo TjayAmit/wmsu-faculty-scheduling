@@ -10,286 +10,133 @@ class ProgramSeeder extends Seeder
 {
     public function run(): void
     {
-        $ccs = Department::where('code', 'CCS')->value('id');
-        $coe = Department::where('code', 'COE')->value('id');
-        $cas = Department::where('code', 'CAS')->value('id');
-        $cba = Department::where('code', 'CBA')->value('id');
         $coed = Department::where('code', 'COEd')->value('id');
-        $con = Department::where('code', 'CON')->value('id');
-        $col = Department::where('code', 'COL')->value('id');
-        $ca = Department::where('code', 'CA')->value('id');
-        $chehm = Department::where('code', 'CHEHM')->value('id');
-        $ipesr = Department::where('code', 'IPESR')->value('id');
+
+        if (! $coed) {
+            $this->command->error('College of Education (COEd) not found. Skipping program seeder.');
+            return;
+        }
 
         $programs = [
-            // ==========================================
-            // COLLEGE OF COMPUTING STUDIES (CCS)
-            // ==========================================
-            [
-                'code' => 'BSCS',
-                'name' => 'Bachelor of Science in Computer Science',
-                'degree_level' => 'bachelor',
-                'department_id' => $ccs,
-                'description' => 'Program focused on theoretical foundations of computing, algorithm design, software development, and research.',
-                'duration_years' => 4.0,
-                'total_units' => 160.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BSIT',
-                'name' => 'Bachelor of Science in Information Technology',
-                'degree_level' => 'bachelor',
-                'department_id' => $ccs,
-                'description' => 'Program focused on the application, integration, and management of information technology in organizations.',
-                'duration_years' => 4.0,
-                'total_units' => 160.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BSISM',
-                'name' => 'BS in Information Systems Management',
-                'degree_level' => 'bachelor',
-                'department_id' => $ccs,
-                'description' => 'Interdisciplinary program combining information technology with business management and organizational studies.',
-                'duration_years' => 4.0,
-                'total_units' => 155.0,
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // COLLEGE OF ENGINEERING (COE)
-            // ==========================================
-            [
-                'code' => 'BSEE',
-                'name' => 'Bachelor of Science in Electrical Engineering',
-                'degree_level' => 'bachelor',
-                'department_id' => $coe,
-                'description' => 'Engineering program focusing on electrical systems, power electronics, and control engineering.',
-                'duration_years' => 5.0,
-                'total_units' => 180.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BSCE',
-                'name' => 'Bachelor of Science in Civil Engineering',
-                'degree_level' => 'bachelor',
-                'department_id' => $coe,
-                'description' => 'Engineering program covering structural, geotechnical, transportation, and environmental engineering.',
-                'duration_years' => 5.0,
-                'total_units' => 182.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BSME',
-                'name' => 'Bachelor of Science in Mechanical Engineering',
-                'degree_level' => 'bachelor',
-                'department_id' => $coe,
-                'description' => 'Engineering program focused on thermodynamics, fluid mechanics, machine design, and manufacturing processes.',
-                'duration_years' => 5.0,
-                'total_units' => 178.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BSECE',
-                'name' => 'BS in Electronics and Communications Engineering',
-                'degree_level' => 'bachelor',
-                'department_id' => $coe,
-                'description' => 'Engineering program covering electronic circuits, telecommunications systems, and signal processing.',
-                'duration_years' => 5.0,
-                'total_units' => 180.0,
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // COLLEGE OF ARTS AND SCIENCES (CAS)
-            // ==========================================
-            [
-                'code' => 'BSMATH',
-                'name' => 'Bachelor of Science in Mathematics',
-                'degree_level' => 'bachelor',
-                'department_id' => $cas,
-                'description' => 'Program providing rigorous training in pure and applied mathematics, statistics, and actuarial science.',
-                'duration_years' => 4.0,
-                'total_units' => 150.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'ABENG',
-                'name' => 'Bachelor of Arts in English',
-                'degree_level' => 'bachelor',
-                'department_id' => $cas,
-                'description' => 'Liberal arts program focusing on English language, literature, linguistics, and communication.',
-                'duration_years' => 4.0,
-                'total_units' => 145.0,
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // COLLEGE OF BUSINESS ADMINISTRATION (CBA)
-            // ==========================================
-            [
-                'code' => 'BSBA-FM',
-                'name' => 'BSBA Major in Financial Management',
-                'degree_level' => 'bachelor',
-                'department_id' => $cba,
-                'description' => 'Business program specializing in corporate finance, investment management, and financial planning.',
-                'duration_years' => 4.0,
-                'total_units' => 150.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BSBA-MM',
-                'name' => 'BSBA Major in Marketing Management',
-                'degree_level' => 'bachelor',
-                'department_id' => $cba,
-                'description' => 'Business program focusing on marketing strategy, consumer behavior, and brand management.',
-                'duration_years' => 4.0,
-                'total_units' => 150.0,
-                'is_active' => true,
-            ],
-            [
-                'code' => 'BSA',
-                'name' => 'Bachelor of Science in Accountancy',
-                'degree_level' => 'bachelor',
-                'department_id' => $cba,
-                'description' => 'Professional accountancy program preparing students for the Philippine CPA Licensure Examination.',
-                'duration_years' => 5.0,
-                'total_units' => 175.0,
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // COLLEGE OF EDUCATION (COEd)
-            // ==========================================
             [
                 'code' => 'BEEd',
                 'name' => 'Bachelor of Elementary Education',
                 'degree_level' => 'bachelor',
                 'department_id' => $coed,
-                'description' => 'Teacher education program preparing graduates to teach at the elementary level.',
+                'description' => 'Focuses on general foundational education, content courses, and pedagogical competencies for elementary-level teaching.',
                 'duration_years' => 4.0,
                 'total_units' => 150.0,
                 'is_active' => true,
             ],
             [
-                'code' => 'BSEd-Math',
-                'name' => 'BSEd Major in Mathematics',
+                'code' => 'BECEd',
+                'name' => 'Bachelor of Early Childhood Education',
                 'degree_level' => 'bachelor',
                 'department_id' => $coed,
-                'description' => 'Secondary teacher education program with specialization in Mathematics.',
+                'description' => 'Concentrates on the development, learning, and care of young children from early childhood through the early grades.',
+                'duration_years' => 4.0,
+                'total_units' => 150.0,
+                'is_active' => true,
+            ],
+            [
+                'code' => 'BSNEd',
+                'name' => 'Bachelor of Special Needs Education',
+                'degree_level' => 'bachelor',
+                'department_id' => $coed,
+                'description' => 'Prepares teachers to handle inclusive education, special learners, and specialized instructional strategies.',
+                'duration_years' => 4.0,
+                'total_units' => 150.0,
+                'is_active' => true,
+            ],
+            [
+                'code' => 'BCAEd',
+                'name' => 'Bachelor of Culture and Arts Education',
+                'degree_level' => 'bachelor',
+                'department_id' => $coed,
+                'description' => 'Integrates arts, cultural heritage, and creative expression with teaching methodologies.',
+                'duration_years' => 4.0,
+                'total_units' => 150.0,
+                'is_active' => true,
+            ],
+            [
+                'code' => 'BSEd-Eng',
+                'name' => 'Bachelor of Secondary Education Major in English',
+                'degree_level' => 'bachelor',
+                'department_id' => $coed,
+                'description' => 'Secondary teacher education program specializing in English language instruction, applied linguistics, and world literature.',
                 'duration_years' => 4.0,
                 'total_units' => 152.0,
                 'is_active' => true,
             ],
             [
-                'code' => 'BSEd-Eng',
-                'name' => 'BSEd Major in English',
+                'code' => 'BSEd-Fil',
+                'name' => 'Bachelor of Secondary Education Major in Filipino',
                 'degree_level' => 'bachelor',
                 'department_id' => $coed,
-                'description' => 'Secondary teacher education program with specialization in English language and literature.',
+                'description' => 'Secondary teacher education program preparing teachers with mastery in Filipino language, linguistics, and literature.',
                 'duration_years' => 4.0,
                 'total_units' => 152.0,
                 'is_active' => true,
             ],
             [
                 'code' => 'BSEd-Sci',
-                'name' => 'BSEd Major in Science',
+                'name' => 'Bachelor of Secondary Education Major in Science',
                 'degree_level' => 'bachelor',
                 'department_id' => $coed,
-                'description' => 'Secondary teacher education program with specialization in General Science.',
+                'description' => 'Secondary teacher education program specializing in general science, biological science, chemistry, and physical sciences pedagogy.',
                 'duration_years' => 4.0,
                 'total_units' => 152.0,
                 'is_active' => true,
             ],
-
-            // ==========================================
-            // COLLEGE OF NURSING (CON)
-            // ==========================================
             [
-                'code' => 'BSN',
-                'name' => 'Bachelor of Science in Nursing',
+                'code' => 'BSEd-Math',
+                'name' => 'Bachelor of Secondary Education Major in Mathematics',
                 'degree_level' => 'bachelor',
-                'department_id' => $con,
-                'description' => 'Nursing program preparing graduates for the Philippine Nurse Licensure Examination (NLE).',
+                'department_id' => $coed,
+                'description' => 'Secondary teacher education program specializing in mathematics, algebra, trigonometry, geometry, and calculus pedagogy.',
                 'duration_years' => 4.0,
-                'total_units' => 170.0,
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // COLLEGE OF LAW (COL)
-            // ==========================================
-            [
-                'code' => 'JD',
-                'name' => 'Juris Doctor',
-                'degree_level' => 'master',
-                'department_id' => $col,
-                'description' => 'Professional law degree preparing students for the Philippine Bar Examination.',
-                'duration_years' => 4.0,
-                'total_units' => 120.0,
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // COLLEGE OF AGRICULTURE (CA)
-            // ==========================================
-            [
-                'code' => 'BSAgri',
-                'name' => 'Bachelor of Science in Agriculture',
-                'degree_level' => 'bachelor',
-                'department_id' => $ca,
-                'description' => 'Program covering crop science, animal science, soil science, and agri-business for sustainable agriculture.',
-                'duration_years' => 4.0,
-                'total_units' => 155.0,
-                'is_active' => true,
-            ],
-
-            // ==========================================
-            // COLLEGE OF HOME ECONOMICS AND HOSPITALITY MANAGEMENT (CHEHM)
-            // ==========================================
-            [
-                'code' => 'BSHRM',
-                'name' => 'BS in Hotel and Restaurant Management',
-                'degree_level' => 'bachelor',
-                'department_id' => $chehm,
-                'description' => 'Program preparing students for careers in hotel, restaurant, and hospitality industry management.',
-                'duration_years' => 4.0,
-                'total_units' => 150.0,
+                'total_units' => 152.0,
                 'is_active' => true,
             ],
             [
-                'code' => 'BSFST',
-                'name' => 'BS in Food Science and Technology',
+                'code' => 'BSEd-SS',
+                'name' => 'Bachelor of Secondary Education Major in Social Studies',
                 'degree_level' => 'bachelor',
-                'department_id' => $chehm,
-                'description' => 'Program focusing on food processing, food safety, nutrition science, and food product development.',
+                'department_id' => $coed,
+                'description' => 'Secondary teacher education program focusing on Philippine history, world history, geography, economics, and sociology pedagogy.',
                 'duration_years' => 4.0,
-                'total_units' => 155.0,
+                'total_units' => 152.0,
                 'is_active' => true,
             ],
-
-            // ==========================================
-            // INSTITUTE OF PHYSICAL EDUCATION, SPORTS AND RECREATION (IPESR)
-            // ==========================================
             [
-                'code' => 'BSPE',
-                'name' => 'Bachelor of Science in Physical Education',
+                'code' => 'BSEd-Val',
+                'name' => 'Bachelor of Secondary Education Major in Values Education',
                 'degree_level' => 'bachelor',
-                'department_id' => $ipesr,
-                'description' => 'Program preparing PE teachers and sports coaches for schools, athletic organizations, and fitness centers.',
+                'department_id' => $coed,
+                'description' => 'Secondary teacher education program focusing on moral development, ethical decision-making, personhood, and values integration.',
                 'duration_years' => 4.0,
-                'total_units' => 145.0,
+                'total_units' => 152.0,
+                'is_active' => true,
+            ],
+            [
+                'code' => 'PEC',
+                'name' => 'Professional Education Certificate',
+                'degree_level' => 'certificate',
+                'department_id' => $coed,
+                'description' => 'A post-baccalaureate certification program for graduates looking to earn professional education units required for licensure.',
+                'duration_years' => 1.0,
+                'total_units' => 18.0,
                 'is_active' => true,
             ],
         ];
 
         foreach ($programs as $program) {
-            Program::firstOrCreate(
+            Program::updateOrCreate(
                 ['code' => $program['code']],
                 $program
             );
         }
 
-        $this->command->info('Programs seeded: '.count($programs).' WMSU academic programs created.');
+        $this->command->info('Programs seeded: '.count($programs).' Western Mindanao State University College of Education degree and certificate programs.');
     }
 }

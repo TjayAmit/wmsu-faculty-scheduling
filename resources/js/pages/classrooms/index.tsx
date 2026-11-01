@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, DoorOpen, Fingerprint, CheckCircle2, Users } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, DoorOpen, Fingerprint, CheckCircle2, Users, CalendarDays, Plus, Clock, AlertTriangle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
@@ -90,7 +90,7 @@ return;
 
                 {/* 2. Summary KPI Cards */}
                 {stats && (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                         <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
                             <div className="flex items-center justify-between">
                                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -123,6 +123,32 @@ return;
                             <p className="mt-1 text-xs text-muted-foreground">
                                 {stats.inactive} inactive / maintenance
                             </p>
+                        </div>
+
+                        {/* Room Schedule Load & 7am-7pm Operating Window */}
+                        <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-amber-500/40 transition-colors">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Schedule Load (7am-7pm)
+                                </span>
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                                    <Clock className="h-4 w-4" />
+                                </div>
+                            </div>
+                            <div className="mt-2.5 flex items-baseline gap-2">
+                                <span className="text-2xl font-bold tracking-tight text-foreground">
+                                    {stats.avg_utilization ?? 0}%
+                                </span>
+                                <span className="text-xs text-muted-foreground">Avg Load</span>
+                            </div>
+                            <div className="mt-1 flex items-center justify-between text-xs">
+                                <span className={(stats.full_rooms ?? 0) > 0 ? 'text-destructive font-semibold' : 'text-muted-foreground'}>
+                                    {stats.full_rooms ?? 0} full of schedule
+                                </span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                                    {stats.available_rooms ?? stats.active} open
+                                </span>
+                            </div>
                         </div>
 
                         <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
@@ -190,6 +216,9 @@ return;
                                     Capacity
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
+                                    Schedule Availability (7am-7pm)
+                                </TableHead>
+                                <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     ZKTeco Device (1:1)
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
@@ -204,7 +233,7 @@ return;
                         <TableBody>
                             {data.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-40 text-center">
+                                    <TableCell colSpan={8} className="h-40 text-center">
                                         <div className="flex flex-col items-center gap-3 text-muted-foreground">
                                             <div className="rounded-full bg-muted p-3">
                                                 <DoorOpen className="h-5 w-5 opacity-50" />
@@ -254,6 +283,59 @@ return;
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5">
+                                            {item.availability ? (
+                                                <div className="space-y-1.5 min-w-[170px]">
+                                                    <div className="flex items-center justify-between text-xs">
+                                                        <Badge
+                                                            variant="outline"
+                                                            className={
+                                                                item.availability.is_full
+                                                                    ? 'border-destructive/30 bg-destructive/10 text-destructive text-[10px] font-semibold gap-1'
+                                                                    : item.availability.status === 'busy'
+                                                                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300 text-[10px] font-semibold'
+                                                                      : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 text-[10px] font-semibold'
+                                                            }
+                                                        >
+                                                            {item.availability.is_full ? (
+                                                                <>
+                                                                    <AlertTriangle className="size-3" />
+                                                                    Full of Schedule
+                                                                </>
+                                                            ) : item.availability.status === 'busy' ? (
+                                                                'Busy'
+                                                            ) : (
+                                                                'Available'
+                                                            )}
+                                                        </Badge>
+                                                        <span className="font-mono text-[11px] font-semibold text-foreground">
+                                                            {item.availability.weekly_available_hours}h free
+                                                        </span>
+                                                    </div>
+                                                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                                                        <div
+                                                            className={`h-full transition-all ${
+                                                                item.availability.is_full
+                                                                    ? 'bg-destructive'
+                                                                    : item.availability.status === 'busy'
+                                                                      ? 'bg-amber-500'
+                                                                      : 'bg-emerald-500'
+                                                            }`}
+                                                            style={{
+                                                                width: `${Math.min(100, Math.max(item.availability.weekly_booked_hours > 0 ? 5 : 0, item.availability.weekly_utilization_rate))}%`,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                                                        <span>{item.availability.weekly_booked_hours}h booked / week</span>
+                                                        <span>{item.availability.weekly_utilization_rate}%</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground italic">7 AM - 7 PM</span>
+                                            )}
+                                        </TableCell>
+
+                                        <TableCell className="px-4 py-3.5">
                                             {(item as { zkteco_device?: { id: number; device_name: string; ip_address: string } | null }).zkteco_device ? (
                                                 <Badge variant="outline" className="gap-1.5 font-medium">
                                                     <Fingerprint className="h-3 w-3 text-primary" />
@@ -285,14 +367,18 @@ return;
                                                         <span className="sr-only">Open actions</span>
                                                     </Button>
                                                 </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-40">
+                                                <DropdownMenuContent align="end" className="w-48">
                                                     <DropdownMenuItem onClick={() => router.get(classroomsShow(item.id))}>
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        View
+                                                        <CalendarDays className="mr-2 h-4 w-4" />
+                                                        View Schedules
+                                                    </DropdownMenuItem>
+                                                    <DropdownMenuItem onClick={() => router.get(`/room-schedules/create?classroom_id=${item.id}`)}>
+                                                        <Plus className="mr-2 h-4 w-4" />
+                                                        Book Room Schedule
                                                     </DropdownMenuItem>
                                                     <DropdownMenuItem onClick={() => router.get(classroomsEdit(item.id))}>
                                                         <Pencil className="mr-2 h-4 w-4" />
-                                                        Edit
+                                                        Edit Classroom
                                                     </DropdownMenuItem>
                                                     <DropdownMenuSeparator />
                                                     <DropdownMenuItem

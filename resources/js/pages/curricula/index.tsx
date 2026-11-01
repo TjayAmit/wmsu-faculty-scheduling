@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, BookOpen, CheckCircle2, GraduationCap, Library } from 'lucide-react';
+import { MoreVertical, Pencil, Trash2, Eye, BookOpen, CheckCircle2, GraduationCap, Library, Building2, Filter } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
@@ -13,6 +13,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Table,
     TableBody,
@@ -31,8 +38,9 @@ import {
 } from '@/routes/curricula';
 import type { CurriculaIndexProps } from '@/types';
 
-export default function Index({ data, filters, stats }: CurriculaIndexProps) {
+export default function Index({ data, filters, stats, departments = [] }: CurriculaIndexProps) {
     const [search, setSearch] = useState(filters.search || '');
+    const [departmentId, setDepartmentId] = useState<string>(String(filters.department_id || 'all'));
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -41,7 +49,7 @@ export default function Index({ data, filters, stats }: CurriculaIndexProps) {
     const navigate = (params: Record<string, unknown> = {}) => {
         router.get(
             curricula(),
-            { search, per_page: perPage, ...params },
+            { search, department_id: departmentId, per_page: perPage, ...params },
             { preserveState: true, preserveScroll: true },
         );
     };
@@ -52,6 +60,11 @@ export default function Index({ data, filters, stats }: CurriculaIndexProps) {
         searchTimeout.current = setTimeout(() => {
             navigate({ search: value, page: 1 });
         }, 350);
+    };
+
+    const handleDepartmentChange = (val: string) => {
+        setDepartmentId(val);
+        navigate({ department_id: val, page: 1 });
     };
 
     const handlePerPageChange = (value: number) => {
@@ -172,17 +185,51 @@ return;
                     <TablePageHeader
                         count={data.total}
                         search={search}
-                        searchPlaceholder="Search curriculum…"
+                        searchPlaceholder="Search curriculum (course, subject, department)…"
                         onSearchChange={handleSearchChange}
                         createHref={curriculaCreate().url}
                         createLabel="New Curriculum"
                     />
 
+                    {/* Department Quick Filter */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-6 py-2.5 bg-muted/20">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                                <Building2 className="size-3.5 text-primary" />
+                                Department:
+                            </span>
+                            <Select value={departmentId} onValueChange={handleDepartmentChange}>
+                                <SelectTrigger className="h-8 text-xs min-w-[220px] bg-background">
+                                    <SelectValue placeholder="All Departments" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Departments</SelectItem>
+                                    {departments.map((dept) => (
+                                        <SelectItem key={dept.id} value={String(dept.id)}>
+                                            {dept.code} - {dept.name}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {departmentId !== 'all' && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDepartmentChange('all')}
+                                className="h-7 text-xs text-muted-foreground hover:text-foreground"
+                            >
+                                Clear Department Filter
+                            </Button>
+                        )}
+                    </div>
+
                     <Table>
                         <TableHeader>
                             <TableRow className="border-b border-border bg-muted/40 hover:bg-muted/40">
                                 <TableHead className="h-11 py-0 pl-6 pr-4 text-sm font-medium text-muted-foreground">
-                                    Program
+                                    Program & Department
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     Subject
@@ -238,9 +285,20 @@ return;
                                         onClick={() => router.get(curriculaShow(item.id))}
                                     >
                                         <TableCell className="py-3.5 pl-6 pr-4">
-                                            <span className="text-sm font-medium text-foreground">
-                                                {item.program?.full_name || item.program?.name || 'N/A'}
-                                            </span>
+                                            <div className="space-y-0.5">
+                                                <span className="text-sm font-semibold text-foreground">
+                                                    {item.program?.code ? `${item.program.code} - ` : ''}
+                                                    {item.program?.name || 'N/A'}
+                                                </span>
+                                                {item.program?.department && (
+                                                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                                                        <Building2 className="size-3 text-primary" />
+                                                        <span>
+                                                            {item.program.department.code} - {item.program.department.name}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </TableCell>
 
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">

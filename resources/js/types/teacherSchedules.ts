@@ -118,8 +118,27 @@ export interface SessionsPaginated {
     to: number | null;
 }
 
+export interface CalendarScheduleItem {
+    id: number;
+    scheduled_date: string;
+    day_of_week: string;
+    subject_code: string;
+    subject_title: string;
+    section: string | null;
+    room: string | null;
+    start_time: string;
+    end_time: string;
+    status: string;
+    notes: string | null;
+    is_holiday: boolean;
+    holiday_name: string | null;
+    semester_name: string;
+    academic_year: string;
+}
+
 export interface TeacherSchedulesIndexProps {
-    mode: 'subjects' | 'sessions';
+    mode: 'calendar' | 'subjects' | 'sessions' | string;
+    calendar_schedules?: CalendarScheduleItem[];
     subjects?: SubjectSummary[];
     sessions?: SessionsPaginated;
     subject?: SubjectDetail;

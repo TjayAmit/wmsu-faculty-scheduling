@@ -17,6 +17,8 @@ class TeachingHistory extends Model
     /** @use HasFactory<TeachingHistoryFactory> */
     use HasFactory, SoftDeletes;
 
+    protected $appends = ['completion_percentage'];
+
     /**
      * Get the teacher for this teaching history.
      */

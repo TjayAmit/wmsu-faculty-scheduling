@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\CurriculumSemesterType;
 use App\Http\Requests\CurriculumRequest;
 use App\Models\Curriculum;
+use App\Models\Department;
 use App\Models\Program;
 use App\Models\Subject;
 use App\Services\CurriculumService;
@@ -20,18 +21,30 @@ class CurriculumController extends Controller
     public function index(Request $request)
     {
         $query = Curriculum::query()
-            ->with(['program', 'subject']);
+            ->with(['program.department', 'subject']);
 
-        if ($request->has('search')) {
+        if ($request->filled('department_id') && $request->department_id !== 'all') {
+            $query->whereHas('program', function ($q) use ($request) {
+                $q->where('department_id', $request->department_id);
+            });
+        }
+
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('program', function ($q) use ($search) {
-                $q->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('code', 'like', '%'.$search.'%');
-            })
-                ->orWhereHas('subject', function ($q) use ($search) {
-                    $q->where('title', 'like', '%'.$search.'%')
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('program', function ($pq) use ($search) {
+                    $pq->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('code', 'like', '%'.$search.'%')
+                        ->orWhereHas('department', function ($dq) use ($search) {
+                            $dq->where('name', 'like', '%'.$search.'%')
+                                ->orWhere('code', 'like', '%'.$search.'%');
+                        });
+                })
+                ->orWhereHas('subject', function ($sq) use ($search) {
+                    $sq->where('title', 'like', '%'.$search.'%')
                         ->orWhere('code', 'like', '%'.$search.'%');
                 });
+            });
         }
 
         $totalCurricula = Curriculum::count();
@@ -45,8 +58,13 @@ class CurriculumController extends Controller
 
         return Inertia::render('curricula/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
-            'filters' => $request->only(['search', 'per_page']),
-            'programs' => Program::active()->select('id', 'code', 'name', 'degree_level')->get(),
+            'filters' => [
+                'search' => $request->search ?? '',
+                'department_id' => $request->department_id ?? 'all',
+                'per_page' => (int) ($request->per_page ?? 10),
+            ],
+            'departments' => Department::active()->orderBy('name')->get(['id', 'code', 'name']),
+            'programs' => Program::active()->with('department:id,code,name')->select('id', 'code', 'name', 'degree_level', 'department_id')->get(),
             'subjects' => Subject::active()->select('id', 'code', 'title', 'units')->get(),
             'stats' => [
                 'total' => $totalCurricula,
@@ -62,7 +80,8 @@ class CurriculumController extends Controller
     public function create()
     {
         return Inertia::render('curricula/create', [
-            'programs' => Program::active()->select('id', 'code', 'name', 'degree_level')->get(),
+            'departments' => Department::active()->orderBy('name')->get(['id', 'code', 'name']),
+            'programs' => Program::active()->with('department:id,code,name')->select('id', 'code', 'name', 'degree_level', 'department_id')->get(),
             'subjects' => Subject::active()->select('id', 'code', 'title', 'units')->get(),
             'semesterTypes' => array_map(fn ($case) => [
                 'value' => $case->value,
@@ -80,7 +99,7 @@ class CurriculumController extends Controller
 
     public function show(Curriculum $curriculum)
     {
-        $curriculum->load(['program', 'subject']);
+        $curriculum->load(['program.department', 'subject']);
 
         return Inertia::render('curricula/show', [
             'curriculum' => $curriculum,
@@ -89,11 +108,12 @@ class CurriculumController extends Controller
 
     public function edit(Curriculum $curriculum)
     {
-        $curriculum->load(['program', 'subject']);
+        $curriculum->load(['program.department', 'subject']);
 
         return Inertia::render('curricula/edit', [
             'curriculum' => $curriculum,
-            'programs' => Program::active()->select('id', 'code', 'name', 'degree_level')->get(),
+            'departments' => Department::active()->orderBy('name')->get(['id', 'code', 'name']),
+            'programs' => Program::active()->with('department:id,code,name')->select('id', 'code', 'name', 'degree_level', 'department_id')->get(),
             'subjects' => Subject::active()->select('id', 'code', 'title', 'units')->get(),
             'semesterTypes' => array_map(fn ($case) => [
                 'value' => $case->value,

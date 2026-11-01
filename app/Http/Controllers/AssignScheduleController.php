@@ -58,22 +58,48 @@ class AssignScheduleController extends Controller
     /**
      * Show the form for creating a new assigned schedule.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('assign-schedules/create', [
-            'teachers' => Teacher::with('user')->get()->map(fn ($t) => [
+        $selectedTeacherId = $request->query('teacher_id');
+        $selectedScheduleId = $request->query('schedule_id');
+
+        $teachers = Teacher::with('user')
+            ->withCount(['assignments as active_assignments_count' => function ($q) {
+                $q->where('is_active', true);
+            }])
+            ->orderBy('active_assignments_count', 'asc')
+            ->get()
+            ->map(fn ($t) => [
                 'id' => $t->id,
                 'name' => $t->user?->name ?? $t->full_name,
-            ]),
-            'schedules' => Schedule::with(['subject', 'semester'])
-                ->where('is_active', true)
-                ->get()
-                ->map(fn ($s) => [
-                    'id' => $s->id,
-                    'name' => $s->subject->code.' - '.$s->subject->title,
-                    'semester' => $s->semester->name,
-                    'timeSlots' => $s->time_slots,
-                ]),
+                'rank' => $t->rank,
+                'department' => $t->department,
+                'employment_type' => $t->employment_type,
+                'active_assignments_count' => $t->active_assignments_count,
+            ]);
+
+        $schedules = Schedule::with(['subject', 'semester', 'classroom', 'teacherAssignment.teacher.user'])
+            ->where('is_active', true)
+            ->get()
+            ->map(fn ($s) => [
+                'id' => $s->id,
+                'name' => $s->subject->code.' - '.$s->subject->title,
+                'subject_code' => $s->subject->code,
+                'subject_title' => $s->subject->title,
+                'units' => $s->subject->units,
+                'section' => $s->section,
+                'room' => $s->classroom ? "{$s->classroom->building} {$s->classroom->room_number}" : ($s->room ?? 'TBA'),
+                'semester' => $s->semester->name,
+                'timeSlots' => $s->time_slots ?? [],
+                'is_assigned' => $s->teacherAssignment !== null && $s->teacherAssignment->is_active,
+                'assigned_teacher' => $s->teacherAssignment?->teacher?->full_name,
+            ]);
+
+        return Inertia::render('assign-schedules/create', [
+            'teachers' => $teachers,
+            'schedules' => $schedules,
+            'selectedTeacherId' => $selectedTeacherId,
+            'selectedScheduleId' => $selectedScheduleId,
         ]);
     }
 
@@ -103,11 +129,11 @@ class AssignScheduleController extends Controller
         try {
             $this->generationService->generateFromDraft($draftSchedule);
 
-            return redirect()->route('assign-schedules.show', $draftSchedule->id)
-                ->with('success', 'Schedule assigned successfully and teacher schedules generated.');
+            return redirect()->route('teachers.show', $validated['teacher_id'])
+                ->with('success', 'Course schedule assigned successfully to teacher.');
         } catch (\Exception $e) {
-            return redirect()->route('assign-schedules.index')
-                ->with('warning', 'Schedule assigned but teacher schedule generation failed: '.$e->getMessage());
+            return redirect()->route('teachers.show', $validated['teacher_id'])
+                ->with('warning', 'Schedule assigned but session generation had issues: '.$e->getMessage());
         }
     }
 
@@ -131,9 +157,14 @@ class AssignScheduleController extends Controller
      */
     public function destroy(DraftSchedule $draftSchedule): RedirectResponse
     {
+        $teacherId = $draftSchedule->teacher_id;
+        if ($draftSchedule->teacher_assignment_id) {
+            \App\Models\TeacherAssignment::where('id', $draftSchedule->teacher_assignment_id)->delete();
+            \App\Models\TeacherSchedule::where('draft_schedule_id', $draftSchedule->id)->delete();
+        }
         $draftSchedule->delete();
 
-        return redirect()->route('assign-schedules.index')
+        return redirect()->back()
             ->with('success', 'Schedule assignment removed successfully.');
     }
 }

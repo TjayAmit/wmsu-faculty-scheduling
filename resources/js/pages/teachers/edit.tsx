@@ -1,5 +1,5 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { Save, UserPlus, UserX, UserCheck, Briefcase, User, Shield } from 'lucide-react';
+import { Save, UserPlus, UserX, UserCheck, Briefcase, User, Shield, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import CreateUserAccountForm from '@/components/teachers/CreateUserAccountForm';
@@ -17,7 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import { index as teachers, show as teachersShow, update as teachersUpdate } from '@/routes/teachers';
 import type { TeachersFormProps } from '@/types';
 
-export default function Edit({ teacher, employmentTypes, availableRoles }: TeachersFormProps) {
+export default function Edit({ teacher, employmentTypes, departments = [], userDepartment, availableRoles }: TeachersFormProps) {
     const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
 
     const fullName =
@@ -225,17 +225,61 @@ export default function Edit({ teacher, employmentTypes, availableRoles }: Teach
                                     </div>
 
                                     <div className="grid gap-4 sm:grid-cols-2">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="department">Department</Label>
-                                            <Input
-                                                id="department"
-                                                value={data.department}
-                                                onChange={(e) => setData('department', e.target.value)}
-                                                placeholder="e.g. College of Computing Studies"
-                                                aria-invalid={!!errors.department}
-                                            />
-                                            <InputError message={errors.department} />
-                                        </div>
+                                        {userDepartment ? (
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center justify-between">
+                                                    <Label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                                                        <Building2 className="size-3.5 text-primary" />
+                                                        Department
+                                                    </Label>
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="border-primary/30 text-primary bg-primary/5 text-[10px] gap-1 px-1.5 py-0"
+                                                    >
+                                                        Department Scope
+                                                    </Badge>
+                                                </div>
+                                                <div className="rounded-lg border border-primary/20 bg-primary/5 px-3 py-2">
+                                                    <p className="text-xs font-semibold text-foreground">
+                                                        {data.department || userDepartment.name}
+                                                    </p>
+                                                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                                                        Faculty member registered under {userDepartment.name} ({userDepartment.code}).
+                                                    </p>
+                                                </div>
+                                                <input type="hidden" name="department" value={data.department} />
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                <Label htmlFor="department">Department</Label>
+                                                {departments.length > 0 ? (
+                                                    <Select
+                                                        value={data.department}
+                                                        onValueChange={(val) => setData('department', val)}
+                                                    >
+                                                        <SelectTrigger id="department">
+                                                            <SelectValue placeholder="Select department" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {departments.map((dept) => (
+                                                                <SelectItem key={dept.id} value={dept.name}>
+                                                                    {dept.code} - {dept.name}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                ) : (
+                                                    <Input
+                                                        id="department"
+                                                        value={data.department}
+                                                        onChange={(e) => setData('department', e.target.value)}
+                                                        placeholder="e.g. College of Education"
+                                                        aria-invalid={!!errors.department}
+                                                    />
+                                                )}
+                                                <InputError message={errors.department} />
+                                            </div>
+                                        )}
 
                                         <div className="space-y-2">
                                             <Label htmlFor="rank">Academic Rank</Label>
@@ -337,8 +381,8 @@ export default function Edit({ teacher, employmentTypes, availableRoles }: Teach
                                                         </DialogDescription>
                                                     </DialogHeader>
                                                     <CreateUserAccountForm
+                                                        teacherName={fullName}
                                                         teacherEmail={teacher?.email || ''}
-                                                        availableRoles={availableRoles || []}
                                                         onSubmit={createUserAccount}
                                                     />
                                                 </DialogContent>

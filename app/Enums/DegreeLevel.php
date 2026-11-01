@@ -7,6 +7,7 @@ enum DegreeLevel: string
     case BACHELOR = 'bachelor';
     case MASTER = 'master';
     case DOCTORAL = 'doctoral';
+    case CERTIFICATE = 'certificate';
 
     public function getLabel(): string
     {
@@ -14,6 +15,7 @@ enum DegreeLevel: string
             self::BACHELOR => 'Bachelor\'s Degree',
             self::MASTER => 'Master\'s Degree',
             self::DOCTORAL => 'Doctoral Degree',
+            self::CERTIFICATE => 'Certificate Program',
         };
     }
 

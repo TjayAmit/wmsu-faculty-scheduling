@@ -2,7 +2,12 @@ import type { Department } from './departments';
 
 export interface Section {
     id: number;
-    name: string;
+    name?: string;
+    section_code?: string;
+    year_level?: number;
+    max_students?: number;
+    current_students?: number;
+    is_active?: boolean;
 }
 
 export interface CurriculumItem {
@@ -10,6 +15,13 @@ export interface CurriculumItem {
     subject_id: number;
     year_level: number;
     semester_type: string;
+    semester_type_label?: string;
+    subject?: {
+        id: number;
+        code: string;
+        name: string;
+        units: number;
+    };
 }
 
 export interface ProgramModel {

@@ -8,9 +8,13 @@ import {
     Fingerprint,
     CheckCircle2,
     Circle,
-    CalendarCheck,
     CalendarDays,
     AlertCircle,
+    Save,
+    ExternalLink,
+    Layers,
+    PenLine,
+    Users,
 } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
@@ -23,7 +27,9 @@ import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
+    SelectGroup,
     SelectItem,
+    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
@@ -55,11 +61,13 @@ export default function Create({
     classrooms = [],
     timeSlots,
     daysOfWeek,
+    sections = [],
 }: SchedulesFormProps & { classrooms?: ClassroomOption[] }) {
     const [timeSlotsForm, setTimeSlotsForm] = useState<TimeSlotItem[]>([]);
     const [newDay, setNewDay] = useState('');
     const [newTimeSlotId, setNewTimeSlotId] = useState('');
     const [slotError, setSlotError] = useState<string | null>(null);
+    const [isCustomSection, setIsCustomSection] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
         subject_id: '',
@@ -74,6 +82,15 @@ export default function Create({
     const selectedSubject = subjects.find((s) => s.id.toString() === data.subject_id);
     const selectedSemester = semesters.find((s) => s.id.toString() === data.semester_id);
     const selectedClassroom = classrooms.find((c) => String(c.id) === data.classroom_id);
+    const selectedSection = sections.find((s) => s.section_code.toLowerCase() === data.section.trim().toLowerCase());
+
+    // Group available sections by degree program
+    const groupedSections = sections.reduce((acc, s) => {
+        const prog = s.program?.code || 'General';
+        if (!acc[prog]) acc[prog] = [];
+        acc[prog].push(s);
+        return acc;
+    }, {} as Record<string, typeof sections>);
 
     const handleClassroomSelect = (classroomId: string) => {
         const selected = classrooms.find((c) => String(c.id) === classroomId);
@@ -95,12 +112,12 @@ export default function Create({
         setSlotError(null);
 
         if (!newDay || !newTimeSlotId) {
-            setSlotError('Please select both a day of week and a time slot.');
+            setSlotError('Please select both a day of week and a time slot period.');
             return;
         }
 
-        if (timeSlotsForm.length >= 6) {
-            setSlotError('A maximum of 6 slots can be scheduled per course section.');
+        if (timeSlotsForm.length >= 3) {
+            setSlotError('A maximum of 3 time slots can be scheduled per course section.');
             return;
         }
 
@@ -150,8 +167,9 @@ export default function Create({
         <>
             <Head title="Create Schedule" />
 
+            {/* Canvas strictly spans full left-to-right space */}
             <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
-                {/* 1. External Page Header */}
+                {/* 1. Page Title & Description OUTSIDE cards (No redundant back arrow) */}
                 <div className="space-y-1">
                     <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                         Create Schedule
@@ -161,504 +179,587 @@ export default function Create({
                     </p>
                 </div>
 
-                {/* 2. Structured Form & Master-Detail Layout */}
-                <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full items-start">
-                    {/* Left Column: Form Cards (8 cols on xl, 7 cols on lg) */}
-                    <div className="lg:col-span-7 xl:col-span-8 space-y-6">
-                        {/* Card 1: Course & Academic Term */}
-                        <Card className="border border-border/80 bg-card shadow-sm">
-                            <CardHeader className="pb-4">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        <BookOpen className="h-4 w-4" />
-                                    </div>
-                                    <div>
+                {/* 2. Full-Width 2:1 Asymmetric Form Layout */}
+                <form onSubmit={handleSubmit} className="w-full">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+                        {/* Main Information Column (2 Columns) */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* Card 1: Course & Academic Term */}
+                            <Card className="shadow-xs">
+                                <CardHeader className="border-b border-border pb-4">
+                                    <div className="flex items-center gap-2">
+                                        <BookOpen className="size-4 text-muted-foreground" />
                                         <CardTitle className="text-base font-semibold">Course & Academic Term</CardTitle>
-                                        <CardDescription className="text-xs">
-                                            Select the academic course, target semester, and class section code.
-                                        </CardDescription>
                                     </div>
-                                </div>
-                            </CardHeader>
+                                    <CardDescription className="text-sm">
+                                        Select the academic course, target semester, and section identifier.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="pt-6 space-y-4">
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="subject_id">
+                                                Subject / Course <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Select
+                                                value={data.subject_id}
+                                                onValueChange={(value) => setData('subject_id', value)}
+                                            >
+                                                <SelectTrigger id="subject_id" aria-invalid={!!errors.subject_id}>
+                                                    <SelectValue placeholder="Select course" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {subjects.map((subject) => (
+                                                        <SelectItem key={subject.id} value={subject.id.toString()}>
+                                                            {subject.code} — {subject.title}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.subject_id} />
+                                        </div>
 
-                            <CardContent className="space-y-4 pt-0">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="subject_id" className="text-xs font-medium">
-                                            Subject / Course <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Select
-                                            value={data.subject_id}
-                                            onValueChange={(value) => setData('subject_id', value)}
-                                        >
-                                            <SelectTrigger id="subject_id" className="h-9 text-xs" aria-invalid={!!errors.subject_id}>
-                                                <SelectValue placeholder="Select course" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {subjects.map((subject) => (
-                                                    <SelectItem key={subject.id} value={subject.id.toString()}>
-                                                        {subject.code} — {subject.title}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.subject_id} />
-                                    </div>
-
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="semester_id" className="text-xs font-medium">
-                                            Academic Semester <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Select
-                                            value={data.semester_id}
-                                            onValueChange={(value) => setData('semester_id', value)}
-                                        >
-                                            <SelectTrigger id="semester_id" className="h-9 text-xs" aria-invalid={!!errors.semester_id}>
-                                                <SelectValue placeholder="Select semester" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {semesters.map((semester) => (
-                                                    <SelectItem key={semester.id} value={semester.id.toString()}>
-                                                        {semester.name} ({semester.academic_year})
-                                                        {semester.is_current ? ' — Current' : ''}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.semester_id} />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="section" className="text-xs font-medium">
-                                            Section Code <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Input
-                                            id="section"
-                                            value={data.section}
-                                            onChange={(e) => setData('section', e.target.value)}
-                                            placeholder="e.g. BSCS 3-A, BSIT 2-B"
-                                            className="h-9 text-xs"
-                                            required
-                                            aria-invalid={!!errors.section}
-                                        />
-                                        <InputError message={errors.section} />
+                                        <div className="space-y-2">
+                                            <Label htmlFor="semester_id">
+                                                Academic Semester <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Select
+                                                value={data.semester_id}
+                                                onValueChange={(value) => setData('semester_id', value)}
+                                            >
+                                                <SelectTrigger id="semester_id" aria-invalid={!!errors.semester_id}>
+                                                    <SelectValue placeholder="Select semester" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {semesters.map((semester) => (
+                                                        <SelectItem key={semester.id} value={semester.id.toString()}>
+                                                            {semester.name} ({semester.academic_year})
+                                                            {semester.is_current ? ' — Current' : ''}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.semester_id} />
+                                        </div>
                                     </div>
 
-                                    {selectedSubject && (
-                                        <div className="rounded-lg border border-primary/20 bg-primary/5 p-2.5 flex items-center justify-between text-xs">
-                                            <div>
-                                                <span className="font-semibold text-foreground">{selectedSubject.code}</span>
-                                                <p className="text-[11px] text-muted-foreground truncate max-w-[200px]">
-                                                    {selectedSubject.title}
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <Label htmlFor="section" className="text-xs font-semibold">
+                                                    Section Code <span className="text-destructive">*</span>
+                                                </Label>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsCustomSection(!isCustomSection)}
+                                                    className="text-[11px] text-primary hover:underline font-medium inline-flex items-center gap-1"
+                                                >
+                                                    {isCustomSection ? (
+                                                        <>
+                                                            <Layers className="size-3" />
+                                                            Choose Registered Section
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <PenLine className="size-3" />
+                                                            Custom Code
+                                                        </>
+                                                    )}
+                                                </button>
+                                            </div>
+
+                                            {!isCustomSection && sections.length > 0 ? (
+                                                <Select
+                                                    value={data.section}
+                                                    onValueChange={(val) => setData('section', val)}
+                                                >
+                                                    <SelectTrigger id="section" aria-invalid={!!errors.section} className="text-sm font-mono">
+                                                        <SelectValue placeholder="Select section from Sections module..." />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="max-h-72">
+                                                        {Object.entries(groupedSections).map(([progCode, secList]) => (
+                                                            <SelectGroup key={progCode}>
+                                                                <SelectLabel className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider bg-muted/40 px-2 py-1">
+                                                                    {progCode} Program Sections
+                                                                </SelectLabel>
+                                                                {secList.map((s) => (
+                                                                    <SelectItem key={s.id} value={s.section_code} className="cursor-pointer">
+                                                                        <div className="flex items-center justify-between w-full gap-4">
+                                                                            <span className="font-mono font-semibold">{s.section_code}</span>
+                                                                            <span className="text-xs text-muted-foreground">
+                                                                                Year {s.year_level} ({s.max_students || 40} seats)
+                                                                            </span>
+                                                                        </div>
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectGroup>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            ) : (
+                                                <Input
+                                                    id="section"
+                                                    value={data.section}
+                                                    onChange={(e) => setData('section', e.target.value)}
+                                                    placeholder="e.g. BEED 3-A, BSED-ENG 2-B"
+                                                    required
+                                                    aria-invalid={!!errors.section}
+                                                    className="text-sm font-mono"
+                                                />
+                                            )}
+
+                                            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                                                <span>
+                                                    {!isCustomSection
+                                                        ? 'Synced with the Sections module database.'
+                                                        : 'Manual entry for unlisted section.'}
+                                                </span>
+                                                <Link
+                                                    href="/sections"
+                                                    target="_blank"
+                                                    className="text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                                                >
+                                                    Sections Module <ExternalLink className="size-2.5" />
+                                                </Link>
+                                            </div>
+                                            <InputError message={errors.section} />
+                                        </div>
+
+                                        {/* Right Column: Selected Section or Subject Info Box */}
+                                        <div className="space-y-2 mt-auto">
+                                            {selectedSection ? (
+                                                <div className="rounded-lg border border-primary/20 bg-primary/5 p-3.5 space-y-1.5">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className="text-xs font-semibold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                                                            <Users className="size-3.5" />
+                                                            Section Details
+                                                        </span>
+                                                        <Badge variant="outline" className="border-primary/30 text-primary bg-background text-[10px] font-mono font-semibold">
+                                                            {selectedSection.section_code}
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-xs font-medium text-foreground truncate">
+                                                        {selectedSection.program?.name || selectedSection.program?.code || 'Academic Degree Program'}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 text-[11px] text-muted-foreground pt-1 border-t border-primary/15">
+                                                        <span>Year {selectedSection.year_level}</span>
+                                                        <span>•</span>
+                                                        <span>Class Capacity: <strong className="text-foreground">{selectedSection.max_students || 40} seats</strong></span>
+                                                    </div>
+                                                </div>
+                                            ) : selectedSubject ? (
+                                                <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-3.5">
+                                                    <div className="space-y-0.5">
+                                                        <span className="text-sm font-semibold text-foreground">
+                                                            {selectedSubject.code}
+                                                        </span>
+                                                        <p className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                                            {selectedSubject.title}
+                                                        </p>
+                                                    </div>
+                                                    <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5 text-xs font-medium">
+                                                        {selectedSubject.units ?? 3} Units
+                                                    </Badge>
+                                                </div>
+                                            ) : (
+                                                <div className="rounded-lg border border-dashed border-border bg-muted/20 p-3.5 text-center text-xs text-muted-foreground">
+                                                    Choose a course and registered section to inspect class enrollment limits.
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </CardContent>
+                            </Card>
+
+                            {/* Card 2: Classroom & Attendance Facility */}
+                            <Card className="shadow-xs">
+                                <CardHeader className="border-b border-border pb-4">
+                                    <div className="flex items-center gap-2">
+                                        <DoorOpen className="size-4 text-muted-foreground" />
+                                        <CardTitle className="text-base font-semibold">Classroom & Biometric Terminal</CardTitle>
+                                    </div>
+                                    <CardDescription className="text-sm">
+                                        Assign physical classroom and link with ZKTeco biometric terminals for verification.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="pt-6 space-y-4">
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="classroom_id">
+                                                Classroom (ZKTeco Binding)
+                                            </Label>
+                                            <Select
+                                                value={data.classroom_id}
+                                                onValueChange={handleClassroomSelect}
+                                            >
+                                                <SelectTrigger id="classroom_id">
+                                                    <SelectValue placeholder="Select classroom..." />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {classrooms.map((c) => (
+                                                        <SelectItem key={c.id} value={String(c.id)}>
+                                                            {c.building} {c.room_number}
+                                                            {c.room_name ? ` (${c.room_name})` : ''}
+                                                            {c.zkteco_device ? ` — [ZKTeco: ${c.zkteco_device.device_name}]` : ' — [No Device]'}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <InputError message={errors.classroom_id} />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="room">
+                                                Room Label <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Input
+                                                id="room"
+                                                value={data.room}
+                                                onChange={(e) => setData('room', e.target.value)}
+                                                placeholder="e.g. ED 101, Education Lab 2"
+                                                required
+                                                aria-invalid={!!errors.room}
+                                            />
+                                            <InputError message={errors.room} />
+                                        </div>
+                                    </div>
+
+                                    {selectedClassroom?.zkteco_device ? (
+                                        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3.5 flex items-start gap-3">
+                                            <Fingerprint className="size-5 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
+                                            <div className="space-y-0.5">
+                                                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                                                    Biometric Verification Active
+                                                </p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Connected to <strong>{selectedClassroom.zkteco_device.device_name}</strong>. Faculty taps in this classroom will automatically verify timetable attendance.
                                                 </p>
                                             </div>
-                                            <Badge variant="outline" className="text-[10px] bg-background">
-                                                {selectedSubject.units} Units
-                                            </Badge>
+                                        </div>
+                                    ) : (
+                                        <div className="rounded-lg border border-border bg-muted/20 p-3.5 flex items-start gap-3">
+                                            <AlertCircle className="size-5 shrink-0 text-muted-foreground/70 mt-0.5" />
+                                            <div className="space-y-0.5 text-xs text-muted-foreground">
+                                                <p className="font-medium text-foreground">Standard / Manual Verification</p>
+                                                <p>
+                                                    No automated biometric device is linked to this room. Faculty schedule presence will be tracked manually or via department log.
+                                                </p>
+                                            </div>
                                         </div>
                                     )}
-                                </div>
-                            </CardContent>
-                        </Card>
+                                </CardContent>
+                            </Card>
 
-                        {/* Card 2: Classroom & Attendance Facility */}
-                        <Card className="border border-border/80 bg-card shadow-sm">
-                            <CardHeader className="pb-4">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                        <DoorOpen className="h-4 w-4" />
+                            {/* Card 3: Weekly Timetable & Period Allocation */}
+                            <Card className="shadow-xs">
+                                <CardHeader className="border-b border-border pb-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <CalendarDays className="size-4 text-muted-foreground" />
+                                            <CardTitle className="text-base font-semibold">Weekly Timetable & Periods</CardTitle>
+                                        </div>
+                                        <Badge variant="outline" className="text-xs font-normal">
+                                            {timeSlotsForm.length} / 3 slots
+                                        </Badge>
                                     </div>
-                                    <div>
-                                        <CardTitle className="text-base font-semibold">Classroom & Attendance Terminal</CardTitle>
-                                        <CardDescription className="text-xs">
-                                            Assign physical classroom and link with ZKTeco biometric terminals for verification.
-                                        </CardDescription>
-                                    </div>
-                                </div>
-                            </CardHeader>
+                                    <CardDescription className="text-sm">
+                                        Assign recurring weekly days and time slot blocks for this schedule.
+                                    </CardDescription>
+                                </CardHeader>
 
-                            <CardContent className="space-y-4 pt-0">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="classroom_id" className="text-xs font-medium">
-                                            Assign Classroom (ZKTeco Binding)
-                                        </Label>
-                                        <Select
-                                            value={data.classroom_id}
-                                            onValueChange={handleClassroomSelect}
-                                        >
-                                            <SelectTrigger id="classroom_id" className="h-9 text-xs">
-                                                <SelectValue placeholder="Select classroom..." />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {classrooms.map((c) => (
-                                                    <SelectItem key={c.id} value={String(c.id)}>
-                                                        {c.building} {c.room_number}
-                                                        {c.room_name ? ` (${c.room_name})` : ''}
-                                                        {c.zkteco_device ? ` — [ZKTeco: ${c.zkteco_device.device_name}]` : ' — [No Device]'}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <InputError message={errors.classroom_id} />
+                                <CardContent className="pt-6 space-y-4">
+                                    {/* Slot Selection Control Box */}
+                                    <div className="rounded-lg border border-border bg-muted/20 p-4">
+                                        <div className="flex flex-col sm:flex-row sm:items-end gap-3">
+                                            <div className="w-full sm:w-48 space-y-1.5">
+                                                <Label htmlFor="day_select" className="text-xs font-medium">
+                                                    Day of Week
+                                                </Label>
+                                                <Select value={newDay} onValueChange={setNewDay}>
+                                                    <SelectTrigger id="day_select" className="w-full">
+                                                        <SelectValue placeholder="Choose day" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {daysOfWeek.map((day) => (
+                                                            <SelectItem key={day.value} value={day.value}>
+                                                                {day.label}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            <div className="w-full sm:flex-1 space-y-1.5">
+                                                <Label htmlFor="time_slot_select" className="text-xs font-medium">
+                                                    Time Slot Period
+                                                </Label>
+                                                <Select value={newTimeSlotId} onValueChange={setNewTimeSlotId}>
+                                                    <SelectTrigger id="time_slot_select" className="w-full">
+                                                        <SelectValue placeholder="Choose period" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {timeSlots.map((slot) => (
+                                                            <SelectItem key={slot.id} value={slot.id.toString()}>
+                                                                {slot.name} ({slot.start_time} - {slot.end_time})
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+
+                                            <Button
+                                                type="button"
+                                                variant="secondary"
+                                                onClick={addTimeSlot}
+                                                disabled={!newDay || !newTimeSlotId || timeSlotsForm.length >= 3}
+                                                className="w-full sm:w-auto h-10 px-4 text-xs font-medium shrink-0"
+                                            >
+                                                <Plus className="mr-1 size-3.5" />
+                                                Add Slot
+                                            </Button>
+                                        </div>
+
+                                        {slotError && (
+                                            <p className="mt-2 text-xs text-destructive font-medium">{slotError}</p>
+                                        )}
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <Label htmlFor="room" className="text-xs font-medium">
-                                            Room Label <span className="text-destructive">*</span>
-                                        </Label>
-                                        <Input
-                                            id="room"
-                                            value={data.room}
-                                            onChange={(e) => setData('room', e.target.value)}
-                                            placeholder="e.g. Room 302, CCS Lab 1"
-                                            className="h-9 text-xs"
-                                            required
-                                            aria-invalid={!!errors.room}
-                                        />
-                                        <InputError message={errors.room} />
-                                    </div>
-                                </div>
+                                    <InputError message={errors.time_slots} />
 
-                                {selectedClassroom?.zkteco_device ? (
-                                    <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 flex items-start gap-2.5 text-xs text-foreground">
-                                        <Fingerprint className="size-4 text-emerald-600 dark:text-emerald-400 mt-0.5 shrink-0" />
-                                        <div className="space-y-0.5">
-                                            <p className="font-semibold text-emerald-700 dark:text-emerald-300">
-                                                Biometric Verification Enabled
+                                    {/* Rendered List of Configured Slots */}
+                                    {timeSlotsForm.length > 0 ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            {timeSlotsForm.map((slot, index) => {
+                                                const slotDetails = getTimeSlot(slot.time_slot_id);
+                                                return (
+                                                    <div
+                                                        key={index}
+                                                        className="flex items-center justify-between rounded-lg border border-border bg-card p-3 shadow-xs transition-colors hover:border-primary/40"
+                                                    >
+                                                        <div className="flex items-center gap-3 min-w-0">
+                                                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
+                                                                <Clock className="size-4" />
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <div className="flex items-center gap-1.5">
+                                                                    <span className="text-sm font-semibold text-foreground">
+                                                                        {getDayLabel(slot.day)}
+                                                                    </span>
+                                                                    {slotDetails && (
+                                                                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
+                                                                            {slotDetails.name}
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                                <p className="text-xs text-muted-foreground font-mono truncate mt-0.5">
+                                                                    {slotDetails
+                                                                        ? `${slotDetails.start_time} — ${slotDetails.end_time}`
+                                                                        : `Slot ID: ${slot.time_slot_id}`}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => removeTimeSlot(index)}
+                                                            className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
+                                                        >
+                                                            <Trash2 className="size-4" />
+                                                            <span className="sr-only">Remove</span>
+                                                        </Button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-8 text-center text-xs text-muted-foreground">
+                                            <Clock className="size-8 text-muted-foreground/40 mb-2" />
+                                            <p className="font-medium text-foreground">No weekly periods added yet</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5">
+                                                Select a day and time slot block above to schedule recurring sessions.
                                             </p>
-                                            <p className="text-[11px] text-muted-foreground">
-                                                Terminal: <strong>{selectedClassroom.zkteco_device.device_name}</strong>. Faculty taps in this room will automatically verify attendance for this class period.
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+
+                        {/* Side Actions & Overview Column (1 Column) */}
+                        <div className="space-y-6">
+                            {/* Schedule Status Card */}
+                            <Card className="shadow-xs">
+                                <CardHeader className="border-b border-border pb-4">
+                                    <CardTitle className="text-base font-semibold">Schedule Status</CardTitle>
+                                    <CardDescription className="text-xs">
+                                        Determine operational status and student visibility.
+                                    </CardDescription>
+                                </CardHeader>
+                                <CardContent className="pt-5 space-y-4">
+                                    <div className="flex items-start space-x-3 rounded-lg border border-border p-3.5 bg-muted/20">
+                                        <Checkbox
+                                            id="is_active"
+                                            checked={data.is_active}
+                                            onCheckedChange={(checked) => setData('is_active', !!checked)}
+                                            className="mt-0.5"
+                                        />
+                                        <div className="space-y-1">
+                                            <Label htmlFor="is_active" className="text-sm font-medium cursor-pointer">
+                                                Active Schedule
+                                            </Label>
+                                            <p className="text-xs text-muted-foreground leading-normal">
+                                                Enable for student enrollment, timetable publication, and faculty load calculations.
                                             </p>
                                         </div>
                                     </div>
-                                ) : (
-                                    <div className="rounded-lg border border-border bg-muted/30 p-3 flex items-start gap-2.5 text-xs text-muted-foreground">
-                                        <AlertCircle className="size-4 shrink-0 text-muted-foreground/70 mt-0.5" />
-                                        <p className="text-[11px]">
-                                            No automated biometric terminal is linked to this room. Faculty will verify schedule presence manually.
+                                    <InputError message={errors.is_active} />
+                                </CardContent>
+                            </Card>
+
+                            {/* Live Preview & Readiness Checklist Card */}
+                            <Card className="shadow-xs">
+                                <CardHeader className="border-b border-border pb-3">
+                                    <div className="flex items-center justify-between">
+                                        <CardTitle className="text-base font-semibold">Live Preview</CardTitle>
+                                        <Badge variant={data.is_active ? 'default' : 'secondary'} className="text-[10px] uppercase tracking-wider">
+                                            {data.is_active ? 'Active' : 'Draft'}
+                                        </Badge>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="pt-4 space-y-3.5 text-xs">
+                                    <div className="space-y-1 border-b border-border/60 pb-2.5">
+                                        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Course Offering</span>
+                                        <p className="font-semibold text-foreground text-sm">
+                                            {selectedSubject
+                                                ? `${selectedSubject.code} — ${selectedSubject.title}`
+                                                : <span className="text-muted-foreground italic font-normal">Not selected</span>}
                                         </p>
                                     </div>
-                                )}
-                            </CardContent>
-                        </Card>
 
-                        {/* Card 3: Weekly Timetable & Period Allocation */}
-                        <Card className="border border-border/80 bg-card shadow-sm">
-                            <CardHeader className="pb-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2.5">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                                            <CalendarDays className="h-4 w-4" />
+                                    <div className="space-y-1 border-b border-border/60 pb-2.5">
+                                        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Academic Term</span>
+                                        <p className="font-medium text-foreground">
+                                            {selectedSemester
+                                                ? `${selectedSemester.name} (${selectedSemester.academic_year})`
+                                                : <span className="text-muted-foreground italic font-normal">Not selected</span>}
+                                        </p>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2 border-b border-border/60 pb-2.5">
+                                        <div>
+                                            <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Section</span>
+                                            <p className="font-semibold text-foreground">
+                                                {data.section || <span className="text-muted-foreground italic font-normal">—</span>}
+                                            </p>
                                         </div>
                                         <div>
-                                            <CardTitle className="text-base font-semibold">Weekly Timetable & Periods</CardTitle>
-                                            <CardDescription className="text-xs">
-                                                Assign recurring days and period blocks for this schedule.
-                                            </CardDescription>
+                                            <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Room</span>
+                                            <p className="font-semibold text-foreground">
+                                                {data.room || <span className="text-muted-foreground italic font-normal">—</span>}
+                                            </p>
                                         </div>
                                     </div>
-                                    <Badge variant="outline" className="text-xs font-normal">
-                                        {timeSlotsForm.length} / 6 slots
-                                    </Badge>
-                                </div>
-                            </CardHeader>
 
-                            <CardContent className="space-y-4 pt-0">
-                                {/* Slot Selection Form Row */}
-                                <div className="rounded-lg border border-border/80 bg-muted/20 p-3">
-                                    <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-                                        <div className="w-full sm:w-48 space-y-1">
-                                            <Label htmlFor="day_select" className="text-xs font-medium">
-                                                Day of Week
-                                            </Label>
-                                            <Select value={newDay} onValueChange={setNewDay}>
-                                                <SelectTrigger id="day_select" className="w-full h-9 text-xs">
-                                                    <SelectValue placeholder="Choose day" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {daysOfWeek.map((day) => (
-                                                        <SelectItem key={day.value} value={day.value}>
-                                                            {day.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        <div className="w-full sm:flex-1 space-y-1">
-                                            <Label htmlFor="time_slot_select" className="text-xs font-medium">
-                                                Time Slot Block
-                                            </Label>
-                                            <Select value={newTimeSlotId} onValueChange={setNewTimeSlotId}>
-                                                <SelectTrigger id="time_slot_select" className="w-full h-9 text-xs">
-                                                    <SelectValue placeholder="Choose period" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {timeSlots.map((slot) => (
-                                                        <SelectItem key={slot.id} value={slot.id.toString()}>
-                                                            {slot.name} ({slot.start_time} - {slot.end_time})
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        <Button
-                                            type="button"
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={addTimeSlot}
-                                            disabled={!newDay || !newTimeSlotId || timeSlotsForm.length >= 6}
-                                            className="w-full sm:w-auto h-9 px-4 text-xs font-medium shrink-0"
-                                        >
-                                            <Plus className="mr-1 size-3.5" />
-                                            Add Slot
-                                        </Button>
-                                    </div>
-
-                                    {slotError && (
-                                        <p className="mt-2 text-xs text-destructive font-medium">{slotError}</p>
-                                    )}
-                                </div>
-
-                                <InputError message={errors.time_slots} />
-
-                                {/* Rendered List of Configured Slots */}
-                                {timeSlotsForm.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                                        {timeSlotsForm.map((slot, index) => {
-                                            const slotDetails = getTimeSlot(slot.time_slot_id);
-                                            return (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center justify-between rounded-lg border border-border bg-card p-2.5 shadow-xs transition-colors hover:border-primary/30"
-                                                >
-                                                    <div className="flex items-center gap-2.5 min-w-0">
-                                                        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-primary shrink-0">
-                                                            <Clock className="size-3.5" />
-                                                        </div>
-                                                        <div className="min-w-0">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className="text-xs font-semibold text-foreground">
-                                                                    {getDayLabel(slot.day)}
-                                                                </span>
-                                                                {slotDetails && (
-                                                                    <Badge variant="outline" className="text-[10px] px-1 py-0 h-4">
-                                                                        {slotDetails.name}
-                                                                    </Badge>
-                                                                )}
-                                                            </div>
-                                                            <p className="text-[11px] text-muted-foreground truncate">
-                                                                {slotDetails
-                                                                    ? `${slotDetails.start_time} — ${slotDetails.end_time}`
-                                                                    : `Slot ID: ${slot.time_slot_id}`}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <Button
-                                                        type="button"
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => removeTimeSlot(index)}
-                                                        className="size-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 shrink-0"
-                                                    >
-                                                        <Trash2 className="size-3.5" />
-                                                        <span className="sr-only">Remove</span>
-                                                    </Button>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-border py-8 text-center text-xs text-muted-foreground">
-                                        <Clock className="size-6 text-muted-foreground/40 mb-1.5" />
-                                        <p className="font-medium text-foreground">No weekly periods added yet</p>
-                                        <p className="text-[11px] text-muted-foreground mt-0.5">
-                                            Select a day and period block above to build the schedule timetable.
+                                    <div className="space-y-1 border-b border-border/60 pb-2.5">
+                                        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Attendance Terminal</span>
+                                        <p className="font-medium text-foreground flex items-center gap-1.5">
+                                            {selectedClassroom?.zkteco_device ? (
+                                                <>
+                                                    <span className="inline-block size-2 rounded-full bg-emerald-500" />
+                                                    <span>{selectedClassroom.zkteco_device.device_name}</span>
+                                                </>
+                                            ) : (
+                                                <span className="text-muted-foreground">Standard / Manual</span>
+                                            )}
                                         </p>
                                     </div>
-                                )}
-                            </CardContent>
-                        </Card>
-                    </div>
 
-                    {/* Right Column: Live Overview & Action Sidebar (4 cols on xl, 5 cols on lg) */}
-                    <div className="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-6">
-                        {/* Action Panel Card */}
-                        <Card className="border border-border/80 bg-card shadow-sm">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-base font-semibold">Publish Schedule</CardTitle>
-                                <CardDescription className="text-xs">
-                                    Set schedule operational status and create record.
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4 pt-0">
-                                <div className="flex items-start space-x-2 rounded-lg border border-border bg-muted/20 p-3">
-                                    <Checkbox
-                                        id="is_active"
-                                        checked={data.is_active}
-                                        onCheckedChange={(checked) => setData('is_active', !!checked)}
-                                        className="mt-0.5"
-                                    />
-                                    <div className="space-y-0.5">
-                                        <Label htmlFor="is_active" className="text-xs font-medium cursor-pointer">
-                                            Active Schedule
-                                        </Label>
-                                        <p className="text-[11px] text-muted-foreground leading-snug">
-                                            Enable for student enrollment and faculty timetable loading.
-                                        </p>
+                                    <div className="space-y-2 pt-1">
+                                        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">Configuration Checklist</span>
+                                        <div className="space-y-1.5 text-xs">
+                                            <div className="flex items-center gap-2">
+                                                {isSubjectReady ? (
+                                                    <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                                                ) : (
+                                                    <Circle className="size-3.5 text-muted-foreground/40 shrink-0" />
+                                                )}
+                                                <span className={isSubjectReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                                                    Course selected
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                {isSemesterReady ? (
+                                                    <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                                                ) : (
+                                                    <Circle className="size-3.5 text-muted-foreground/40 shrink-0" />
+                                                )}
+                                                <span className={isSemesterReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                                                    Semester assigned
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                {isRoomSectionReady ? (
+                                                    <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                                                ) : (
+                                                    <Circle className="size-3.5 text-muted-foreground/40 shrink-0" />
+                                                )}
+                                                <span className={isRoomSectionReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                                                    Room & section defined
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                {isSlotsReady ? (
+                                                    <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
+                                                ) : (
+                                                    <Circle className="size-3.5 text-muted-foreground/40 shrink-0" />
+                                                )}
+                                                <span className={isSlotsReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
+                                                    Weekly time slots added ({timeSlotsForm.length}/3)
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <InputError message={errors.is_active} />
+                                </CardContent>
+                            </Card>
 
-                                <div className="space-y-2 pt-1">
+                            {/* Form Action Controls Card */}
+                            <Card className="shadow-xs">
+                                <CardHeader className="border-b border-border pb-3">
+                                    <CardTitle className="text-base font-semibold">Save Schedule</CardTitle>
+                                </CardHeader>
+                                <CardContent className="pt-4 space-y-2.5">
                                     <Button
                                         type="submit"
                                         disabled={processing}
-                                        className="w-full text-xs font-semibold"
+                                        className="w-full h-10 gap-1.5 font-medium"
                                     >
                                         {processing ? (
                                             <>
-                                                <Spinner className="mr-2 size-3.5" />
+                                                <Spinner className="size-4 mr-2" />
                                                 Creating Schedule...
                                             </>
                                         ) : (
-                                            'Create Schedule'
+                                            <>
+                                                <Save className="size-4" />
+                                                Create Schedule
+                                            </>
                                         )}
                                     </Button>
 
-                                    <Button variant="outline" asChild className="w-full text-xs">
+                                    <Button
+                                        variant="outline"
+                                        type="button"
+                                        asChild
+                                        className="w-full h-10"
+                                    >
                                         <Link href={schedules()}>Cancel</Link>
                                     </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Live Schedule Summary Card */}
-                        <Card className="border border-border/80 bg-card shadow-sm">
-                            <CardHeader className="pb-3">
-                                <div className="flex items-center justify-between">
-                                    <CardTitle className="text-sm font-semibold">Live Preview</CardTitle>
-                                    <Badge variant="secondary" className="text-[10px] uppercase tracking-wider">
-                                        Draft
-                                    </Badge>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="space-y-3 pt-0 text-xs">
-                                <div className="space-y-1 border-b border-border/60 pb-2.5">
-                                    <span className="text-[11px] text-muted-foreground font-medium">Course</span>
-                                    <p className="font-medium text-foreground">
-                                        {selectedSubject
-                                            ? `${selectedSubject.code} — ${selectedSubject.title}`
-                                            : <span className="text-muted-foreground italic">Not selected</span>}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-1 border-b border-border/60 pb-2.5">
-                                    <span className="text-[11px] text-muted-foreground font-medium">Academic Term</span>
-                                    <p className="font-medium text-foreground">
-                                        {selectedSemester
-                                            ? `${selectedSemester.name} (${selectedSemester.academic_year})`
-                                            : <span className="text-muted-foreground italic">Not selected</span>}
-                                    </p>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-2 border-b border-border/60 pb-2.5">
-                                    <div>
-                                        <span className="text-[11px] text-muted-foreground font-medium">Section</span>
-                                        <p className="font-medium text-foreground">
-                                            {data.section || <span className="text-muted-foreground italic">—</span>}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <span className="text-[11px] text-muted-foreground font-medium">Room</span>
-                                        <p className="font-medium text-foreground">
-                                            {data.room || <span className="text-muted-foreground italic">—</span>}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-1 border-b border-border/60 pb-2.5">
-                                    <span className="text-[11px] text-muted-foreground font-medium">Attendance Terminal</span>
-                                    <p className="font-medium text-foreground flex items-center gap-1.5">
-                                        {selectedClassroom?.zkteco_device ? (
-                                            <>
-                                                <span className="inline-block size-1.5 rounded-full bg-emerald-500" />
-                                                <span>{selectedClassroom.zkteco_device.device_name}</span>
-                                            </>
-                                        ) : (
-                                            <span className="text-muted-foreground">Standard / Manual</span>
-                                        )}
-                                    </p>
-                                </div>
-
-                                <div className="space-y-1 pt-0.5">
-                                    <span className="text-[11px] text-muted-foreground font-medium">Allocated Periods</span>
-                                    <p className="font-medium text-foreground">
-                                        {timeSlotsForm.length > 0
-                                            ? `${timeSlotsForm.length} weekly slot${timeSlotsForm.length > 1 ? 's' : ''}`
-                                            : <span className="text-muted-foreground italic">None added</span>}
-                                    </p>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Readiness Checklist */}
-                        <Card className="border border-border/80 bg-card shadow-sm">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                    Configuration Checklist
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2 pt-0 text-xs">
-                                <div className="flex items-center gap-2">
-                                    {isSubjectReady ? (
-                                        <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
-                                    ) : (
-                                        <Circle className="size-4 text-muted-foreground/40 shrink-0" />
-                                    )}
-                                    <span className={isSubjectReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                                        Course offering selected
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    {isSemesterReady ? (
-                                        <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
-                                    ) : (
-                                        <Circle className="size-4 text-muted-foreground/40 shrink-0" />
-                                    )}
-                                    <span className={isSemesterReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                                        Academic semester assigned
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    {isRoomSectionReady ? (
-                                        <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
-                                    ) : (
-                                        <Circle className="size-4 text-muted-foreground/40 shrink-0" />
-                                    )}
-                                    <span className={isRoomSectionReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                                        Room label & section defined
-                                    </span>
-                                </div>
-
-                                <div className="flex items-center gap-2">
-                                    {isSlotsReady ? (
-                                        <CheckCircle2 className="size-4 text-emerald-500 shrink-0" />
-                                    ) : (
-                                        <Circle className="size-4 text-muted-foreground/40 shrink-0" />
-                                    )}
-                                    <span className={isSlotsReady ? 'text-foreground font-medium' : 'text-muted-foreground'}>
-                                        At least one weekly time slot added
-                                    </span>
-                                </div>
-                            </CardContent>
-                        </Card>
+                                </CardContent>
+                            </Card>
+                        </div>
                     </div>
                 </form>
             </div>

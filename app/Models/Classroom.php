@@ -36,6 +36,22 @@ class Classroom extends Model
     }
 
     /**
+     * Get the recurring schedules assigned to this classroom.
+     */
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
+    /**
+     * Get the date-specific room schedules / reservations for this classroom.
+     */
+    public function roomSchedules(): HasMany
+    {
+        return $this->hasMany(RoomSchedule::class);
+    }
+
+    /**
      * Get the full room identifier.
      */
     public function getFullIdentifierAttribute(): string

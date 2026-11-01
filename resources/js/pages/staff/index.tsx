@@ -1,17 +1,11 @@
 import { Head, router } from '@inertiajs/react';
-import { MoreVertical, Pencil, Trash2, Eye, Users } from 'lucide-react';
+import { Pencil, Trash2, Users, Building2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePageHeader } from '@/components/table-page-header';
 import { TablePagination } from '@/components/table-pagination';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {
     Table,
     TableBody,
@@ -107,13 +101,16 @@ export default function Index({ data, filters }: StaffIndexProps) {
                                     Name
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
+                                    Department
+                                </TableHead>
+                                <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     Email
                                 </TableHead>
                                 <TableHead className="h-11 px-4 py-0 text-sm font-medium text-muted-foreground">
                                     Date Added
                                 </TableHead>
-                                <TableHead className="h-11 w-12 py-0 pl-4 pr-6">
-                                    <span className="sr-only">Actions</span>
+                                <TableHead className="h-11 w-24 py-0 pl-4 pr-6 text-right text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    Actions
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -121,7 +118,7 @@ export default function Index({ data, filters }: StaffIndexProps) {
                         <TableBody>
                             {data.data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="h-40 text-center">
+                                    <TableCell colSpan={5} className="h-40 text-center">
                                         <div className="flex flex-col items-center gap-3 text-muted-foreground">
                                             <div className="rounded-full bg-muted p-3">
                                                 <Users className="h-5 w-5 opacity-50" />
@@ -156,6 +153,24 @@ export default function Index({ data, filters }: StaffIndexProps) {
                                             </span>
                                         </TableCell>
 
+                                        <TableCell className="px-4 py-3.5 text-sm">
+                                            {item.department ? (
+                                                <Badge
+                                                    variant="outline"
+                                                    className="border-primary/20 bg-primary/5 text-primary text-xs font-normal gap-1"
+                                                >
+                                                    <Building2 className="h-3 w-3" />
+                                                    <span>
+                                                        {item.department.code} - {item.department.name}
+                                                    </span>
+                                                </Badge>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground italic">
+                                                    Unassigned
+                                                </span>
+                                            )}
+                                        </TableCell>
+
                                         <TableCell className="px-4 py-3.5 text-sm text-muted-foreground">
                                             {item.email}
                                         </TableCell>
@@ -165,39 +180,37 @@ export default function Index({ data, filters }: StaffIndexProps) {
                                         </TableCell>
 
                                         <TableCell
-                                            className="py-3.5 pl-4 pr-6"
+                                            className="py-3.5 pl-4 pr-6 text-right"
                                             onClick={(e) => e.stopPropagation()}
                                         >
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                                                    >
-                                                        <MoreVertical className="h-4 w-4" />
-                                                        <span className="sr-only">Open actions</span>
-                                                    </Button>
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent align="end" className="w-40">
-                                                    <DropdownMenuItem onClick={() => router.get(staffShow(item.id))}>
-                                                        <Eye className="mr-2 h-4 w-4" />
-                                                        View
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuItem onClick={() => router.get(staffEdit(item.id))}>
-                                                        <Pencil className="mr-2 h-4 w-4" />
-                                                        Edit
-                                                    </DropdownMenuItem>
-                                                    <DropdownMenuSeparator />
-                                                    <DropdownMenuItem
-                                                        onClick={() => setDeleteId(item.id)}
-                                                        className="text-destructive focus:bg-destructive/10 focus:text-destructive"
-                                                    >
-                                                        <Trash2 className="mr-2 h-4 w-4" />
-                                                        Delete
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
+                                            <div className="flex items-center justify-end gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
+                                                    title="Edit Faculty Staff"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.get(staffEdit(item.id));
+                                                    }}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                    <span className="sr-only">Edit</span>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                                    title="Delete Faculty Staff"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setDeleteId(item.id);
+                                                    }}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                    <span className="sr-only">Delete</span>
+                                                </Button>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))

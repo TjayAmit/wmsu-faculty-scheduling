@@ -12,17 +12,65 @@ export interface DraftScheduleSchedule {
         id: number;
         code: string;
         title: string;
+        units?: string | number;
+        description?: string | null;
     };
     semester: {
         id: number;
         name: string;
         academic_year: string;
+        semester_type?: string;
+        start_date?: string;
+        end_date?: string;
+        is_current?: boolean;
     };
+    classroom?: {
+        id: number;
+        building: string;
+        room_number: string;
+        room_name?: string | null;
+        capacity?: number;
+        room_type?: string;
+        equipment?: string[];
+        is_active?: boolean;
+    } | null;
+    room?: string | null;
+    section?: string | null;
+    time_slots?: Array<{
+        day: string;
+        time_slot_id: string | number;
+    }>;
 }
 
 export interface DraftScheduleTeacherAssignment {
     id: number;
     is_active: boolean;
+    teacher_id?: number;
+    schedule_id?: number;
+    assigned_at?: string | null;
+    assigned_by?: number | null;
+    assigned_by_user?: User | null;
+}
+
+export interface ResolvedTimeSlot {
+    day?: string | null;
+    time_slot_id?: string | number | null;
+    name?: string | null;
+    start_time?: string | null;
+    end_time?: string | null;
+}
+
+export interface GeneratedSession {
+    id: number;
+    scheduled_date: string;
+    day_of_week: string;
+    start_time: string;
+    end_time: string;
+    room?: string | null;
+    section?: string | null;
+    status: string;
+    is_holiday?: boolean;
+    holiday_name?: string | null;
 }
 
 export interface DraftSchedule {
@@ -87,6 +135,8 @@ export interface DraftSchedulesFormProps {
 
 export interface DraftSchedulesShowProps {
     draftSchedule: DraftSchedule;
+    resolvedTimeSlots?: ResolvedTimeSlot[];
+    generatedSessions?: GeneratedSession[];
 }
 
 export interface DraftSchedulesMyDraftsProps {

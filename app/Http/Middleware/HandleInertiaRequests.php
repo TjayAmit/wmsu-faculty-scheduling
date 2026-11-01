@@ -74,7 +74,7 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user()?->load('department'),
                 'roles' => $request->user()?->getRoleNames() ?? collect(),
                 'permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? collect(),
                 'unlinked_teachers' => $this->unlinkedTeachersForPrompt($request),

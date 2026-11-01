@@ -1,5 +1,16 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import {
+    ArrowLeft,
+    CheckCircle2,
+    DoorOpen,
+    Fingerprint,
+    Save,
+    Sparkles,
+    Users,
+    XCircle,
+} from 'lucide-react';
 import InputError from '@/components/input-error';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -13,190 +24,368 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import { index as classrooms, show as classroomsShow, update as classroomsUpdate } from '@/routes/classrooms';
-import type { ClassroomsFormProps } from '@/types';
+import {
+    index as classrooms,
+    show as classroomsShow,
+    update as classroomsUpdate,
+} from '@/routes/classrooms';
+import type { ClassroomsFormProps, RoomType } from '@/types';
 
-export default function Edit({ classroom, roomTypes }: ClassroomsFormProps) {
+const CAPACITY_PRESETS = ['30', '40', '45', '50', '60', '100'];
+
+const ROOM_TYPE_LABELS: Record<string, string> = {
+    classroom: 'Classroom / Lecture',
+    lab: 'Laboratory / Studio',
+    lecture_hall: 'Lecture Hall / Auditorium',
+    office: 'Faculty / Admin Office',
+};
+
+export default function Edit({ classroom, roomTypes = [] }: ClassroomsFormProps) {
     const { data, setData, put, processing, errors } = useForm({
         building: classroom?.building || '',
         room_number: classroom?.room_number || '',
         room_name: classroom?.room_name || '',
-        capacity: classroom?.capacity.toString() || '',
+        capacity: classroom?.capacity ? classroom.capacity.toString() : '40',
         room_type: classroom?.room_type || 'classroom',
-        equipment: classroom?.equipment || [],
+        equipment: (classroom?.equipment || []) as string[],
         is_active: classroom?.is_active ?? true,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
         if (classroom) {
             put(classroomsUpdate.url(classroom.id));
         }
     };
 
-    const addEquipment = () => {
-        setData('equipment', [...data.equipment, '']);
+    const getRoomTypeValue = (type: RoomType | string): string => {
+        return typeof type === 'string' ? type : type.value;
     };
 
-    const removeEquipment = (index: number) => {
-        setData('equipment', data.equipment.filter((_, i) => i !== index));
-    };
-
-    const updateEquipment = (index: number, value: string) => {
-        const newEquipment = [...data.equipment];
-        newEquipment[index] = value;
-        setData('equipment', newEquipment);
+    const getRoomTypeLabel = (type: RoomType | string): string => {
+        const val = getRoomTypeValue(type);
+        return (
+            ROOM_TYPE_LABELS[val] ||
+            (typeof type === 'object' && 'label' in type ? type.label : val)
+        );
     };
 
     return (
         <>
-            <Head title="Edit Classroom" />
+            <Head title={`Edit ${classroom?.building} - Rm ${classroom?.room_number}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 lg:p-6 w-full">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+                {/* Back Navigation */}
+                <div className="flex items-center justify-between">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        asChild
+                        className="-ml-2 text-muted-foreground hover:text-foreground"
+                    >
+                        <Link href={classroom ? classroomsShow(classroom.id) : classrooms()}>
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Back to {classroom ? 'Classroom Details' : 'Classrooms'}
+                        </Link>
+                    </Button>
+                </div>
+
+                {/* Page Title */}
                 <div className="space-y-1">
                     <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                        Edit Classroom
+                        Edit Classroom Specifications
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        Update classroom location details, room designation, and facility parameters.
+                        Update venue location, seating capacity, and operational status for {classroom?.building} - Rm {classroom?.room_number}.
                     </p>
                 </div>
 
-                <Card className="w-full">
-                    <CardHeader>
-                        <CardTitle>Classroom Specifications</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="building">Building</Label>
-                                    <Input
-                                        id="building"
-                                        value={data.building}
-                                        onChange={(e) => setData('building', e.target.value)}
-                                        placeholder="e.g., Main Building"
-                                        required
-                                    />
-                                    <InputError message={errors.building} />
+                {/* 2-Column Responsive Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Form Column */}
+                    <div className="lg:col-span-7 xl:col-span-8">
+                        <Card className="shadow-sm">
+                            <CardHeader className="pb-3 border-b border-border/60 bg-muted/20">
+                                <div className="flex items-center gap-2">
+                                    <DoorOpen className="h-4 w-4 text-primary" />
+                                    <CardTitle className="text-base font-semibold">Facility & Room Specifications</CardTitle>
                                 </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="room_number">Room Number</Label>
-                                    <Input
-                                        id="room_number"
-                                        value={data.room_number}
-                                        onChange={(e) => setData('room_number', e.target.value)}
-                                        placeholder="e.g., 101"
-                                        required
-                                    />
-                                    <InputError message={errors.room_number} />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="room_name">Room Name (Optional)</Label>
-                                <Input
-                                    id="room_name"
-                                    value={data.room_name}
-                                    onChange={(e) => setData('room_name', e.target.value)}
-                                    placeholder="e.g., Computer Lab A"
-                                />
-                                <InputError message={errors.room_name} />
-                            </div>
-
-                            <div className="grid gap-6 md:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label htmlFor="capacity">Capacity</Label>
-                                    <Input
-                                        id="capacity"
-                                        type="number"
-                                        min="1"
-                                        max="500"
-                                        value={data.capacity}
-                                        onChange={(e) => setData('capacity', e.target.value)}
-                                        placeholder="e.g., 40"
-                                        required
-                                    />
-                                    <InputError message={errors.capacity} />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="room_type">Room Type</Label>
-                                    <Select
-                                        value={data.room_type}
-                                        onValueChange={(value) => setData('room_type', value)}
-                                    >
-                                        <SelectTrigger id="room_type">
-                                            <SelectValue placeholder="Select room type" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {roomTypes?.map((type) => (
-                                                <SelectItem key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <InputError message={errors.room_type} />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Equipment</Label>
-                                <div className="space-y-2">
-                                    {data.equipment.map((item, index) => (
-                                        <div key={index} className="flex items-center gap-2">
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                <form onSubmit={handleSubmit} className="space-y-5">
+                                    {/* Building & Room Number */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="building" className="text-xs font-semibold">
+                                                Building / Campus Hall <span className="text-destructive">*</span>
+                                            </Label>
                                             <Input
-                                                value={item}
-                                                onChange={(e) => updateEquipment(index, e.target.value)}
-                                                placeholder="e.g., Projector, Whiteboard"
+                                                id="building"
+                                                value={data.building}
+                                                onChange={(e) => setData('building', e.target.value)}
+                                                placeholder="e.g., Education Building"
+                                                required
+                                                className="text-sm"
                                             />
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => removeEquipment(index)}
-                                            >
-                                                Remove
-                                            </Button>
+                                            <p className="text-[11px] text-muted-foreground">
+                                                Facility name or academic building location.
+                                            </p>
+                                            <InputError message={errors.building} />
                                         </div>
-                                    ))}
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={addEquipment}
-                                    >
-                                        + Add Equipment
-                                    </Button>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="room_number" className="text-xs font-semibold">
+                                                Room Number <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Input
+                                                id="room_number"
+                                                value={data.room_number}
+                                                onChange={(e) => setData('room_number', e.target.value)}
+                                                placeholder="e.g., 101, 203, Lab 1"
+                                                required
+                                                className="font-mono text-sm"
+                                            />
+                                            <p className="text-[11px] text-muted-foreground">
+                                                Unique number/code within the building.
+                                            </p>
+                                            <InputError message={errors.room_number} />
+                                        </div>
+                                    </div>
+
+                                    {/* Room Name & Room Type */}
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="room_name" className="text-xs font-semibold">
+                                                Designated Room Name (Optional)
+                                            </Label>
+                                            <Input
+                                                id="room_name"
+                                                value={data.room_name}
+                                                onChange={(e) => setData('room_name', e.target.value)}
+                                                placeholder="e.g., Educational Technology & Media Lab"
+                                                className="text-sm"
+                                            />
+                                            <p className="text-[11px] text-muted-foreground">
+                                                Custom title for specialized laboratories or lecture halls.
+                                            </p>
+                                            <InputError message={errors.room_name} />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label htmlFor="room_type" className="text-xs font-semibold">
+                                                Room Classification <span className="text-destructive">*</span>
+                                            </Label>
+                                            <Select
+                                                value={data.room_type}
+                                                onValueChange={(value) => setData('room_type', value)}
+                                            >
+                                                <SelectTrigger id="room_type" className="text-sm">
+                                                    <SelectValue placeholder="Select classification" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {roomTypes.map((type) => {
+                                                        const val = getRoomTypeValue(type);
+                                                        return (
+                                                            <SelectItem key={val} value={val} className="cursor-pointer">
+                                                                {getRoomTypeLabel(type)}
+                                                            </SelectItem>
+                                                        );
+                                                    })}
+                                                </SelectContent>
+                                            </Select>
+                                            <p className="text-[11px] text-muted-foreground">
+                                                Classroom, laboratory, lecture hall, or department office.
+                                            </p>
+                                            <InputError message={errors.room_type} />
+                                        </div>
+                                    </div>
+
+                                    {/* Capacity with Quick Presets */}
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <Label htmlFor="capacity" className="text-xs font-semibold">
+                                                Student Seating Capacity <span className="text-destructive">*</span>
+                                            </Label>
+                                            <span className="text-[11px] text-muted-foreground">
+                                                Range: 1 – 500 seats
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                                            <div className="w-full sm:w-44">
+                                                <Input
+                                                    id="capacity"
+                                                    type="number"
+                                                    min="1"
+                                                    max="500"
+                                                    value={data.capacity}
+                                                    onChange={(e) => setData('capacity', e.target.value)}
+                                                    placeholder="40"
+                                                    required
+                                                    className="text-sm"
+                                                />
+                                            </div>
+                                            {/* Capacity Quick Presets */}
+                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                <span className="text-[11px] text-muted-foreground mr-1">Presets:</span>
+                                                {CAPACITY_PRESETS.map((cap) => (
+                                                    <button
+                                                        key={cap}
+                                                        type="button"
+                                                        onClick={() => setData('capacity', cap)}
+                                                        className={`text-[11px] px-2.5 py-1 rounded border transition-colors ${
+                                                            data.capacity === cap
+                                                                ? 'bg-primary text-primary-foreground border-primary font-semibold'
+                                                                : 'bg-muted/40 border-border text-muted-foreground hover:bg-muted'
+                                                        }`}
+                                                    >
+                                                        {cap}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <InputError message={errors.capacity} />
+                                    </div>
+
+                                    {/* Active Checkbox Banner */}
+                                    <div className="rounded-lg border border-border bg-muted/20 p-3.5 flex items-start gap-3">
+                                        <Checkbox
+                                            id="is_active"
+                                            checked={data.is_active}
+                                            onCheckedChange={(checked) => setData('is_active', checked as boolean)}
+                                            className="mt-0.5"
+                                        />
+                                        <div className="space-y-0.5">
+                                            <Label htmlFor="is_active" className="text-xs font-semibold cursor-pointer">
+                                                Active Classroom Facility
+                                            </Label>
+                                            <p className="text-[11px] text-muted-foreground">
+                                                When enabled, this classroom is available for timetable scheduling, room conflict detection, and biometric device assignment.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex items-center gap-3 pt-3 border-t border-border/60">
+                                        <Button
+                                            type="submit"
+                                            disabled={processing}
+                                            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm text-xs font-medium"
+                                        >
+                                            <Save className="mr-1.5 h-4 w-4" />
+                                            {processing ? 'Saving Changes…' : 'Save Changes'}
+                                        </Button>
+                                        <Button variant="outline" size="sm" asChild className="text-xs">
+                                            <Link href={classroom ? classroomsShow(classroom.id) : classrooms()}>
+                                                Cancel
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Sidebar: Live Facility Preview & Device Integration */}
+                    <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+                        {/* Live Classroom Preview Card */}
+                        <Card className="shadow-sm border-dashed">
+                            <CardHeader className="pb-3 border-b border-border/60 bg-muted/20">
+                                <div className="flex items-center gap-2">
+                                    <Sparkles className="h-4 w-4 text-primary" />
+                                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                        Live Facility Preview
+                                    </CardTitle>
                                 </div>
-                                <InputError message={errors.equipment} />
-                            </div>
+                            </CardHeader>
+                            <CardContent className="pt-4 space-y-3">
+                                <div className="rounded-lg border border-border bg-card p-4 space-y-3 shadow-2xs">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <Badge
+                                            variant="outline"
+                                            className="text-xs capitalize font-medium border-primary/20 bg-primary/5 text-primary"
+                                        >
+                                            {ROOM_TYPE_LABELS[data.room_type] || data.room_type}
+                                        </Badge>
+                                        {data.is_active ? (
+                                            <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 text-[10px] h-5 px-1.5 gap-1 shadow-none">
+                                                <CheckCircle2 className="h-3 w-3" />
+                                                Active
+                                            </Badge>
+                                        ) : (
+                                            <Badge variant="outline" className="text-[10px] h-5 px-1.5 gap-1">
+                                                <XCircle className="h-3 w-3" />
+                                                Inactive
+                                            </Badge>
+                                        )}
+                                    </div>
 
-                            <div className="flex items-center space-x-2">
-                                <Checkbox
-                                    id="is_active"
-                                    checked={data.is_active}
-                                    onCheckedChange={(checked) => setData('is_active', checked as boolean)}
-                                />
-                                <Label htmlFor="is_active" className="text-sm font-normal">
-                                    Active classroom
-                                </Label>
-                            </div>
+                                    <div>
+                                        <h4 className="font-semibold text-base text-foreground leading-snug">
+                                            {data.building.trim() || 'Building Name'}
+                                            {data.room_number.trim()
+                                                ? ` - Rm ${data.room_number}`
+                                                : ' - Room TBA'}
+                                        </h4>
+                                        <p className="text-xs text-muted-foreground mt-0.5">
+                                            {data.room_name.trim() || 'Standard Academic Lecture Space'}
+                                        </p>
+                                    </div>
 
-                            <div className="flex items-center gap-4 pt-4">
-                                <Button type="submit" disabled={processing}>
-                                    {processing ? 'Saving...' : 'Save Changes'}
-                                </Button>
-                                <Button variant="outline" asChild>
-                                    <Link href={classroom ? classroomsShow(classroom.id) : classrooms()}>Cancel</Link>
-                                </Button>
-                            </div>
-                        </form>
-                    </CardContent>
-                </Card>
+                                    <div className="flex items-center justify-between pt-2 border-t border-border/60 text-xs">
+                                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                                            <Users className="h-3.5 w-3.5" />
+                                            <span>
+                                                Capacity:{' '}
+                                                <strong className="text-foreground">
+                                                    {data.capacity || '40'} seats
+                                                </strong>
+                                            </span>
+                                        </span>
+                                        <span className="text-[11px] text-muted-foreground font-mono">
+                                            WMSU Campus
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <p className="text-[11px] text-muted-foreground text-center">
+                                    Simulation of how this room card appears in timetable scheduling and campus directory views.
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        {/* Attendance & Biometric Integration Guidelines */}
+                        <Card className="shadow-sm">
+                            <CardHeader className="pb-3 border-b border-border/60 bg-muted/20">
+                                <div className="flex items-center gap-2">
+                                    <Fingerprint className="h-4 w-4 text-primary" />
+                                    <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                        Campus Hardware Integration
+                                    </CardTitle>
+                                </div>
+                            </CardHeader>
+                            <CardContent className="pt-3.5 space-y-3 text-xs text-muted-foreground leading-relaxed">
+                                <div className="flex items-start gap-2">
+                                    <span className="font-bold text-primary shrink-0">•</span>
+                                    <span>
+                                        <strong className="text-foreground">Biometric Tracking:</strong> This room can be linked with physical ZKTeco attendance devices in the <Link href="/zkteco/devices" className="text-primary hover:underline font-medium">ZKTeco Devices</Link> module.
+                                    </span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                    <span className="font-bold text-primary shrink-0">•</span>
+                                    <span>
+                                        <strong className="text-foreground">Conflict Prevention:</strong> System automatically monitors time slot overlaps to prevent double-booking room venues.
+                                    </span>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                    <span className="font-bold text-primary shrink-0">•</span>
+                                    <span>
+                                        <strong className="text-foreground">Seating Allocation:</strong> Course sections assigned to this room should not exceed the registered student seating capacity.
+                                    </span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
             </div>
         </>
     );

@@ -4,6 +4,12 @@ export interface Program {
     name: string;
     degree_level: string;
     full_name?: string;
+    department_id?: number;
+    department?: {
+        id: number;
+        code: string;
+        name: string;
+    };
 }
 
 export interface CurriculumSubject {
@@ -51,8 +57,10 @@ export interface CurriculaIndexProps {
     };
     filters: {
         search?: string;
+        department_id?: string | number;
         per_page?: number;
     };
+    departments?: Array<{ id: number; code: string; name: string }>;
     programs: Program[];
     subjects: CurriculumSubject[];
     stats?: CurriculaStats;
@@ -60,6 +68,7 @@ export interface CurriculaIndexProps {
 
 export interface CurriculaFormProps {
     curriculum?: Curriculum;
+    departments?: Array<{ id: number; code: string; name: string }>;
     programs: Program[];
     subjects: CurriculumSubject[];
     semesterTypes: SemesterType[];

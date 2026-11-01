@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['teacher_id', 'schedule_id', 'status', 'notes', 'reviewed_by', 'reviewed_at', 'review_comments', 'submitted_at', 'teacher_assignment_id'])]
@@ -45,6 +46,14 @@ class DraftSchedule extends Model
     public function teacherAssignment(): BelongsTo
     {
         return $this->belongsTo(TeacherAssignment::class, 'teacher_assignment_id');
+    }
+
+    /**
+     * Get the generated teacher schedule sessions for this draft.
+     */
+    public function teacherSchedules(): HasMany
+    {
+        return $this->hasMany(TeacherSchedule::class);
     }
 
     /**

@@ -17,6 +17,8 @@ class Semester extends Model
     /** @use HasFactory<SemesterFactory> */
     use HasFactory, SoftDeletes;
 
+    protected $appends = ['year'];
+
     #[Cast(type: SemesterType::class)]
     protected SemesterType|string $semester_type;
 
@@ -28,6 +30,14 @@ class Semester extends Model
 
     #[Cast(type: 'boolean')]
     protected $is_current;
+
+    /**
+     * Get the year (alias for academic_year).
+     */
+    public function getYearAttribute(): string
+    {
+        return $this->academic_year ?? '';
+    }
 
     /**
      * Get the schedules for the semester.

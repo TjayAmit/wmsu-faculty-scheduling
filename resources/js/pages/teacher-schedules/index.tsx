@@ -1,15 +1,20 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeft,
     BookOpen,
     Calendar,
+    CalendarDays,
+    ChevronLeft,
     ChevronRight,
     Clock,
     FileText,
+    LayoutGrid,
     MapPin,
     Users,
+    CheckCircle2,
+    ArrowRight,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,6 +27,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import {
     index as teacherSchedules,
     show as teacherSchedulesShow,
@@ -31,6 +37,7 @@ import type {
     SubjectSummary,
     SessionSummary,
     SessionsPaginated,
+    CalendarScheduleItem,
 } from '@/types';
 import {
     teacherScheduleStatusOptions,
@@ -39,11 +46,10 @@ import {
     dayLabels,
 } from '@/types/teacherSchedules';
 
-// ─── helpers ────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Parses a bare H:i:s time string into a display string like "8:00 AM". */
 function formatTime(timeStr: string): string {
-    // timeStr arrives as "08:00:00" from the backend
     const date = new Date(`1970-01-01T${timeStr}`);
 
     return date.toLocaleTimeString('en-US', {
@@ -61,6 +67,16 @@ function formatShortDate(dateStr: string): string {
     });
 }
 
+/** Formats a Date object to YYYY-MM-DD */
+function toDateStr(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/** Check if two dates represent the same calendar day */
+function sameDay(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
 /** Comma-separated day abbreviations like "Mon, Wed". */
 function formatDays(days: string[]): string {
     const abbr: Record<string, string> = {
@@ -76,7 +92,430 @@ function formatDays(days: string[]): string {
     return days.map((d) => abbr[d] ?? d).join(', ');
 }
 
-// ─── subject card ────────────────────────────────────────────────────────────
+// ─── Calendar Month Grid Component ───────────────────────────────────────────
+
+function TeacherCalendarGrid({
+    year,
+    month,
+    selectedDate,
+    datesWithClasses,
+    holidayDates,
+    onSelectDate,
+    onPrevMonth,
+    onNextMonth,
+    onToday,
+}: {
+    year: number;
+    month: number;
+    selectedDate: Date;
+    datesWithClasses: Map<string, number>;
+    holidayDates: Set<string>;
+    onSelectDate: (d: Date) => void;
+    onPrevMonth: () => void;
+    onNextMonth: () => void;
+    onToday: () => void;
+}) {
+    const today = new Date();
+    const firstDow = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const isCurrentCalMonth = year === today.getFullYear() && month === today.getMonth();
+
+    const cells: (number | null)[] = [
+        ...Array(firstDow).fill(null),
+        ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+    ];
+
+    while (cells.length % 7 !== 0) {
+        cells.push(null);
+    }
+
+    const monthLabel = new Date(year, month, 1).toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric',
+    });
+
+    return (
+        <div className="flex flex-col h-full">
+            {/* Header / Month Navigation */}
+            <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-base font-bold text-foreground">
+                    {monthLabel}
+                </h2>
+                <div className="flex items-center gap-1.5">
+                    {!isCurrentCalMonth && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-7 px-2.5 text-xs font-medium"
+                            onClick={onToday}
+                        >
+                            Today
+                        </Button>
+                    )}
+                    <button
+                        type="button"
+                        onClick={onPrevMonth}
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        aria-label="Previous month"
+                    >
+                        <ChevronLeft className="h-4 w-4" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onNextMonth}
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        aria-label="Next month"
+                    >
+                        <ChevronRight className="h-4 w-4" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Day of Week Headers */}
+            <div className="mb-2 grid grid-cols-7 border-b border-border/60 pb-2">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => (
+                    <div
+                        key={d}
+                        className="text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+                    >
+                        {d}
+                    </div>
+                ))}
+            </div>
+
+            {/* Calendar Days Matrix */}
+            <div className="grid grid-cols-7 gap-y-1">
+                {cells.map((day, i) => {
+                    if (!day) {
+                        return <div key={`empty-${i}`} className="h-11" />;
+                    }
+
+                    const date = new Date(year, month, day);
+                    const dateStr = toDateStr(date);
+                    const isSel = sameDay(date, selectedDate);
+                    const isToday = sameDay(date, today);
+                    const classCount = datesWithClasses.get(dateStr) || 0;
+                    const isHoliday = holidayDates.has(dateStr);
+
+                    return (
+                        <div key={`day-${day}`} className="flex flex-col items-center py-0.5">
+                            <button
+                                type="button"
+                                onClick={() => onSelectDate(date)}
+                                className={cn(
+                                    'relative flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold transition-all',
+                                    isSel
+                                        ? 'bg-[#800000] text-white shadow-sm ring-2 ring-[#800000]/30'
+                                        : isToday
+                                        ? 'ring-2 ring-[#800000] text-[#800000] dark:text-primary font-bold hover:bg-muted'
+                                        : 'text-foreground hover:bg-muted/60',
+                                )}
+                                aria-label={`Select ${dateStr}`}
+                            >
+                                {day}
+                                {classCount > 0 && !isSel && (
+                                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-primary/10 px-1 text-[9px] font-bold text-primary">
+                                        {classCount}
+                                    </span>
+                                )}
+                            </button>
+
+                            {/* Dot Indicators */}
+                            <div className="mt-1 flex h-2 items-center justify-center gap-1">
+                                {classCount > 0 && (
+                                    <span
+                                        className={cn(
+                                            'h-1.5 w-1.5 rounded-full',
+                                            isSel ? 'bg-primary' : 'bg-primary/80',
+                                        )}
+                                        title={`${classCount} classes scheduled`}
+                                    />
+                                )}
+                                {isHoliday && (
+                                    <span
+                                        className="h-1.5 w-1.5 rounded-full bg-amber-500"
+                                        title="Holiday"
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Legend */}
+            <div className="mt-auto flex items-center justify-between border-t border-border/70 pt-3 text-[11px] text-muted-foreground flex-wrap gap-2">
+                <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-primary" />
+                        Classes Scheduled
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                        <span className="h-2 w-2 rounded-full bg-amber-500" />
+                        Holiday
+                    </span>
+                </div>
+                <span>Click any date to view daily timetable</span>
+            </div>
+        </div>
+    );
+}
+
+// ─── Selected Day Schedule Panel (Right Pane) ────────────────────────────────
+
+function SelectedDaySchedulePanel({
+    selectedDate,
+    schedules,
+}: {
+    selectedDate: Date;
+    schedules: CalendarScheduleItem[];
+}) {
+    const today = new Date();
+    const isToday = sameDay(selectedDate, today);
+
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+    }).format(selectedDate);
+
+    return (
+        <div className="flex flex-col h-full space-y-3">
+            {/* Header */}
+            <div className="flex items-start justify-between border-b border-border/70 pb-3 gap-2">
+                <div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Selected Day Timetable
+                        </span>
+                        {isToday && (
+                            <Badge variant="outline" className="text-[10px] h-4 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30 font-semibold">
+                                Today
+                            </Badge>
+                        )}
+                    </div>
+                    <h3 className="text-base font-bold text-foreground mt-0.5">
+                        {formattedDate}
+                    </h3>
+                </div>
+
+                <Badge variant="secondary" className="font-mono text-xs h-6 px-2 shrink-0">
+                    {schedules.length} {schedules.length === 1 ? 'class' : 'classes'}
+                </Badge>
+            </div>
+
+            {/* Schedule List */}
+            {schedules.length === 0 ? (
+                <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center text-muted-foreground">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+                        <Calendar className="h-6 w-6 text-muted-foreground/40" />
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-sm font-semibold text-foreground">No Classes Scheduled</p>
+                        <p className="text-xs text-muted-foreground max-w-[240px]">
+                            You have no teaching sessions assigned on {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                    {schedules.map((item) => {
+                        const statusVariant = getTeacherScheduleStatusVariant(item.status);
+                        const statusLabel = getTeacherScheduleStatusLabel(item.status);
+
+                        return (
+                            <Card
+                                key={item.id}
+                                className="overflow-hidden border border-border/80 bg-card p-3.5 shadow-2xs hover:border-primary/40 transition-colors"
+                            >
+                                <div className="space-y-2.5">
+                                    {/* Row 1: Time, Section, and Status */}
+                                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                                        <div className="flex items-center gap-1.5 font-bold text-xs text-primary">
+                                            <Clock className="size-3.5 shrink-0" />
+                                            <span>
+                                                {formatTime(item.start_time)} – {formatTime(item.end_time)}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-1.5">
+                                            {item.section && (
+                                                <Badge variant="outline" className="text-[10px] h-4.5 font-mono bg-background">
+                                                    {item.section}
+                                                </Badge>
+                                            )}
+                                            <Badge variant={statusVariant} className="text-[10px] h-4.5 font-medium capitalize">
+                                                {statusLabel}
+                                            </Badge>
+                                        </div>
+                                    </div>
+
+                                    {/* Row 2: Subject Info */}
+                                    <div>
+                                        <h4 className="text-sm font-bold text-foreground line-clamp-1">
+                                            {item.subject_code} — {item.subject_title}
+                                        </h4>
+                                    </div>
+
+                                    {/* Row 3: Room and Semester */}
+                                    <div className="flex items-center justify-between border-t border-border/40 pt-2 text-xs text-muted-foreground flex-wrap gap-2">
+                                        <div className="flex items-center gap-3">
+                                            <span className="flex items-center gap-1 font-medium text-foreground">
+                                                <MapPin className="size-3 text-muted-foreground" />
+                                                {item.room ? `Room ${item.room}` : 'No room assigned'}
+                                            </span>
+                                            {item.semester_name && (
+                                                <span className="flex items-center gap-1">
+                                                    <BookOpen className="size-3 text-muted-foreground" />
+                                                    {item.semester_name}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <Link
+                                            href={teacherSchedulesShow(item.id).url}
+                                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
+                                        >
+                                            <span>View Details</span>
+                                            <ArrowRight className="size-3" />
+                                        </Link>
+                                    </div>
+
+                                    {/* Holiday or Notes */}
+                                    {item.is_holiday && (
+                                        <div className="rounded bg-amber-500/10 px-2 py-1 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                                            Holiday: {item.holiday_name || 'Official School Holiday'}
+                                        </div>
+                                    )}
+                                </div>
+                            </Card>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
+    );
+}
+
+// ─── Main Teacher Calendar View (Left: Calendar, Right: Daily Timetable) ─────
+
+function TeacherCalendarView({
+    calendarSchedules = [],
+    subjects = [],
+}: {
+    calendarSchedules: CalendarScheduleItem[];
+    subjects: SubjectSummary[];
+}) {
+    const today = new Date();
+    const [selectedDate, setSelectedDate] = useState<Date>(today);
+    const [viewMonth, setViewMonth] = useState<{ year: number; month: number }>(() => ({
+        year: today.getFullYear(),
+        month: today.getMonth(),
+    }));
+
+    // Pre-index schedules by date string (YYYY-MM-DD)
+    const schedulesByDate = useMemo(() => {
+        const map = new Map<string, CalendarScheduleItem[]>();
+
+        for (const s of calendarSchedules) {
+            const arr = map.get(s.scheduled_date) || [];
+            arr.push(s);
+            map.set(s.scheduled_date, arr);
+        }
+
+        return map;
+    }, [calendarSchedules]);
+
+    // Map dates to class counts
+    const datesWithClasses = useMemo(() => {
+        const map = new Map<string, number>();
+
+        for (const [dateStr, list] of schedulesByDate.entries()) {
+            map.set(dateStr, list.length);
+        }
+
+        return map;
+    }, [schedulesByDate]);
+
+    // Track holiday dates
+    const holidayDates = useMemo(() => {
+        const set = new Set<string>();
+
+        for (const s of calendarSchedules) {
+            if (s.is_holiday) {
+                set.add(s.scheduled_date);
+            }
+        }
+
+        return set;
+    }, [calendarSchedules]);
+
+    // Schedules for currently selected date
+    const selectedDateStr = toDateStr(selectedDate);
+    const selectedDaySchedules = useMemo(
+        () => schedulesByDate.get(selectedDateStr) || [],
+        [schedulesByDate, selectedDateStr],
+    );
+
+    const handlePrevMonth = () => {
+        setViewMonth((prev) => {
+            if (prev.month === 0) {
+                return { year: prev.year - 1, month: 11 };
+            }
+
+            return { year: prev.year, month: prev.month - 1 };
+        });
+    };
+
+    const handleNextMonth = () => {
+        setViewMonth((prev) => {
+            if (prev.month === 11) {
+                return { year: prev.year + 1, month: 0 };
+            }
+
+            return { year: prev.year, month: prev.month + 1 };
+        });
+    };
+
+    const handleToday = () => {
+        setViewMonth({ year: today.getFullYear(), month: today.getMonth() });
+        setSelectedDate(today);
+    };
+
+    return (
+        <Card className="gap-0 py-0 overflow-hidden shadow-xs border-border">
+            <CardContent className="p-0">
+                <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-12 lg:divide-x lg:divide-y-0">
+                    {/* Left Pane (Calendar): 7 Columns on Desktop */}
+                    <div className="p-5 lg:col-span-7">
+                        <TeacherCalendarGrid
+                            year={viewMonth.year}
+                            month={viewMonth.month}
+                            selectedDate={selectedDate}
+                            datesWithClasses={datesWithClasses}
+                            holidayDates={holidayDates}
+                            onSelectDate={setSelectedDate}
+                            onPrevMonth={handlePrevMonth}
+                            onNextMonth={handleNextMonth}
+                            onToday={handleToday}
+                        />
+                    </div>
+
+                    {/* Right Pane (Daily Schedule): 5 Columns on Desktop */}
+                    <div className="bg-muted/10 p-5 lg:col-span-5">
+                        <SelectedDaySchedulePanel
+                            selectedDate={selectedDate}
+                            schedules={selectedDaySchedules}
+                        />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
+
+// ─── Subject Card (For alternative Subjects Grid view) ───────────────────────
 
 interface SubjectCardProps {
     subject: SubjectSummary;
@@ -148,15 +587,10 @@ function SubjectCard({ subject }: SubjectCardProps) {
                             <Badge variant="destructive" className="text-xs h-4 px-1.5">{subject.cancelled} cancelled</Badge>
                         )}
                         {subject.postponed > 0 && (
-                            <Badge variant="outline" className="text-xs h-4 px-1.5">{subject.postponed} postponed</Badge>
+                            <Badge variant="outline" className="text-xs h-4 px-1.5 text-amber-600 border-amber-400">{subject.postponed} postponed</Badge>
                         )}
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-primary font-medium shrink-0 group-hover:gap-2 transition-all">
-                        {subject.next_session && (
-                            <span className="text-muted-foreground font-normal">
-                                Next {formatShortDate(subject.next_session)} ·{' '}
-                            </span>
-                        )}
+                    <div className="flex items-center gap-1 text-xs text-primary font-medium group-hover:underline">
                         View sessions
                         <ChevronRight className="h-3.5 w-3.5" />
                     </div>
@@ -166,23 +600,11 @@ function SubjectCard({ subject }: SubjectCardProps) {
     );
 }
 
-// ─── subjects view ───────────────────────────────────────────────────────────
+// ─── Subjects View (Grid of Cards) ───────────────────────────────────────────
 
-interface SubjectsViewProps {
-    subjects: SubjectSummary[];
-}
-
-function SubjectsView({ subjects }: SubjectsViewProps) {
+function SubjectsView({ subjects }: { subjects: SubjectSummary[] }) {
     return (
-        <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
-            {/* page header */}
-            <div className="space-y-1.5">
-                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">My Schedule</h1>
-                <p className="text-sm text-muted-foreground">
-                    {subjects.length} {subjects.length === 1 ? 'subject' : 'subjects'} enrolled for this academic term.
-                </p>
-            </div>
-
+        <div>
             {subjects.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-4 py-20 text-muted-foreground">
                     <div className="rounded-full bg-muted p-4">
@@ -204,7 +626,7 @@ function SubjectsView({ subjects }: SubjectsViewProps) {
     );
 }
 
-// ─── sessions view ───────────────────────────────────────────────────────────
+// ─── Sessions View (For specific subject drilled-down view) ────────────────────
 
 interface SessionRowProps {
     session: SessionSummary;
@@ -345,7 +767,7 @@ function SessionsView({ sessions, subject, filters }: SessionsViewProps) {
                     className="gap-1.5 -ml-2"
                 >
                     <ArrowLeft className="h-4 w-4" />
-                    Back to subjects
+                    Back to My Schedule
                 </Button>
             </div>
 
@@ -456,16 +878,16 @@ function SessionsView({ sessions, subject, filters }: SessionsViewProps) {
     );
 }
 
-// ─── page ────────────────────────────────────────────────────────────────────
+// ─── Main Page Entry ─────────────────────────────────────────────────────────
 
 export default function Index(props: TeacherSchedulesIndexProps) {
     const { mode } = props;
+    const [viewMode, setViewMode] = useState<'calendar' | 'subjects'>('calendar');
 
-    return (
-        <>
-            <Head title="My Schedule" />
-
-            {mode === 'sessions' ? (
+    if (mode === 'sessions') {
+        return (
+            <>
+                <Head title="Course Sessions" />
                 <SessionsView
                     sessions={props.sessions ?? { data: [], total: 0, current_page: 1, last_page: 1, per_page: 15, from: null, to: null }}
                     subject={props.subject ?? {
@@ -481,16 +903,71 @@ export default function Index(props: TeacherSchedulesIndexProps) {
                     }}
                     filters={props.filters}
                 />
-            ) : mode === 'subjects' ? (
-                <SubjectsView subjects={props.subjects ?? []} />
-            ) : (
-                // Admin fallback — the old flat table experience is preserved by the
-                // backend returning mode-less props; render a minimal notice so the
-                // page doesn't crash if somehow reached without schedules.
-                <div className="p-6 text-sm text-muted-foreground">
-                    Admin schedule view — use the admin panel.
+            </>
+        );
+    }
+
+    const subjects = props.subjects ?? [];
+    const calendarSchedules = props.calendar_schedules ?? [];
+
+    return (
+        <>
+            <Head title="My Schedule" />
+
+            <div className="flex h-full flex-1 flex-col gap-5 p-4 lg:p-6 w-full">
+                {/* Page Header with View Switcher */}
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="space-y-1">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                            My Schedule
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            {subjects.length} {subjects.length === 1 ? 'subject' : 'subjects'} enrolled · {calendarSchedules.length} teaching sessions across the term.
+                        </p>
+                    </div>
+
+                    {/* View Switcher Pills */}
+                    <div className="flex items-center rounded-lg border border-border bg-muted/40 p-1 shrink-0">
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('calendar')}
+                            className={cn(
+                                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all',
+                                viewMode === 'calendar'
+                                    ? 'bg-background text-foreground shadow-2xs'
+                                    : 'text-muted-foreground hover:text-foreground',
+                            )}
+                        >
+                            <CalendarDays className="size-3.5" />
+                            <span>Calendar & Daily Schedule</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => setViewMode('subjects')}
+                            className={cn(
+                                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all',
+                                viewMode === 'subjects'
+                                    ? 'bg-background text-foreground shadow-2xs'
+                                    : 'text-muted-foreground hover:text-foreground',
+                            )}
+                        >
+                            <LayoutGrid className="size-3.5" />
+                            <span>By Subject ({subjects.length})</span>
+                        </button>
+                    </div>
                 </div>
-            )}
+
+                {/* View Content */}
+                {viewMode === 'calendar' ? (
+                    <TeacherCalendarView
+                        calendarSchedules={calendarSchedules}
+                        subjects={subjects}
+                    />
+                ) : (
+                    <SubjectsView subjects={subjects} />
+                )}
+            </div>
         </>
     );
 }

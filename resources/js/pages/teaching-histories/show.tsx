@@ -17,7 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import { index as teachingHistories, edit as teachingHistoriesEdit, destroy as teachingHistoriesDestroy, archive as teachingHistoriesArchive } from '@/routes/teaching-histories';
 import type { TeachingHistoriesShowProps } from '@/types';
 
-export default function Show({ teachingHistory }: TeachingHistoriesShowProps) {
+export default function Show({ teachingHistory, isTeacherRole = false, canManage = true }: TeachingHistoriesShowProps) {
     const [showDelete, setShowDelete] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -51,7 +51,7 @@ export default function Show({ teachingHistory }: TeachingHistoriesShowProps) {
 
     return (
         <>
-            <Head title={`Teaching History - ${teachingHistory.subject?.name || 'Details'}`} />
+            <Head title={`Teaching History - ${teachingHistory.subject?.title || teachingHistory.subject?.name || 'Details'}`} />
 
             <div className="flex h-full flex-1 flex-col gap-4 p-4">
                 <div>
@@ -71,28 +71,30 @@ export default function Show({ teachingHistory }: TeachingHistoriesShowProps) {
                                 <Badge variant="secondary">Archived</Badge>
                             )}
                         </div>
-                        <div className="flex items-center gap-2">
-                            {!teachingHistory.archived_at && (
-                                <Button variant="outline" size="sm" onClick={handleArchive}>
-                                    <Archive className="mr-2 h-4 w-4" />
-                                    Archive
+                        {!isTeacherRole && canManage && (
+                            <div className="flex items-center gap-2">
+                                {!teachingHistory.archived_at && (
+                                    <Button variant="outline" size="sm" onClick={handleArchive}>
+                                        <Archive className="mr-2 h-4 w-4" />
+                                        Archive
+                                    </Button>
+                                )}
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={teachingHistoriesEdit(teachingHistory.id)}>
+                                        <Pencil className="mr-2 h-4 w-4" />
+                                        Edit
+                                    </Link>
                                 </Button>
-                            )}
-                            <Button asChild variant="outline" size="sm">
-                                <Link href={teachingHistoriesEdit(teachingHistory.id)}>
-                                    <Pencil className="mr-2 h-4 w-4" />
-                                    Edit
-                                </Link>
-                            </Button>
-                            <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => setShowDelete(true)}
-                            >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                            </Button>
-                        </div>
+                                <Button
+                                    variant="destructive"
+                                    size="sm"
+                                    onClick={() => setShowDelete(true)}
+                                >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Delete
+                                </Button>
+                            </div>
+                        )}
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-1">
@@ -108,7 +110,7 @@ export default function Show({ teachingHistory }: TeachingHistoriesShowProps) {
                             <p className="text-sm font-medium text-muted-foreground">Subject</p>
                             <p>
                                 {teachingHistory.subject
-                                    ? `${teachingHistory.subject.code} - ${teachingHistory.subject.name}`
+                                    ? `${teachingHistory.subject.code} - ${teachingHistory.subject.title || teachingHistory.subject.name}`
                                     : 'Not assigned'}
                             </p>
                         </div>
@@ -117,7 +119,7 @@ export default function Show({ teachingHistory }: TeachingHistoriesShowProps) {
                             <p className="text-sm font-medium text-muted-foreground">Semester</p>
                             <p>
                                 {teachingHistory.semester
-                                    ? `${teachingHistory.semester.name} ${teachingHistory.semester.year}`
+                                    ? `${teachingHistory.semester.name} ${teachingHistory.semester.academic_year || teachingHistory.semester.year || ''}`
                                     : 'Not assigned'}
                             </p>
                         </div>

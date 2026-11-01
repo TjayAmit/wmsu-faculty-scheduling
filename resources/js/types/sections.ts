@@ -3,18 +3,39 @@ import type { Teacher } from './teachers';
 export interface SectionProgram {
     id: number;
     name: string;
+    code?: string;
 }
 
 export interface SectionSemester {
     id: number;
     name: string;
-    year: string;
+    academic_year?: string;
+    semester_type?: string;
+    year?: string;
 }
 
 export interface SectionTeacherSchedule {
     id: number;
     teacher_id: number;
-    schedule_id: number;
+    subject_id?: number;
+    scheduled_date?: string;
+    day_of_week?: string;
+    start_time?: string;
+    end_time?: string;
+    room?: string;
+    status?: string;
+    subject?: {
+        id: number;
+        code: string;
+        name: string;
+        units: number;
+    };
+    teacher?: {
+        id: number;
+        first_name: string;
+        last_name: string;
+        employee_id: string;
+    };
 }
 
 export interface SectionModel {
@@ -42,12 +63,15 @@ export interface SectionModel {
 export interface SectionProgramOption {
     id: number;
     name: string;
+    code?: string;
 }
 
 export interface SectionSemesterOption {
     id: number;
     name: string;
-    year: string;
+    year?: string;
+    academic_year?: string;
+    is_current?: boolean;
 }
 
 export interface SectionTeacherOption {

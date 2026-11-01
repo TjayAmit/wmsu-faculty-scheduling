@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\DTOs\TeachingHistoryData;
+use App\Models\TeacherAssignment;
+use App\Models\TeacherSchedule;
 use App\Models\TeachingHistory;
 use App\Repositories\TeachingHistoryRepository;
 use Illuminate\Database\Eloquent\Model;
@@ -96,6 +98,66 @@ class TeachingHistoryService
         $this->logActivity('archived', $result, $data);
 
         return $result;
+    }
+
+    public function syncFromAssignments(): int
+    {
+        $assignments = TeacherAssignment::with(['schedule.subject', 'schedule.semester', 'teacher'])
+            ->whereHas('schedule')
+            ->get();
+
+        $synced = 0;
+        foreach ($assignments as $assignment) {
+            $schedule = $assignment->schedule;
+            if (! $schedule || ! $schedule->subject_id || ! $schedule->semester_id) {
+                continue;
+            }
+
+            // Calculate hours from teacher sessions or default 54 hours (3 units * 18 weeks)
+            $sessions = TeacherSchedule::where('teacher_assignment_id', $assignment->id)
+                ->orWhere(function ($q) use ($assignment, $schedule) {
+                    $q->where('teacher_id', $assignment->teacher_id)
+                        ->where('subject_id', $schedule->subject_id)
+                        ->where('semester_id', $schedule->semester_id);
+                })
+                ->get();
+
+            $totalSessions = $sessions->count();
+            $completedSessions = $sessions->where('status', 'completed')->count();
+
+            $units = (float) ($schedule->subject->units ?? 3.0);
+            $hoursAssigned = $units > 0 ? $units * 18 : 54.0;
+
+            if ($totalSessions > 0) {
+                $hoursCompleted = round(($completedSessions / $totalSessions) * $hoursAssigned, 2);
+            } else {
+                $hoursCompleted = 0.0;
+            }
+
+            $status = 'completed';
+            if ($totalSessions > 0 && $completedSessions < $totalSessions) {
+                $status = 'incomplete';
+            }
+
+            TeachingHistory::updateOrCreate(
+                [
+                    'teacher_id' => $assignment->teacher_id,
+                    'schedule_id' => $assignment->schedule_id,
+                ],
+                [
+                    'semester_id' => $schedule->semester_id,
+                    'subject_id' => $schedule->subject_id,
+                    'hours_assigned' => $hoursAssigned,
+                    'hours_completed' => $hoursCompleted,
+                    'status' => $status,
+                    'notes' => 'Official course assignment for Section ' . ($schedule->section ?? 'N/A') . ' (' . ($schedule->room ?? 'Assigned Room') . ')',
+                ]
+            );
+
+            $synced++;
+        }
+
+        return $synced;
     }
 
     protected function getDtoClass(): string

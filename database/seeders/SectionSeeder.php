@@ -15,111 +15,97 @@ class SectionSeeder extends Seeder
 
         if (! $currentSemesterId) {
             $this->command->warn('No current semester found. Skipping section seeder.');
-
             return;
         }
 
-        $bscs = Program::where('code', 'BSCS')->value('id');
-        $bsit = Program::where('code', 'BSIT')->value('id');
-        $bsee = Program::where('code', 'BSEE')->value('id');
-        $bsn = Program::where('code', 'BSN')->value('id');
-        $bsba = Program::where('code', 'BSBA-FM')->value('id');
+        $programs = [
+            'BEEd' => [
+                1 => ['A', 'B'],
+                2 => ['A', 'B'],
+                3 => ['A', 'B'],
+                4 => ['A'],
+            ],
+            'BSEd-Eng' => [
+                1 => ['A', 'B'],
+                2 => ['A'],
+                3 => ['A'],
+                4 => ['A'],
+            ],
+            'BSEd-Math' => [
+                1 => ['A', 'B'],
+                2 => ['A'],
+                3 => ['A'],
+                4 => ['A'],
+            ],
+            'BSEd-Sci' => [
+                1 => ['A'],
+                2 => ['A'],
+                3 => ['A'],
+                4 => ['A'],
+            ],
+            'BECEd' => [
+                1 => ['A'],
+                2 => ['A'],
+            ],
+            'BSNEd' => [
+                1 => ['A'],
+                2 => ['A'],
+            ],
+            'BCAEd' => [
+                1 => ['A'],
+                2 => ['A'],
+            ],
+            'BSEd-Fil' => [
+                1 => ['A'],
+                2 => ['A'],
+            ],
+            'BSEd-SS' => [
+                1 => ['A'],
+                2 => ['A'],
+            ],
+            'BSEd-Val' => [
+                1 => ['A'],
+                2 => ['A'],
+            ],
+            'PEC' => [
+                1 => ['A'],
+            ],
+        ];
 
-        $sections = [];
+        $totalSeeded = 0;
 
-        // BSCS – 4 year levels × 2 sections (A and B)
-        if ($bscs) {
-            foreach (range(1, 4) as $year) {
-                foreach (['A', 'B'] as $section) {
-                    $sections[] = [
-                        'section_code' => "BSCS-{$year}{$section}",
-                        'program_id' => $bscs,
-                        'semester_id' => $currentSemesterId,
-                        'year_level' => $year,
-                        'max_students' => 40,
-                        'current_students' => 0,
-                        'adviser_id' => null,
-                        'is_active' => true,
-                    ];
+        foreach ($programs as $progCode => $yearSections) {
+            $programId = Program::where('code', $progCode)->value('id');
+            if (! $programId) {
+                continue;
+            }
+
+            foreach ($yearSections as $year => $sections) {
+                foreach ($sections as $sectionLetter) {
+                    $sectionCode = "{$progCode}-{$year}{$sectionLetter}";
+
+                    Section::updateOrCreate(
+                        [
+                            'section_code' => $sectionCode,
+                            'semester_id' => $currentSemesterId,
+                        ],
+                        [
+                            'section_code' => $sectionCode,
+                            'program_id' => $programId,
+                            'semester_id' => $currentSemesterId,
+                            'year_level' => $year,
+                            'max_students' => 40,
+                            'current_students' => 0,
+                            'adviser_id' => null,
+                            'is_active' => true,
+                        ]
+                    );
+
+                    $totalSeeded++;
                 }
             }
         }
 
-        // BSIT – 4 year levels × 2 sections (A and B)
-        if ($bsit) {
-            foreach (range(1, 4) as $year) {
-                foreach (['A', 'B'] as $section) {
-                    $sections[] = [
-                        'section_code' => "BSIT-{$year}{$section}",
-                        'program_id' => $bsit,
-                        'semester_id' => $currentSemesterId,
-                        'year_level' => $year,
-                        'max_students' => 40,
-                        'current_students' => 0,
-                        'adviser_id' => null,
-                        'is_active' => true,
-                    ];
-                }
-            }
-        }
-
-        // BSEE – 5 year levels × 1 section
-        if ($bsee) {
-            foreach (range(1, 5) as $year) {
-                $sections[] = [
-                    'section_code' => "BSEE-{$year}A",
-                    'program_id' => $bsee,
-                    'semester_id' => $currentSemesterId,
-                    'year_level' => $year,
-                    'max_students' => 40,
-                    'current_students' => 0,
-                    'adviser_id' => null,
-                    'is_active' => true,
-                ];
-            }
-        }
-
-        // BSN – 4 year levels × 2 sections (A and B)
-        if ($bsn) {
-            foreach (range(1, 4) as $year) {
-                foreach (['A', 'B'] as $section) {
-                    $sections[] = [
-                        'section_code' => "BSN-{$year}{$section}",
-                        'program_id' => $bsn,
-                        'semester_id' => $currentSemesterId,
-                        'year_level' => $year,
-                        'max_students' => 45,
-                        'current_students' => 0,
-                        'adviser_id' => null,
-                        'is_active' => true,
-                    ];
-                }
-            }
-        }
-
-        // BSBA-FM – 4 year levels × 1 section
-        if ($bsba) {
-            foreach (range(1, 4) as $year) {
-                $sections[] = [
-                    'section_code' => "BSBA-FM-{$year}A",
-                    'program_id' => $bsba,
-                    'semester_id' => $currentSemesterId,
-                    'year_level' => $year,
-                    'max_students' => 40,
-                    'current_students' => 0,
-                    'adviser_id' => null,
-                    'is_active' => true,
-                ];
-            }
-        }
-
-        foreach ($sections as $section) {
-            Section::firstOrCreate(
-                ['section_code' => $section['section_code']],
-                $section
-            );
-        }
-
-        $this->command->info('Sections seeded: '.count($sections).' sections for current semester (2nd Sem AY 2025-2026).');
+        $this->command->info("Sections seeded: {$totalSeeded} College of Education active sections for current semester.");
     }
 }

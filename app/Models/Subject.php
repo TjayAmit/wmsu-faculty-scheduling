@@ -15,6 +15,8 @@ class Subject extends Model
     /** @use HasFa, SoftDeletesctory<SubjectFactory> */
     use HasFactory;
 
+    protected $appends = ['name'];
+
     #[Cast(type: 'decimal:1')]
     protected $units;
 
@@ -22,11 +24,27 @@ class Subject extends Model
     protected $is_active;
 
     /**
+     * Get the subject name (alias for title).
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->title ?? '';
+    }
+
+    /**
      * Get the schedules for the subject.
      */
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    /**
+     * Get the curriculum entries that include this subject.
+     */
+    public function curricula(): HasMany
+    {
+        return $this->hasMany(Curriculum::class);
     }
 
     /**

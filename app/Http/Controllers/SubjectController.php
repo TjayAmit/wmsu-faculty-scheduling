@@ -62,7 +62,12 @@ class SubjectController extends Controller
 
     public function show(Subject $subject)
     {
-        $subject->load('schedules');
+        $subject->load([
+            'schedules.semester',
+            'schedules.classroom',
+            'schedules.teacherAssignment.teacher.user',
+            'curricula.program',
+        ]);
 
         return Inertia::render('subjects/show', [
             'subject' => $subject,

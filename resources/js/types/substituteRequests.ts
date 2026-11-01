@@ -58,9 +58,34 @@ export interface SubstituteRequestsIndexProps {
     teachers: SubstituteRequestTeacherOption[];
 }
 
+export interface FormTeacherOption {
+    id: number;
+    name?: string;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    department?: string;
+    rank?: string;
+}
+
+export interface FormScheduleOption {
+    id: number;
+    subject_code: string;
+    subject_title: string;
+    section?: string | null;
+    semester_name?: string;
+    room?: string;
+    teacher_id?: number | null;
+    teacher_name?: string | null;
+    display_label: string;
+}
+
 export interface SubstituteRequestsFormProps {
     substituteRequest?: SubstituteRequest;
-    teachers: SubstituteRequestTeacherOption[];
+    teachers: FormTeacherOption[];
+    schedules?: FormScheduleOption[];
+    currentTeacherId?: number | null;
+    isTeacherRole?: boolean;
 }
 
 export interface SubstituteRequestsShowProps {

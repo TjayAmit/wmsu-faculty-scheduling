@@ -1,3 +1,4 @@
+import type { FacultyDraftSchedule } from './facultyDraftSchedules';
 import type { Subject } from './subjects';
 
 export interface TimeSlot {
@@ -60,6 +61,7 @@ export interface Schedule {
 }
 
 export interface SchedulesIndexProps {
+    activeTab?: 'schedules' | 'drafts';
     data: {
         data: Schedule[];
         current_page: number;
@@ -69,10 +71,51 @@ export interface SchedulesIndexProps {
         from: number;
         to: number;
     };
+    drafts?: {
+        data: FacultyDraftSchedule[];
+        current_page: number;
+        last_page: number;
+        per_page: number;
+        total: number;
+        from: number;
+        to: number;
+    };
+    counts?: {
+        schedules: number;
+        drafts: number;
+        pending_drafts: number;
+    };
+    stats?: {
+        total_schedules: number;
+        assigned_schedules: number;
+        unassigned_schedules: number;
+        total_drafts: number;
+        pending_drafts: number;
+        approved_drafts: number;
+        rejected_drafts: number;
+    };
     filters: {
+        tab?: string;
         search?: string;
+        draft_status?: string;
+        draft_search?: string;
         per_page?: number;
     };
+}
+
+export interface ScheduleSectionOption {
+    id: number;
+    section_code: string;
+    program_id: number;
+    semester_id: number;
+    year_level: number;
+    max_students?: number;
+    current_students?: number;
+    program?: {
+        id: number;
+        code: string;
+        name: string;
+    } | null;
 }
 
 export interface SchedulesFormProps {
@@ -81,6 +124,7 @@ export interface SchedulesFormProps {
         id: number;
         code: string;
         title: string;
+        units?: number;
     }[];
     semesters: {
         id: number;
@@ -98,6 +142,7 @@ export interface SchedulesFormProps {
         value: string;
         label: string;
     }[];
+    sections?: ScheduleSectionOption[];
 }
 
 export interface SchedulesShowProps {

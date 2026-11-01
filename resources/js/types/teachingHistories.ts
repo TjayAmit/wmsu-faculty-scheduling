@@ -3,12 +3,14 @@ import type { Teacher } from './teachers';
 export interface TeachingHistorySemester {
     id: number;
     name: string;
-    year: string;
+    year?: string;
+    academic_year?: string;
 }
 
 export interface TeachingHistorySubject {
     id: number;
-    name: string;
+    name?: string;
+    title?: string;
     code: string;
 }
 
@@ -76,6 +78,9 @@ export interface TeachingHistoriesIndexProps {
     };
     teachers: TeachingHistoryTeacherOption[];
     semesters: TeachingHistorySemesterOption[];
+    isTeacherRole?: boolean;
+    canCreate?: boolean;
+    canManage?: boolean;
 }
 
 export interface TeachingHistoriesFormProps {
@@ -87,6 +92,8 @@ export interface TeachingHistoriesFormProps {
 
 export interface TeachingHistoriesShowProps {
     teachingHistory: TeachingHistory;
+    isTeacherRole?: boolean;
+    canManage?: boolean;
 }
 
 export interface TeachingHistoriesTeacherHistoryProps {

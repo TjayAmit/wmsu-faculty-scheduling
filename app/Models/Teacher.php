@@ -38,6 +38,14 @@ class Teacher extends Model
     }
 
     /**
+     * Get the department associated with the teacher.
+     */
+    public function department(): BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department', 'name');
+    }
+
+    /**
      * Get the teacher assignments for the teacher.
      */
     public function assignments(): HasMany
@@ -51,6 +59,30 @@ class Teacher extends Model
     public function activeAssignments(): HasMany
     {
         return $this->assignments()->where('is_active', true);
+    }
+
+    /**
+     * Get draft schedule proposals/assignments for the teacher.
+     */
+    public function draftSchedules(): HasMany
+    {
+        return $this->hasMany(DraftSchedule::class);
+    }
+
+    /**
+     * Get individual generated teaching sessions for the teacher.
+     */
+    public function teacherSchedules(): HasMany
+    {
+        return $this->hasMany(TeacherSchedule::class);
+    }
+
+    /**
+     * Get teaching history archival records for the teacher.
+     */
+    public function teachingHistories(): HasMany
+    {
+        return $this->hasMany(TeachingHistory::class);
     }
 
     /**

@@ -66,8 +66,10 @@ export default function Show({ assignment }: AssignSchedulesShowProps) {
                                 </div>
                                 <div className="grid gap-1">
                                     <p className="text-sm font-medium text-muted-foreground">Teacher</p>
-                                    <p className="font-medium">{assignment.teacher.user.name}</p>
-                                    <p className="text-sm text-muted-foreground">{assignment.teacher.user.email}</p>
+                                    <p className="font-medium">
+                                        {assignment.teacher?.full_name || assignment.teacher?.user?.name || `${assignment.teacher?.first_name ?? ''} ${assignment.teacher?.last_name ?? ''}`.trim() || 'Unassigned Teacher'}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">{assignment.teacher?.user?.email || assignment.teacher?.email || 'No email'}</p>
                                 </div>
                             </div>
 

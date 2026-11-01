@@ -9,6 +9,19 @@ class TeachingHistoryRequest extends FormRequest
 {
     public function authorize(): bool
     {
+        $user = $this->user();
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(['Admin', 'Faculty Admin'])) {
+            return true;
+        }
+
+        if ($user->hasAnyRole(['Teacher', 'teacher', 'Instructor', 'instructor'])) {
+            return false;
+        }
+
         return true;
     }
 

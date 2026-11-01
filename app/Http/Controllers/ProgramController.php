@@ -65,7 +65,7 @@ class ProgramController extends Controller
 
     public function show(Program $program)
     {
-        $program->load(['department', 'sections', 'curriculum']);
+        $program->load(['department', 'sections', 'curriculum.subject']);
 
         return Inertia::render('programs/show', [
             'program' => $program,

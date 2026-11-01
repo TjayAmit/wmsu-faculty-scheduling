@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -33,11 +34,34 @@ class Department extends Model
     }
 
     /**
+     * Get all curricula under this department through its programs.
+     */
+    public function curricula(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Curriculum::class,
+            Program::class,
+            'department_id',
+            'program_id',
+            'id',
+            'id'
+        );
+    }
+
+    /**
      * Get the teachers in this department.
      */
     public function teachers(): HasMany
     {
-        return $this->hasMany(Teacher::class);
+        return $this->hasMany(Teacher::class, 'department', 'name');
+    }
+
+    /**
+     * Get the staff members assigned to this department.
+     */
+    public function staff(): HasMany
+    {
+        return $this->hasMany(User::class);
     }
 
     /**

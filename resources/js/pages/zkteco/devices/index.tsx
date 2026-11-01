@@ -275,16 +275,16 @@ export default function ZktecoDevicesIndex({ data, filters, stats, teachers }: P
 
                 {/* 2. Summary KPI Cards */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-primary/40 transition-colors">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Registered Terminals
                             </span>
-                            <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                 <Cpu className="h-4 w-4" />
                             </div>
                         </div>
-                        <div className="mt-2 text-2xl font-bold text-foreground">
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
                             {stats.total_devices}
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -292,16 +292,16 @@ export default function ZktecoDevicesIndex({ data, filters, stats, teachers }: P
                         </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-emerald-500/40 transition-colors">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Online Terminals
                             </span>
-                            <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                                 <Wifi className="h-4 w-4" />
                             </div>
                         </div>
-                        <div className="mt-2 text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
                             {stats.online_devices}
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -309,16 +309,16 @@ export default function ZktecoDevicesIndex({ data, filters, stats, teachers }: P
                         </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-amber-500/40 transition-colors">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Offline / Standby
                             </span>
-                            <div className="rounded-lg bg-amber-500/10 p-2 text-amber-600 dark:text-amber-400">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
                                 <WifiOff className="h-4 w-4" />
                             </div>
                         </div>
-                        <div className="mt-2 text-2xl font-bold text-foreground">
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
                             {stats.offline_devices}
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">
@@ -326,16 +326,16 @@ export default function ZktecoDevicesIndex({ data, filters, stats, teachers }: P
                         </p>
                     </div>
 
-                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                    <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
                         <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                 Unassigned Classrooms
                             </span>
-                            <div className="rounded-lg bg-blue-500/10 p-2 text-blue-600 dark:text-blue-400">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
                                 <DoorOpen className="h-4 w-4" />
                             </div>
                         </div>
-                        <div className="mt-2 text-2xl font-bold text-foreground">
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
                             {stats.unassigned_classrooms}
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">

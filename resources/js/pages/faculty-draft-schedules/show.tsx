@@ -92,7 +92,9 @@ export default function Show({ draftSchedule }: FacultyDraftSchedulesShowProps) 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Teacher</p>
-                                <p>{draftSchedule.teacher.user.name}</p>
+                                <p>
+                                    {draftSchedule.teacher?.full_name || draftSchedule.teacher?.user?.name || `${draftSchedule.teacher?.first_name ?? ''} ${draftSchedule.teacher?.last_name ?? ''}`.trim() || 'Unassigned Teacher'}
+                                </p>
                             </div>
                             <div className="grid gap-1">
                                 <p className="text-sm font-medium text-muted-foreground">Status</p>
