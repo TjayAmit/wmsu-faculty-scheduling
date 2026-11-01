@@ -269,109 +269,110 @@ export default function InstructorDashboard({
                     </Card>
                 )}
 
-                {/* 2. Top Metric Cards: [Date & Time (Primary BG)] -> [Today's Classes] -> [Weekly Load] -> [Pending Requests (Forwarded)] */}
+                {/* 2. Overview Metric Cards */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {/* Card 1: Live Date & Time with Primary Background */}
-                    <Card className="border-primary bg-primary text-primary-foreground shadow-sm hover:shadow-md transition-shadow">
-                        <CardContent className="p-4 sm:p-5">
-                            <div className="flex items-center justify-between">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-primary-foreground/80">
-                                    Date & Time
-                                </p>
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20 text-white backdrop-blur-sm">
-                                    <Clock className="h-4 w-4" />
-                                </div>
+                    {/* Card 1: Live Date & Time */}
+                    <div className="rounded-xl border border-[#800000] bg-[#800000]/5 ring-1 ring-[#800000]/20 dark:bg-[#800000]/10 p-4 shadow-sm transition-all">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Date & Time
+                            </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                                <Clock className="h-4 w-4" />
                             </div>
-                            <div className="mt-2.5">
-                                <div className="text-2xl font-bold tracking-tight text-white font-mono">
-                                    {formattedTime}
-                                </div>
-                                <div className="mt-1 flex items-center gap-1.5 text-xs text-white/90">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                                    <span>{formattedDate}</span>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground font-mono">
+                            {formattedTime}
+                        </div>
+                        <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                            <span>{formattedDate}</span>
+                        </div>
+                    </div>
 
                     {/* Card 2: Today's Classes */}
-                    <Card className="border-border bg-card shadow-sm hover:border-orange-500/40 transition-colors">
-                        <CardContent className="p-4 sm:p-5">
-                            <div className="flex items-center justify-between">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                    Today's Classes
-                                </p>
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400">
-                                    <CalendarCheck className="h-4 w-4" />
-                                </div>
+                    <button
+                        type="button"
+                        onClick={() => setScheduleTab('today')}
+                        className={`text-left rounded-xl border p-4 shadow-sm transition-all ${
+                            scheduleTab === 'today'
+                                ? 'border-blue-500/40 bg-blue-500/5 ring-1 ring-blue-500/20 dark:bg-blue-500/10'
+                                : 'border-border bg-card hover:border-blue-500/40'
+                        }`}
+                    >
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Today's Classes
+                            </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                <CalendarCheck className="h-4 w-4" />
                             </div>
-                            <div className="mt-2.5">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-2xl font-bold tracking-tight text-foreground">
-                                        {stats.today_classes}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">
-                                        {stats.today_classes === 1 ? 'class session' : 'class sessions'}
-                                    </span>
-                                </div>
-                                <p className="mt-1 text-xs text-muted-foreground">
-                                    {stats.today_classes > 0
-                                        ? `${stats.today_completed} attended / completed`
-                                        : 'No classes scheduled today'}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                            {stats.today_classes}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            {stats.today_classes > 0
+                                ? `${stats.today_completed} completed • ${stats.today_classes - stats.today_completed} remaining`
+                                : 'No classes scheduled today'}
+                        </p>
+                    </button>
 
                     {/* Card 3: Weekly Teaching Load */}
-                    <Card className="border-border bg-card shadow-sm hover:border-blue-500/40 transition-colors">
-                        <CardContent className="p-4 sm:p-5">
-                            <div className="flex items-center justify-between">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                    Weekly Load
-                                </p>
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                                    <BookOpen className="h-4 w-4" />
-                                </div>
+                    <button
+                        type="button"
+                        onClick={() => setScheduleTab('weekly')}
+                        className={`text-left rounded-xl border p-4 shadow-sm transition-all ${
+                            scheduleTab === 'weekly'
+                                ? 'border-purple-600/40 bg-purple-500/5 ring-1 ring-purple-500/20 dark:bg-purple-500/10'
+                                : 'border-border bg-card hover:border-purple-500/40'
+                        }`}
+                    >
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Weekly Load
+                            </span>
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                <BookOpen className="h-4 w-4" />
                             </div>
-                            <div className="mt-2.5">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-2xl font-bold tracking-tight text-foreground">
-                                        {stats.total_units}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">Units</span>
-                                </div>
-                                <p className="mt-1 text-xs text-muted-foreground">
-                                    {stats.assigned_courses_count} subjects &bull; {stats.weekly_hours} hrs/week
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                            {stats.total_units}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            {stats.assigned_courses_count} {stats.assigned_courses_count === 1 ? 'subject' : 'subjects'} • {stats.weekly_hours} hrs/week
+                        </p>
+                    </button>
 
-                    {/* Card 4: Pending Requests (FORWARDED FROM CARD 4) */}
-                    <Card className="border-border bg-card shadow-sm hover:border-purple-500/40 transition-colors">
-                        <CardContent className="p-4 sm:p-5">
-                            <div className="flex items-center justify-between">
-                                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                                    Pending Requests
-                                </p>
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                                    <FileText className="h-4 w-4" />
-                                </div>
+                    {/* Card 4: Pending Requests */}
+                    <button
+                        type="button"
+                        onClick={() => setActivityTab('requests')}
+                        className={`text-left rounded-xl border p-4 shadow-sm transition-all ${
+                            stats.pending_requests > 0
+                                ? 'border-amber-500/40 bg-amber-500/5 hover:border-amber-500 ring-1 ring-amber-500/20'
+                                : 'border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-500/50'
+                        }`}
+                    >
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Pending Requests
+                            </span>
+                            <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+                                stats.pending_requests > 0
+                                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                    : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                            }`}>
+                                <FileText className="h-4 w-4" />
                             </div>
-                            <div className="mt-2.5">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-2xl font-bold tracking-tight text-foreground">
-                                        {stats.pending_requests}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground">Requests</span>
-                                </div>
-                                <p className="mt-1 text-xs text-muted-foreground">
-                                    {stats.pending_requests > 0 ? 'Awaiting administrative approval' : 'All requests up to date'}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                        <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                            {stats.pending_requests}
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            {stats.pending_requests > 0 ? `${stats.pending_requests} awaiting approval` : 'All requests up to date'}
+                        </p>
+                    </button>
                 </div>
 
                 {/* 3. Compact Spotlight Banner: Live Class OR Day Status */}
