@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DraftScheduleRequest;
 use App\Models\DraftSchedule;
 use App\Models\Schedule;
+use App\Models\Semester;
 use App\Models\Teacher;
 use App\Services\DraftScheduleService;
 use Illuminate\Http\Request;
@@ -54,11 +55,69 @@ class DraftScheduleController extends Controller
             ? Teacher::where('id', $currentTeacher->id)->with('user')->get()
             : Teacher::active()->with('user')->get();
 
+        $currentSemester = Semester::where('is_current', true)->first();
+
+        $schedulesQuery = Schedule::with(['subject', 'semester', 'classroom', 'teacherAssignment.teacher.user'])
+            ->where('is_active', true);
+
+        if ($currentSemester) {
+            $hasCurrentSemesterSchedules = (clone $schedulesQuery)->where('semester_id', $currentSemester->id)->exists();
+            if ($hasCurrentSemesterSchedules) {
+                $schedulesQuery->where('semester_id', $currentSemester->id);
+            }
+        }
+
+        $existingDrafts = $currentTeacher
+            ? DraftSchedule::where('teacher_id', $currentTeacher->id)->pluck('status', 'schedule_id')->toArray()
+            : [];
+
+        $schedules = $schedulesQuery->get()->map(function ($s) use ($currentTeacher, $existingDrafts, $isTeacher) {
+            $isAssigned = $s->teacherAssignment !== null && $s->teacherAssignment->is_active;
+            $assignedTeacherId = $s->teacherAssignment?->teacher_id;
+            $assignedTeacherName = $s->teacherAssignment?->teacher?->full_name ?? $s->teacherAssignment?->teacher?->user?->name;
+
+            $isAssignedToCurrent = $currentTeacher && $assignedTeacherId === $currentTeacher->id;
+            $hasDraft = isset($existingDrafts[$s->id]);
+            $rawDraftStatus = $hasDraft ? $existingDrafts[$s->id] : null;
+            $draftStatus = is_object($rawDraftStatus) ? $rawDraftStatus->value : $rawDraftStatus;
+
+            // A schedule is already taken by the current teacher if assigned to them or approved/pending draft exists
+            $isAlreadyInUserSchedule = $isAssignedToCurrent || in_array($draftStatus, ['approved', 'pending_review']);
+
+            return [
+                'id' => $s->id,
+                'subject_code' => $s->subject?->code ?? 'N/A',
+                'subject_title' => $s->subject?->title ?? 'No title',
+                'units' => $s->subject?->units,
+                'section' => $s->section,
+                'room' => $s->classroom ? ($s->classroom->full_identifier ?? $s->classroom->room_number) : ($s->room ?? 'TBA'),
+                'semester_name' => $s->semester?->name,
+                'is_assigned' => $isAssigned,
+                'assigned_teacher_id' => $assignedTeacherId,
+                'assigned_teacher_name' => $assignedTeacherName,
+                'is_assigned_to_current' => $isAssignedToCurrent,
+                'has_user_draft' => $hasDraft,
+                'user_draft_status' => $draftStatus,
+                'is_disabled_for_teacher' => (bool) ($isTeacher && ($isAlreadyInUserSchedule || ($isAssigned && ! $isAssignedToCurrent))),
+                'subject' => $s->subject ? [
+                    'id' => $s->subject->id,
+                    'code' => $s->subject->code,
+                    'title' => $s->subject->title,
+                    'units' => $s->subject->units,
+                ] : null,
+                'semester' => $s->semester ? [
+                    'id' => $s->semester->id,
+                    'name' => $s->semester->name,
+                    'academic_year' => $s->semester->academic_year,
+                ] : null,
+            ];
+        });
+
         return Inertia::render('draft-schedules/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['status', 'teacher_id', 'per_page']),
             'teachers' => $teachers,
-            'schedules' => Schedule::with(['subject', 'semester'])->active()->get(),
+            'schedules' => $schedules,
             'isTeacherRole' => (bool) $isTeacher,
             'currentTeacher' => $currentTeacher ? [
                 'id' => $currentTeacher->id,
@@ -80,6 +139,15 @@ class DraftScheduleController extends Controller
                 return back()->with('error', 'Teacher profile not found for this account.');
             }
             $request->merge(['teacher_id' => $currentTeacher->id]);
+
+            $existing = DraftSchedule::where('teacher_id', $currentTeacher->id)
+                ->where('schedule_id', $request->schedule_id)
+                ->whereIn('status', ['draft', 'pending_review', 'approved'])
+                ->first();
+
+            if ($existing) {
+                return back()->withErrors(['schedule_id' => 'You already have an active or approved request for this course schedule.']);
+            }
         }
 
         $this->service->createFromRequest($request);

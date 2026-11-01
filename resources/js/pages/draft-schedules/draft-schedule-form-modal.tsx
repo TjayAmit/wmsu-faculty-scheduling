@@ -1,7 +1,8 @@
 import { useForm } from '@inertiajs/react';
-import { Loader2 } from 'lucide-react';
+import { BookOpen, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import InputError from '@/components/input-error';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -39,11 +40,24 @@ export interface DraftScheduleFormModalProps {
     }[];
     schedules?: {
         id: number;
+        subject_code?: string;
+        subject_title?: string;
+        units?: number | string | null;
         section?: string | null;
+        room?: string | null;
+        semester_name?: string | null;
+        is_assigned?: boolean;
+        assigned_teacher_id?: number | null;
+        assigned_teacher_name?: string | null;
+        is_assigned_to_current?: boolean;
+        has_user_draft?: boolean;
+        user_draft_status?: string | null;
+        is_disabled_for_teacher?: boolean;
         subject?: {
             id: number;
             code: string;
             title: string;
+            units?: number | string | null;
         };
         semester?: {
             id: number;
@@ -78,6 +92,8 @@ export function DraftScheduleFormModal({
         schedule_id: '',
         notes: '',
     });
+
+    const selectedSchedule = schedules.find((s) => String(s.id) === String(data.schedule_id));
 
     useEffect(() => {
         if (open) {
@@ -197,20 +213,57 @@ export function DraftScheduleFormModal({
                                 value={data.schedule_id}
                                 onValueChange={(value) => setData('schedule_id', value)}
                             >
-                                <SelectTrigger id="modal_schedule_id" className="w-full text-xs h-9">
+                                <SelectTrigger id="modal_schedule_id" className="w-full text-xs h-9 min-w-0">
                                     <SelectValue placeholder="Select course schedule slot" />
                                 </SelectTrigger>
-                                <SelectContent className="max-h-64">
+                                <SelectContent className="w-[var(--radix-select-trigger-width)] max-h-72">
                                     {schedules.map((s) => {
-                                        const code = s.subject?.code ?? 'N/A';
-                                        const title = s.subject?.title ?? 'No title';
-                                        const sem = s.semester?.name ?? '';
-                                        const sec = s.section ? ` • Sec ${s.section}` : '';
-                                        const label = `${code} - ${title}${sem ? ` (${sem}${sec})` : sec ? ` (${sec})` : ''}`;
+                                        const code = s.subject_code || s.subject?.code || 'N/A';
+                                        const title = s.subject_title || s.subject?.title || 'No title';
+                                        const sec = s.section ? `Sec ${s.section}` : '';
+                                        const isCurrentAssigned = s.is_assigned_to_current || s.user_draft_status === 'approved';
+                                        const isPending = s.user_draft_status === 'pending_review';
+                                        const isOtherAssigned = s.is_assigned && !s.is_assigned_to_current;
+                                        const isDisabled = isTeacherRole && Boolean(s.is_disabled_for_teacher && (!draftSchedule || draftSchedule.schedule_id !== s.id));
+                                        const textVal = `${code}${sec ? ` • ${sec}` : ''} — ${title}`;
 
                                         return (
-                                            <SelectItem key={s.id} value={String(s.id)} className="text-xs">
-                                                {label}
+                                            <SelectItem
+                                                key={s.id}
+                                                value={String(s.id)}
+                                                disabled={isDisabled}
+                                                textValue={textVal}
+                                                className="py-2.5 px-3 text-xs"
+                                            >
+                                                <div className="flex flex-col gap-1 w-full overflow-hidden text-left">
+                                                    <div className="flex items-center justify-between gap-1.5 w-full">
+                                                        <span className="font-semibold text-foreground truncate text-xs">
+                                                            {code} <span className="font-normal text-muted-foreground">— {title}</span>
+                                                        </span>
+                                                        {isCurrentAssigned ? (
+                                                            <Badge variant="outline" className="text-[9px] h-4 shrink-0 bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30">
+                                                                Already in Schedule
+                                                            </Badge>
+                                                        ) : isPending ? (
+                                                            <Badge variant="outline" className="text-[9px] h-4 shrink-0 bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30">
+                                                                Pending Request
+                                                            </Badge>
+                                                        ) : isOtherAssigned ? (
+                                                            <Badge variant="outline" className="text-[9px] h-4 shrink-0 bg-muted text-muted-foreground border-border">
+                                                                {s.assigned_teacher_name ? `Assigned: ${s.assigned_teacher_name}` : 'Assigned'}
+                                                            </Badge>
+                                                        ) : (
+                                                            <Badge variant="outline" className="text-[9px] h-4 shrink-0 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30">
+                                                                Available
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
+                                                        {sec && <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-[10px]">{sec}</span>}
+                                                        {s.units && <span>{s.units} units</span>}
+                                                        {s.room && <span>• {s.room}</span>}
+                                                    </div>
+                                                </div>
                                             </SelectItem>
                                         );
                                     })}
@@ -218,6 +271,28 @@ export function DraftScheduleFormModal({
                             </Select>
                             <InputError message={errors.schedule_id} />
                         </div>
+
+                        {/* Selected Schedule Quick Preview */}
+                        {selectedSchedule && (
+                            <div className="rounded-lg border border-border/70 bg-muted/30 p-3 space-y-1 text-xs">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5 font-semibold text-foreground truncate">
+                                        <BookOpen className="size-3.5 text-primary shrink-0" />
+                                        <span className="truncate">{selectedSchedule.subject_code || selectedSchedule.subject?.code} — {selectedSchedule.subject_title || selectedSchedule.subject?.title}</span>
+                                    </div>
+                                    {selectedSchedule.section && (
+                                        <Badge variant="outline" className="text-[10px] h-4.5 font-mono shrink-0 ml-2">
+                                            Sec {selectedSchedule.section}
+                                        </Badge>
+                                    )}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+                                    {selectedSchedule.units && <span>Units: <strong className="text-foreground">{selectedSchedule.units}</strong></span>}
+                                    {selectedSchedule.room && <span>Room: <strong className="text-foreground">{selectedSchedule.room}</strong></span>}
+                                    {selectedSchedule.semester_name && <span>Semester: <strong className="text-foreground">{selectedSchedule.semester_name}</strong></span>}
+                                </div>
+                            </div>
+                        )}
 
                         {/* 3. Notes */}
                         <div className="space-y-1.5">

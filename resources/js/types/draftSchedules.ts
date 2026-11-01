@@ -119,11 +119,24 @@ export interface DraftSchedulesIndexProps {
     }[];
     schedules?: {
         id: number;
+        subject_code?: string;
+        subject_title?: string;
+        units?: number | string | null;
         section?: string | null;
+        room?: string | null;
+        semester_name?: string | null;
+        is_assigned?: boolean;
+        assigned_teacher_id?: number | null;
+        assigned_teacher_name?: string | null;
+        is_assigned_to_current?: boolean;
+        has_user_draft?: boolean;
+        user_draft_status?: string | null;
+        is_disabled_for_teacher?: boolean;
         subject?: {
             id: number;
             code: string;
             title: string;
+            units?: number | string | null;
         };
         semester?: {
             id: number;
