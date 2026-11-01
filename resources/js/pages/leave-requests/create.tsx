@@ -24,6 +24,7 @@ import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -519,14 +520,14 @@ export default function Create({
                                                 <Label htmlFor="start_date" className="text-xs text-muted-foreground">
                                                     Start Date *
                                                 </Label>
-                                                <Input
+                                                <DatePicker
                                                     id="start_date"
-                                                    type="date"
-                                                    min={todayIso}
                                                     value={data.start_date}
-                                                    onChange={(e) => handleStartDateChange(e.target.value)}
-                                                    className={cn('h-10 bg-background', errors.start_date && 'border-destructive')}
-                                                    required
+                                                    onChange={(val) => handleStartDateChange(val)}
+                                                    minDate={todayIso}
+                                                    placeholder="Select start date"
+                                                    hasError={Boolean(errors.start_date)}
+                                                    className="h-10 bg-background"
                                                 />
                                                 <InputError message={errors.start_date} />
                                             </div>
@@ -535,14 +536,14 @@ export default function Create({
                                                 <Label htmlFor="end_date" className="text-xs text-muted-foreground">
                                                     End Date *
                                                 </Label>
-                                                <Input
+                                                <DatePicker
                                                     id="end_date"
-                                                    type="date"
-                                                    min={data.start_date || todayIso}
                                                     value={data.end_date}
-                                                    onChange={(e) => setData('end_date', e.target.value)}
-                                                    className={cn('h-10 bg-background', errors.end_date && 'border-destructive')}
-                                                    required
+                                                    onChange={(val) => setData('end_date', val)}
+                                                    minDate={data.start_date || todayIso}
+                                                    placeholder="Select end date"
+                                                    hasError={Boolean(errors.end_date)}
+                                                    className="h-10 bg-background"
                                                 />
                                                 <InputError message={errors.end_date} />
                                             </div>

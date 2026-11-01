@@ -19,6 +19,7 @@ import InputError from '@/components/input-error';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -259,17 +260,15 @@ export default function Create({
                                         <Label htmlFor="date" className="text-xs font-semibold">
                                             Substitution Date <span className="text-destructive">*</span>
                                         </Label>
-                                        <div className="relative">
-                                            <Input
-                                                id="date"
-                                                type="date"
-                                                min={todayDateStr}
-                                                value={data.date}
-                                                onChange={(e) => setData('date', e.target.value)}
-                                                className="text-xs h-9"
-                                                required
-                                            />
-                                        </div>
+                                        <DatePicker
+                                            id="date"
+                                            value={data.date}
+                                            onChange={(val) => setData('date', val)}
+                                            minDate={todayDateStr}
+                                            placeholder="Select substitution date"
+                                            hasError={Boolean(errors.date)}
+                                            className="h-9"
+                                        />
                                         <InputError message={errors.date} />
                                         <p className="text-[11px] text-muted-foreground">
                                             The calendar date when substitute coverage is needed.
