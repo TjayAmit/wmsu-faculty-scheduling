@@ -213,15 +213,6 @@ export default function InstructorDashboard({
                             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                                 {teacher ? `${greeting}, ${teacher.full_name}` : greeting}
                             </h1>
-                            {semester && (
-                                <Badge
-                                    variant="outline"
-                                    className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium px-2.5 py-0.5"
-                                >
-                                    <span className="mr-1.5 h-2 w-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
-                                    {semester.name}
-                                </Badge>
-                            )}
                         </div>
                         <p className="text-sm text-muted-foreground">
                             {teacher ? (
