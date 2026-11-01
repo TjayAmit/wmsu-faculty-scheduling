@@ -32,15 +32,14 @@ class DraftScheduleController extends Controller
         return Inertia::render('draft-schedules/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['status', 'teacher_id', 'per_page']),
+            'teachers' => Teacher::active()->with('user')->get(),
+            'schedules' => Schedule::with(['subject', 'semester'])->active()->get(),
         ]);
     }
 
     public function create()
     {
-        return Inertia::render('draft-schedules/create', [
-            'teachers' => Teacher::active()->with('user')->get(),
-            'schedules' => Schedule::with(['subject', 'semester'])->active()->get(),
-        ]);
+        return redirect()->route('draft-schedules.index', ['create' => 1]);
     }
 
     public function store(DraftScheduleRequest $request)
@@ -94,13 +93,7 @@ class DraftScheduleController extends Controller
 
     public function edit(DraftSchedule $draftSchedule)
     {
-        $draftSchedule->load(['teacher', 'schedule']);
-
-        return Inertia::render('draft-schedules/edit', [
-            'draftSchedule' => $draftSchedule,
-            'teachers' => Teacher::active()->with('user')->get(),
-            'schedules' => Schedule::with(['subject', 'semester'])->active()->get(),
-        ]);
+        return redirect()->route('draft-schedules.index', ['edit' => $draftSchedule->id]);
     }
 
     public function update(DraftScheduleRequest $request, DraftSchedule $draftSchedule)

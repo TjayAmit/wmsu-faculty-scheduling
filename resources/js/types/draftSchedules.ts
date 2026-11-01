@@ -107,6 +107,30 @@ export interface DraftSchedulesIndexProps {
         teacher_id?: number;
         per_page?: number;
     };
+    teachers?: {
+        id: number;
+        full_name?: string;
+        first_name?: string;
+        last_name?: string;
+        user?: {
+            id: number;
+            name: string;
+        };
+    }[];
+    schedules?: {
+        id: number;
+        section?: string | null;
+        subject?: {
+            id: number;
+            code: string;
+            title: string;
+        };
+        semester?: {
+            id: number;
+            name: string;
+            academic_year: string;
+        };
+    }[];
 }
 
 export interface DraftSchedulesFormProps {

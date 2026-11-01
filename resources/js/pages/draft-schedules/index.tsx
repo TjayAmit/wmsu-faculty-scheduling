@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
-import { Pencil, Trash2, CheckCircle, XCircle, Send } from 'lucide-react';
-import { useState } from 'react';
+import { Pencil, Trash2, CheckCircle, XCircle, Send, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
@@ -24,9 +24,7 @@ import AppLayout from '@/layouts/app-layout';
 import { fmtDate } from '@/lib/utils';
 import {
     index as draftSchedules,
-    create as draftSchedulesCreate,
     show as draftSchedulesShow,
-    edit as draftSchedulesEdit,
     destroy as draftSchedulesDestroy,
     submit as draftSchedulesSubmit,
     approve as draftSchedulesApprove,
@@ -38,13 +36,51 @@ import {
     getDraftScheduleStatusVariant,
     getDraftScheduleStatusLabel,
 } from '@/types/draftSchedules';
+import { DraftScheduleFormModal } from './draft-schedule-form-modal';
 
-export default function Index({ data, filters }: DraftSchedulesIndexProps) {
+export default function Index({ data, filters, teachers = [], schedules = [] }: DraftSchedulesIndexProps) {
     const [status, setStatus] = useState(filters.status || '_all');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [processingId, setProcessingId] = useState<number | null>(null);
+
+    // Modal state for Create and Edit requests
+    const [formModalOpen, setFormModalOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState<DraftSchedule | null>(null);
+
+    const handleOpenCreate = () => {
+        setEditingItem(null);
+        setFormModalOpen(true);
+    };
+
+    const handleOpenEdit = (item: DraftSchedule) => {
+        setEditingItem(item);
+        setFormModalOpen(true);
+    };
+
+    // Auto-open modal if redirected with ?create=1 or ?edit=ID
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('create') === '1') {
+            setEditingItem(null);
+            setFormModalOpen(true);
+            const url = new URL(window.location.href);
+            url.searchParams.delete('create');
+            window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+        } else if (params.get('edit')) {
+            const editId = Number(params.get('edit'));
+            const target = data.data.find((item) => item.id === editId);
+            if (target) {
+                setEditingItem(target);
+                setFormModalOpen(true);
+            }
+            const url = new URL(window.location.href);
+            url.searchParams.delete('edit');
+            window.history.replaceState({}, '', url.pathname + (url.search ? url.search : ''));
+        }
+    }, [data.data]);
 
     const navigate = (params: Record<string, unknown> = {}) => {
         router.get(
@@ -135,10 +171,9 @@ return;
                                     ))}
                                 </SelectContent>
                             </Select>
-                            <Button asChild size="sm">
-                                <a href={draftSchedulesCreate().url}>
-                                    New Assignment
-                                </a>
+                            <Button size="sm" onClick={handleOpenCreate} className="gap-1.5">
+                                <Plus className="h-4 w-4" />
+                                <span>New Assignment</span>
                             </Button>
                         </div>
                     </div>
@@ -247,7 +282,7 @@ return;
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground"
-                                                    onClick={() => router.get(draftSchedulesEdit(item.id).url)}
+                                                    onClick={() => handleOpenEdit(item)}
                                                     title="Edit"
                                                 >
                                                     <Pencil className="h-4 w-4" />
@@ -287,6 +322,14 @@ return;
                 onConfirm={handleDelete}
                 isLoading={isDeleting}
                 itemName="assignment"
+            />
+
+            <DraftScheduleFormModal
+                open={formModalOpen}
+                onOpenChange={setFormModalOpen}
+                draftSchedule={editingItem}
+                teachers={teachers}
+                schedules={schedules}
             />
         </>
     );
