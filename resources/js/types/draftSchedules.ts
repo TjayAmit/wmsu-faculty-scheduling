@@ -131,6 +131,11 @@ export interface DraftSchedulesIndexProps {
             academic_year: string;
         };
     }[];
+    isTeacherRole?: boolean;
+    currentTeacher?: {
+        id: number;
+        name: string;
+    } | null;
 }
 
 export interface DraftSchedulesFormProps {

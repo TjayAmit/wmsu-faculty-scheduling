@@ -1,7 +1,8 @@
 import { useForm } from '@inertiajs/react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, UserCheck } from 'lucide-react';
 import { useEffect } from 'react';
 import InputError from '@/components/input-error';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -51,6 +52,11 @@ export interface DraftScheduleFormModalProps {
             academic_year: string;
         };
     }[];
+    isTeacherRole?: boolean;
+    currentTeacher?: {
+        id: number;
+        name: string;
+    } | null;
 }
 
 export function DraftScheduleFormModal({
@@ -59,11 +65,17 @@ export function DraftScheduleFormModal({
     draftSchedule,
     teachers = [],
     schedules = [],
+    isTeacherRole = false,
+    currentTeacher = null,
 }: DraftScheduleFormModalProps) {
     const isEditing = Boolean(draftSchedule);
 
+    const defaultTeacherId = isTeacherRole && currentTeacher?.id
+        ? String(currentTeacher.id)
+        : '';
+
     const { data, setData, post, put, processing, errors, reset, clearErrors } = useForm({
-        teacher_id: '',
+        teacher_id: defaultTeacherId,
         schedule_id: '',
         notes: '',
     });
@@ -73,19 +85,19 @@ export function DraftScheduleFormModal({
             clearErrors();
             if (draftSchedule) {
                 setData({
-                    teacher_id: draftSchedule.teacher_id ? String(draftSchedule.teacher_id) : '',
+                    teacher_id: draftSchedule.teacher_id ? String(draftSchedule.teacher_id) : defaultTeacherId,
                     schedule_id: draftSchedule.schedule_id ? String(draftSchedule.schedule_id) : '',
                     notes: draftSchedule.notes || '',
                 });
             } else {
                 setData({
-                    teacher_id: '',
+                    teacher_id: defaultTeacherId,
                     schedule_id: '',
                     notes: '',
                 });
             }
         }
-    }, [open, draftSchedule]);
+    }, [open, draftSchedule, defaultTeacherId]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -114,51 +126,89 @@ export function DraftScheduleFormModal({
         clearErrors();
     };
 
+    const modalTitle = isTeacherRole
+        ? (isEditing ? 'Edit Schedule Request' : 'Request Schedule Assignment')
+        : (isEditing ? 'Edit Schedule Assignment' : 'New Schedule Assignment');
+
+    const modalDescription = isTeacherRole
+        ? (isEditing ? 'Update your course schedule preference or notes.' : 'Select a course schedule slot to request teaching load for yourself.')
+        : (isEditing ? 'Update the assigned faculty teacher or course schedule slot.' : 'Select a faculty teacher and class schedule slot to establish teaching coverage.');
+
+    const submitLabel = isTeacherRole
+        ? (isEditing ? 'Save Changes' : 'Submit Schedule Request')
+        : (isEditing ? 'Save Changes' : 'Create Assignment');
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-lg p-0 overflow-hidden gap-0">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader className="p-6 pb-4 border-b border-border/80">
                         <DialogTitle className="text-lg font-bold text-foreground">
-                            {isEditing ? 'Edit Schedule Assignment' : 'New Schedule Assignment'}
+                            {modalTitle}
                         </DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground mt-1">
-                            {isEditing
-                                ? 'Update the assigned faculty teacher or course schedule slot.'
-                                : 'Select a faculty teacher and class schedule slot to establish teaching coverage.'}
+                            {modalDescription}
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="p-6 space-y-4">
-                        {/* 1. Teacher Selector */}
-                        <div className="space-y-1.5">
-                            <Label htmlFor="modal_teacher_id" className="text-xs font-semibold text-foreground">
-                                Teacher <span className="text-destructive">*</span>
-                            </Label>
-                            <Select
-                                value={data.teacher_id}
-                                onValueChange={(value) => setData('teacher_id', value)}
-                            >
-                                <SelectTrigger id="modal_teacher_id" className="w-full text-xs h-9">
-                                    <SelectValue placeholder="Select faculty teacher" />
-                                </SelectTrigger>
-                                <SelectContent className="max-h-60">
-                                    {teachers.map((t) => {
-                                        const name =
-                                            t.full_name ||
-                                            t.user?.name ||
-                                            `${t.first_name ?? ''} ${t.last_name ?? ''}`.trim() ||
-                                            `Teacher #${t.id}`;
-                                        return (
-                                            <SelectItem key={t.id} value={String(t.id)} className="text-xs">
-                                                {name}
-                                            </SelectItem>
-                                        );
-                                    })}
-                                </SelectContent>
-                            </Select>
-                            <InputError message={errors.teacher_id} />
-                        </div>
+                        {/* 1. Teacher Selector or Readonly Self Profile */}
+                        {isTeacherRole ? (
+                            <div className="space-y-1.5">
+                                <Label className="text-xs font-semibold text-foreground">
+                                    Requesting Teacher
+                                </Label>
+                                <div className="flex items-center justify-between rounded-lg border border-border/80 bg-muted/40 px-3.5 py-2.5 text-xs">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="flex size-7 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
+                                            <UserCheck className="size-4" />
+                                        </div>
+                                        <div>
+                                            <span className="font-semibold text-foreground block">
+                                                {currentTeacher?.name || 'Your Profile'}
+                                            </span>
+                                            <span className="text-[11px] text-muted-foreground">
+                                                Logged in as Faculty Instructor
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <Badge variant="outline" className="h-5 text-[10px] bg-primary/5 text-primary border-primary/25 font-semibold">
+                                        Your Profile
+                                    </Badge>
+                                </div>
+                                <input type="hidden" name="teacher_id" value={data.teacher_id} />
+                                <InputError message={errors.teacher_id} />
+                            </div>
+                        ) : (
+                            <div className="space-y-1.5">
+                                <Label htmlFor="modal_teacher_id" className="text-xs font-semibold text-foreground">
+                                    Teacher <span className="text-destructive">*</span>
+                                </Label>
+                                <Select
+                                    value={data.teacher_id}
+                                    onValueChange={(value) => setData('teacher_id', value)}
+                                >
+                                    <SelectTrigger id="modal_teacher_id" className="w-full text-xs h-9">
+                                        <SelectValue placeholder="Select faculty teacher" />
+                                    </SelectTrigger>
+                                    <SelectContent className="max-h-60">
+                                        {teachers.map((t) => {
+                                            const name =
+                                                t.full_name ||
+                                                t.user?.name ||
+                                                `${t.first_name ?? ''} ${t.last_name ?? ''}`.trim() ||
+                                                `Teacher #${t.id}`;
+                                            return (
+                                                <SelectItem key={t.id} value={String(t.id)} className="text-xs">
+                                                    {name}
+                                                </SelectItem>
+                                            );
+                                        })}
+                                    </SelectContent>
+                                </Select>
+                                <InputError message={errors.teacher_id} />
+                            </div>
+                        )}
 
                         {/* 2. Schedule Selector */}
                         <div className="space-y-1.5">
@@ -226,7 +276,7 @@ export function DraftScheduleFormModal({
                             className="text-xs h-8 gap-1.5"
                         >
                             {processing && <Loader2 className="size-3.5 animate-spin" />}
-                            <span>{isEditing ? 'Save Changes' : 'Create Assignment'}</span>
+                            <span>{submitLabel}</span>
                         </Button>
                     </DialogFooter>
                 </form>

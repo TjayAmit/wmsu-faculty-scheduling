@@ -16,24 +16,54 @@ class DraftScheduleController extends Controller
         protected DraftScheduleService $service
     ) {}
 
+    protected function isTeacherUser(): bool
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return false;
+        }
+
+        if ($user->hasAnyRole(['Admin', 'admin', 'Faculty Admin', 'faculty_admin'])) {
+            return false;
+        }
+
+        return $user->hasRole('Teacher') || $user->hasRole('teacher') || $user->isTeacher();
+    }
+
     public function index(Request $request)
     {
+        $user = auth()->user();
+        $isTeacher = $this->isTeacherUser();
+        $currentTeacher = $user?->teacher;
+
         $query = DraftSchedule::query()
             ->with(['teacher.user', 'schedule.subject', 'schedule.semester', 'reviewer']);
 
-        if ($request->has('status')) {
+        if ($isTeacher) {
+            // A teacher can ONLY see their own schedule requests
+            $query->where('teacher_id', $currentTeacher?->id ?? 0);
+        } elseif ($request->filled('teacher_id')) {
+            $query->where('teacher_id', $request->teacher_id);
+        }
+
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->has('teacher_id')) {
-            $query->where('teacher_id', $request->teacher_id);
-        }
+        $teachers = $isTeacher && $currentTeacher
+            ? Teacher::where('id', $currentTeacher->id)->with('user')->get()
+            : Teacher::active()->with('user')->get();
 
         return Inertia::render('draft-schedules/index', [
             'data' => $query->latest()->paginate($request->per_page ?? 10)->withQueryString(),
             'filters' => $request->only(['status', 'teacher_id', 'per_page']),
-            'teachers' => Teacher::active()->with('user')->get(),
+            'teachers' => $teachers,
             'schedules' => Schedule::with(['subject', 'semester'])->active()->get(),
+            'isTeacherRole' => (bool) $isTeacher,
+            'currentTeacher' => $currentTeacher ? [
+                'id' => $currentTeacher->id,
+                'name' => $currentTeacher->full_name || $currentTeacher->user?->name || "Teacher #{$currentTeacher->id}",
+            ] : null,
         ]);
     }
 
@@ -44,6 +74,14 @@ class DraftScheduleController extends Controller
 
     public function store(DraftScheduleRequest $request)
     {
+        if ($this->isTeacherUser()) {
+            $currentTeacher = auth()->user()->teacher;
+            if (! $currentTeacher) {
+                return back()->with('error', 'Teacher profile not found for this account.');
+            }
+            $request->merge(['teacher_id' => $currentTeacher->id]);
+        }
+
         $this->service->createFromRequest($request);
 
         return redirect()->route('draft-schedules.index')->with('success', 'Draft schedule created successfully');
@@ -98,6 +136,14 @@ class DraftScheduleController extends Controller
 
     public function update(DraftScheduleRequest $request, DraftSchedule $draftSchedule)
     {
+        if ($this->isTeacherUser()) {
+            $currentTeacher = auth()->user()->teacher;
+            if (! $currentTeacher || $draftSchedule->teacher_id !== $currentTeacher->id) {
+                abort(403, 'Unauthorized to modify this schedule request.');
+            }
+            $request->merge(['teacher_id' => $currentTeacher->id]);
+        }
+
         $this->service->updateFromRequest($draftSchedule->id, $request);
 
         return redirect()->route('draft-schedules.index')->with('success', 'Draft schedule updated successfully');
@@ -105,6 +151,13 @@ class DraftScheduleController extends Controller
 
     public function destroy(DraftSchedule $draftSchedule)
     {
+        if ($this->isTeacherUser()) {
+            $currentTeacher = auth()->user()->teacher;
+            if (! $currentTeacher || $draftSchedule->teacher_id !== $currentTeacher->id) {
+                abort(403, 'Unauthorized to delete this schedule request.');
+            }
+        }
+
         $this->service->delete($draftSchedule->id);
 
         return redirect()->route('draft-schedules.index')->with('success', 'Draft schedule deleted successfully');
@@ -112,6 +165,13 @@ class DraftScheduleController extends Controller
 
     public function submit(DraftSchedule $draftSchedule)
     {
+        if ($this->isTeacherUser()) {
+            $currentTeacher = auth()->user()->teacher;
+            if (! $currentTeacher || $draftSchedule->teacher_id !== $currentTeacher->id) {
+                abort(403, 'Unauthorized action.');
+            }
+        }
+
         $this->service->submitForReview($draftSchedule->id);
 
         return redirect()->route('draft-schedules.show', $draftSchedule->id)->with('success', 'Draft schedule submitted for review');
@@ -119,6 +179,10 @@ class DraftScheduleController extends Controller
 
     public function approve(Request $request, DraftSchedule $draftSchedule)
     {
+        if ($this->isTeacherUser()) {
+            abort(403, 'Teachers cannot approve schedule requests.');
+        }
+
         $request->validate([
             'comments' => 'nullable|string|max:1000',
         ]);
@@ -130,6 +194,10 @@ class DraftScheduleController extends Controller
 
     public function reject(Request $request, DraftSchedule $draftSchedule)
     {
+        if ($this->isTeacherUser()) {
+            abort(403, 'Teachers cannot reject schedule requests.');
+        }
+
         $request->validate([
             'comments' => 'nullable|string|max:1000',
         ]);

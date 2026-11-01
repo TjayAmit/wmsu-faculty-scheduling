@@ -38,7 +38,14 @@ import {
 } from '@/types/draftSchedules';
 import { DraftScheduleFormModal } from './draft-schedule-form-modal';
 
-export default function Index({ data, filters, teachers = [], schedules = [] }: DraftSchedulesIndexProps) {
+export default function Index({
+    data,
+    filters,
+    teachers = [],
+    schedules = [],
+    isTeacherRole = false,
+    currentTeacher = null,
+}: DraftSchedulesIndexProps) {
     const [status, setStatus] = useState(filters.status || '_all');
     const [perPage, setPerPage] = useState(Number((filters as Record<string, unknown>).per_page) || 10);
     const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -146,7 +153,9 @@ return;
                         Schedule Requests
                     </h1>
                     <p className="text-sm text-muted-foreground">
-                        Submit and monitor term schedule proposals, teaching preferences, and review approvals.
+                        {isTeacherRole
+                            ? 'Submit and track your proposed teaching schedules and review approvals.'
+                            : 'Submit and monitor term schedule proposals, teaching preferences, and review approvals.'}
                     </p>
                 </div>
 
@@ -173,7 +182,7 @@ return;
                             </Select>
                             <Button size="sm" onClick={handleOpenCreate} className="gap-1.5">
                                 <Plus className="h-4 w-4" />
-                                <span>New Assignment</span>
+                                <span>{isTeacherRole ? 'New Request' : 'New Assignment'}</span>
                             </Button>
                         </div>
                     </div>
@@ -330,6 +339,8 @@ return;
                 draftSchedule={editingItem}
                 teachers={teachers}
                 schedules={schedules}
+                isTeacherRole={isTeacherRole}
+                currentTeacher={currentTeacher}
             />
         </>
     );
