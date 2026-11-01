@@ -14,7 +14,7 @@ import {
     CheckCircle2,
     ArrowRight,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -100,9 +100,11 @@ function TeacherCalendarGrid({
     selectedDate,
     datesWithClasses,
     holidayDates,
+    activeMonths = [],
     onSelectDate,
     onPrevMonth,
     onNextMonth,
+    onMonthChange,
     onToday,
 }: {
     year: number;
@@ -110,9 +112,11 @@ function TeacherCalendarGrid({
     selectedDate: Date;
     datesWithClasses: Map<string, number>;
     holidayDates: Set<string>;
+    activeMonths?: { year: number; month: number; label: string; count: number }[];
     onSelectDate: (d: Date) => void;
     onPrevMonth: () => void;
     onNextMonth: () => void;
+    onMonthChange: (year: number, month: number) => void;
     onToday: () => void;
 }) {
     const today = new Date();
@@ -134,13 +138,51 @@ function TeacherCalendarGrid({
         year: 'numeric',
     });
 
+    const isMonthInActive = activeMonths.some((am) => am.year === year && am.month === month);
+
     return (
         <div className="flex flex-col h-full">
             {/* Header / Month Navigation */}
-            <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-base font-bold text-foreground">
-                    {monthLabel}
-                </h2>
+            <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
+                    {activeMonths.length > 0 ? (
+                        <div className="flex items-center gap-1.5">
+                            <Select
+                                value={isMonthInActive ? `${year}-${month}` : '_custom'}
+                                onValueChange={(val) => {
+                                    if (val !== '_custom') {
+                                        const [y, m] = val.split('-').map(Number);
+                                        onMonthChange(y, m);
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="h-8 font-bold text-sm border-border bg-background shadow-2xs hover:border-primary/50 transition-colors gap-2 min-w-[170px]">
+                                    <SelectValue>{monthLabel}</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {!isMonthInActive && (
+                                        <SelectItem value="_custom" disabled>
+                                            {monthLabel} (0 classes)
+                                        </SelectItem>
+                                    )}
+                                    {activeMonths.map((am) => (
+                                        <SelectItem key={`${am.year}-${am.month}`} value={`${am.year}-${am.month}`}>
+                                            <span className="font-semibold">{am.label}</span>
+                                            <span className="ml-1.5 text-muted-foreground font-mono text-[11px]">
+                                                ({am.count} {am.count === 1 ? 'class' : 'classes'})
+                                            </span>
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    ) : (
+                        <h2 className="text-base font-bold text-foreground">
+                            {monthLabel}
+                        </h2>
+                    )}
+                </div>
+
                 <div className="flex items-center gap-1.5">
                     {!isCurrentCalMonth && (
                         <Button
@@ -155,7 +197,7 @@ function TeacherCalendarGrid({
                     <button
                         type="button"
                         onClick={onPrevMonth}
-                        className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
                         aria-label="Previous month"
                     >
                         <ChevronLeft className="h-4 w-4" />
@@ -163,7 +205,7 @@ function TeacherCalendarGrid({
                     <button
                         type="button"
                         onClick={onNextMonth}
-                        className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-muted hover:text-foreground cursor-pointer"
                         aria-label="Next month"
                     >
                         <ChevronRight className="h-4 w-4" />
@@ -298,6 +340,8 @@ function SelectedDaySchedulePanel({
     schedules,
     onSelectDate,
     nextDateWithClasses,
+    firstDateWithClasses,
+    semesterName,
     onPrevDay,
     onNextDay,
 }: {
@@ -305,6 +349,8 @@ function SelectedDaySchedulePanel({
     schedules: CalendarScheduleItem[];
     onSelectDate: (d: Date) => void;
     nextDateWithClasses?: string | null;
+    firstDateWithClasses?: string | null;
+    semesterName?: string | null;
     onPrevDay: () => void;
     onNextDay: () => void;
 }) {
@@ -324,6 +370,13 @@ function SelectedDaySchedulePanel({
         const dt = new Date(y, m - 1, d);
         return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     }, [nextDateWithClasses]);
+
+    const firstDateFormatted = useMemo(() => {
+        if (!firstDateWithClasses) return null;
+        const [y, m, d] = firstDateWithClasses.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }, [firstDateWithClasses]);
 
     return (
         <div className="flex flex-col h-full space-y-4">
@@ -360,12 +413,17 @@ function SelectedDaySchedulePanel({
                     </div>
                     <div className="space-y-1">
                         <p className="text-sm font-semibold text-foreground">No Classes Scheduled</p>
-                        <p className="text-xs text-muted-foreground max-w-[260px]">
-                            You have no teaching sessions assigned on {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}.
+                        <p className="text-xs text-muted-foreground max-w-[280px]">
+                            You have no teaching sessions assigned on {selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.
                         </p>
+                        {semesterName && (
+                            <p className="text-[11px] text-muted-foreground/75 max-w-[280px]">
+                                Teaching loads are scheduled in {semesterName}.
+                            </p>
+                        )}
                     </div>
 
-                    {nextDateWithClasses && (
+                    {nextDateWithClasses ? (
                         <Button
                             variant="outline"
                             size="sm"
@@ -378,7 +436,20 @@ function SelectedDaySchedulePanel({
                             <span>Jump to Next Class ({nextDateFormatted})</span>
                             <ArrowRight className="size-3.5" />
                         </Button>
-                    )}
+                    ) : firstDateWithClasses ? (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                const [y, m, d] = firstDateWithClasses.split('-').map(Number);
+                                onSelectDate(new Date(y, m - 1, d));
+                            }}
+                            className="mt-2 text-xs font-medium text-primary border-primary/30 hover:bg-primary/10 gap-1.5"
+                        >
+                            <span>View Semester Classes ({firstDateFormatted})</span>
+                            <ArrowRight className="size-3.5" />
+                        </Button>
+                    ) : null}
                 </div>
             ) : (
                 <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
@@ -503,12 +574,86 @@ function TeacherCalendarView({
     calendarSchedules: CalendarScheduleItem[];
     subjects: SubjectSummary[];
 }) {
-    const today = new Date();
-    const [selectedDate, setSelectedDate] = useState<Date>(today);
+    // 1. Semester & academic year context
+    const semesterName = calendarSchedules[0]?.semester_name || null;
+    const academicYear = calendarSchedules[0]?.academic_year || null;
+    const firstDateWithClasses = calendarSchedules[0]?.scheduled_date || null;
+
+    // 2. Pre-index active months that contain sessions
+    const activeMonths = useMemo(() => {
+        const map = new Map<string, { year: number; month: number; label: string; count: number }>();
+
+        for (const s of calendarSchedules) {
+            const [y, m] = s.scheduled_date.split('-').map(Number);
+            const key = `${y}-${m - 1}`;
+            const existing = map.get(key);
+            if (existing) {
+                existing.count++;
+            } else {
+                const dt = new Date(y, m - 1, 1);
+                map.set(key, {
+                    year: y,
+                    month: m - 1,
+                    label: dt.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+                    count: 1,
+                });
+            }
+        }
+
+        return Array.from(map.values()).sort((a, b) => a.year - b.year || a.month - b.month);
+    }, [calendarSchedules]);
+
+    // 3. Intelligently determine initial date so calendar doesn't open to an empty out-of-semester month
+    const initialDate = useMemo(() => {
+        const today = new Date();
+        if (calendarSchedules.length === 0) return today;
+
+        const todayStr = toDateStr(today);
+
+        // A. If today has classes, start on today
+        if (calendarSchedules.some((s) => s.scheduled_date === todayStr)) {
+            return today;
+        }
+
+        // B. If today falls within the range of scheduled classes
+        const minDateStr = calendarSchedules[0]?.scheduled_date;
+        const maxDateStr = calendarSchedules[calendarSchedules.length - 1]?.scheduled_date;
+
+        if (minDateStr && maxDateStr && todayStr >= minDateStr && todayStr <= maxDateStr) {
+            // Find upcoming class from today or fall back to today
+            const nextClass = calendarSchedules.find((s) => s.scheduled_date >= todayStr);
+            if (nextClass) {
+                const [y, m, d] = nextClass.scheduled_date.split('-').map(Number);
+                return new Date(y, m - 1, d);
+            }
+            return today;
+        }
+
+        // C. If today is outside the semester range (e.g. wall clock is Nov 2026, semester was Jan-May 2026)
+        // Default to the first date with scheduled classes so the user immediately sees their active timetable!
+        const firstClass = calendarSchedules[0];
+        if (firstClass) {
+            const [y, m, d] = firstClass.scheduled_date.split('-').map(Number);
+            return new Date(y, m - 1, d);
+        }
+
+        return today;
+    }, [calendarSchedules]);
+
+    const [selectedDate, setSelectedDate] = useState<Date>(initialDate);
     const [viewMonth, setViewMonth] = useState<{ year: number; month: number }>(() => ({
-        year: today.getFullYear(),
-        month: today.getMonth(),
+        year: initialDate.getFullYear(),
+        month: initialDate.getMonth(),
     }));
+
+    // Keep view aligned when initialDate updates
+    useEffect(() => {
+        setSelectedDate(initialDate);
+        setViewMonth({
+            year: initialDate.getFullYear(),
+            month: initialDate.getMonth(),
+        });
+    }, [initialDate]);
 
     // Pre-index schedules by date string (YYYY-MM-DD)
     const schedulesByDate = useMemo(() => {
@@ -555,13 +700,26 @@ function TeacherCalendarView({
     );
 
     // Today's classes
+    const today = new Date();
     const todayStr = toDateStr(today);
     const todayClasses = useMemo(
         () => schedulesByDate.get(todayStr) || [],
         [schedulesByDate, todayStr],
     );
 
-    // Next upcoming session
+    // Count classes in the currently viewed month
+    const currentMonthPrefix = `${viewMonth.year}-${String(viewMonth.month + 1).padStart(2, '0')}`;
+    const currentMonthClassCount = useMemo(() => {
+        let count = 0;
+        for (const s of calendarSchedules) {
+            if (s.scheduled_date.startsWith(currentMonthPrefix)) {
+                count++;
+            }
+        }
+        return count;
+    }, [calendarSchedules, currentMonthPrefix]);
+
+    // Next upcoming session from today onwards
     const nextUpcomingSession = useMemo(() => {
         const future = calendarSchedules
             .filter((s) => s.scheduled_date >= todayStr && s.status !== 'cancelled' && !s.is_holiday)
@@ -578,29 +736,34 @@ function TeacherCalendarView({
         return futureDates[0] || null;
     }, [selectedDate, datesWithClasses]);
 
-    const handlePrevMonth = () => {
-        setViewMonth((prev) => {
-            if (prev.month === 0) {
-                return { year: prev.year - 1, month: 11 };
-            }
+    const handleMonthChange = (year: number, month: number) => {
+        setViewMonth({ year, month });
+        const targetPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+        const firstInMonth = calendarSchedules.find((s) => s.scheduled_date.startsWith(targetPrefix));
+        if (firstInMonth) {
+            const [y, m, d] = firstInMonth.scheduled_date.split('-').map(Number);
+            setSelectedDate(new Date(y, m - 1, d));
+        } else {
+            setSelectedDate(new Date(year, month, 1));
+        }
+    };
 
-            return { year: prev.year, month: prev.month - 1 };
-        });
+    const handlePrevMonth = () => {
+        const newYear = viewMonth.month === 0 ? viewMonth.year - 1 : viewMonth.year;
+        const newMonth = viewMonth.month === 0 ? 11 : viewMonth.month - 1;
+        handleMonthChange(newYear, newMonth);
     };
 
     const handleNextMonth = () => {
-        setViewMonth((prev) => {
-            if (prev.month === 11) {
-                return { year: prev.year + 1, month: 0 };
-            }
-
-            return { year: prev.year, month: prev.month + 1 };
-        });
+        const newYear = viewMonth.month === 11 ? viewMonth.year + 1 : viewMonth.year;
+        const newMonth = viewMonth.month === 11 ? 0 : viewMonth.month + 1;
+        handleMonthChange(newYear, newMonth);
     };
 
     const handleToday = () => {
-        setViewMonth({ year: today.getFullYear(), month: today.getMonth() });
-        setSelectedDate(today);
+        const now = new Date();
+        setViewMonth({ year: now.getFullYear(), month: now.getMonth() });
+        setSelectedDate(now);
     };
 
     const handleSelectDate = (d: Date) => {
@@ -694,17 +857,58 @@ function TeacherCalendarView({
                         </div>
                     </div>
                     <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground truncate">
-                        {nextUpcomingSession ? formatShortDate(nextUpcomingSession.scheduled_date) : 'Term Done'}
+                        {nextUpcomingSession
+                            ? formatShortDate(nextUpcomingSession.scheduled_date)
+                            : calendarSchedules.length > 0
+                            ? 'Term Completed'
+                            : 'No Sessions'}
                     </div>
                     <p className="mt-1 text-xs text-muted-foreground truncate">
                         {nextUpcomingSession
                             ? `${nextUpcomingSession.subject_code} • ${formatTime(nextUpcomingSession.start_time)}`
-                            : 'All sessions completed'}
+                            : calendarSchedules.length > 0
+                            ? `${calendarSchedules.length} sessions recorded`
+                            : 'No active schedule'}
                     </p>
                 </div>
             </div>
 
-            {/* 2. Interactive Calendar & Timetable Split Card */}
+            {/* 2. Active Semester Notice & Jump Bar */}
+            {semesterName && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/80 bg-card px-4 py-2.5 shadow-2xs">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="flex items-center gap-1.5 font-bold text-xs text-foreground">
+                            <BookOpen className="size-3.5 text-primary" />
+                            <span>{semesterName}</span>
+                            {academicYear && <span className="text-muted-foreground font-normal">({academicYear})</span>}
+                        </span>
+                        <span className="text-muted-foreground text-xs">•</span>
+                        <span className="text-xs text-muted-foreground">
+                            <span className="font-semibold text-foreground">{calendarSchedules.length}</span> total sessions across{' '}
+                            <span className="font-semibold text-foreground">{activeMonths.length}</span> months
+                        </span>
+                    </div>
+
+                    {currentMonthClassCount === 0 && activeMonths.length > 0 && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                const firstMonth = activeMonths[0];
+                                if (firstMonth) {
+                                    handleMonthChange(firstMonth.year, firstMonth.month);
+                                }
+                            }}
+                            className="h-7 text-xs font-semibold text-primary border-primary/30 hover:bg-primary/10 gap-1.5"
+                        >
+                            <span>Jump to Active Term Month ({activeMonths[0]?.label})</span>
+                            <ArrowRight className="size-3" />
+                        </Button>
+                    )}
+                </div>
+            )}
+
+            {/* 3. Interactive Calendar & Timetable Split Card */}
             <Card className="gap-0 py-0 overflow-hidden shadow-xs border-border">
                 <CardContent className="p-0">
                     <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-12 lg:divide-x lg:divide-y-0">
@@ -716,9 +920,11 @@ function TeacherCalendarView({
                                 selectedDate={selectedDate}
                                 datesWithClasses={datesWithClasses}
                                 holidayDates={holidayDates}
+                                activeMonths={activeMonths}
                                 onSelectDate={handleSelectDate}
                                 onPrevMonth={handlePrevMonth}
                                 onNextMonth={handleNextMonth}
+                                onMonthChange={handleMonthChange}
                                 onToday={handleToday}
                             />
                         </div>
@@ -730,6 +936,8 @@ function TeacherCalendarView({
                                 schedules={selectedDaySchedules}
                                 onSelectDate={handleSelectDate}
                                 nextDateWithClasses={nextDateWithClasses}
+                                firstDateWithClasses={firstDateWithClasses}
+                                semesterName={semesterName}
                                 onPrevDay={handlePrevDay}
                                 onNextDay={handleNextDay}
                             />
