@@ -13,9 +13,18 @@ import {
     CheckCircle2,
     Clock,
     BookOpen,
+    QrCode,
+    Send,
+    Loader2,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { ConfirmDeleteDialog } from '@/components/confirm-delete-dialog';
+import {
+    QrPassModal,
+    generateAndEmailTeacherQrPass,
+    type QrPassTeacher,
+} from '@/components/qr-pass-modal';
 import { TablePageHeader } from '@/components/table-page-header';
 import { TablePagination } from '@/components/table-pagination';
 import { Badge } from '@/components/ui/badge';
@@ -56,7 +65,33 @@ export default function Index({ data, filters, employmentTypes, stats }: Teacher
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showFilters, setShowFilters] = useState(false);
+    const [selectedQrTeacher, setSelectedQrTeacher] = useState<QrPassTeacher | null>(null);
+    const [sendingQrId, setSendingQrId] = useState<number | null>(null);
     const searchTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    const toQrPassTeacher = (item: any): QrPassTeacher => ({
+        id: item.id,
+        full_name: item.full_name,
+        employee_id: item.employee_id,
+        email: item.email,
+        department: item.department,
+        rank: item.rank,
+        qr_payload: item.qr_payload || `WMSU-QR:${item.employee_id}`,
+    });
+
+    const handleGenerateAndSendQr = async (item: any) => {
+        if (sendingQrId === item.id) return;
+        const qrTeacher = toQrPassTeacher(item);
+        setSendingQrId(item.id);
+        try {
+            const res = await generateAndEmailTeacherQrPass(qrTeacher);
+            toast.success(res.message);
+        } catch (err) {
+            toast.error(err instanceof Error ? err.message : 'Failed to send QR Pass to email.');
+        } finally {
+            setSendingQrId(null);
+        }
+    };
 
     const navigate = (params: Record<string, unknown> = {}) => {
         router.get(
@@ -503,7 +538,7 @@ export default function Index({ data, filters, employmentTypes, stats }: Teacher
                                                             <span className="sr-only">Open actions</span>
                                                         </Button>
                                                     </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end" className="w-48">
+                                                    <DropdownMenuContent align="end" className="w-56">
                                                         {/* Primary Decision Action: Assign Course Schedule */}
                                                         <DropdownMenuItem
                                                             onClick={() => router.get(`${assignSchedulesCreate().url}?teacher_id=${item.id}`)}
@@ -513,9 +548,30 @@ export default function Index({ data, filters, employmentTypes, stats }: Teacher
                                                             Assign Schedule
                                                         </DropdownMenuItem>
 
+                                                        <DropdownMenuItem
+                                                            onClick={() => handleGenerateAndSendQr(item)}
+                                                            disabled={sendingQrId === item.id}
+                                                        >
+                                                            {sendingQrId === item.id ? (
+                                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                            ) : (
+                                                                <Send className="mr-2 h-4 w-4" />
+                                                            )}
+                                                            Generate &amp; Send QR to Email
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuItem
+                                                            onClick={() => setSelectedQrTeacher(toQrPassTeacher(item))}
+                                                        >
+                                                            <QrCode className="mr-2 h-4 w-4" />
+                                                            View / Print QR Pass
+                                                        </DropdownMenuItem>
+
+                                                        <DropdownMenuSeparator />
+
                                                         <DropdownMenuItem onClick={() => router.get(teachersShow(item.id))}>
                                                             <Eye className="mr-2 h-4 w-4" />
-                                                            View Profile & Schedule
+                                                            View Profile &amp; Schedule
                                                         </DropdownMenuItem>
 
                                                         <DropdownMenuItem onClick={() => router.get(teachersEdit(item.id))}>
@@ -575,6 +631,14 @@ export default function Index({ data, filters, employmentTypes, stats }: Teacher
                 description="Are you sure you want to delete this teacher? This action cannot be undone."
                 onConfirm={handleDelete}
                 loading={isDeleting}
+            />
+
+            <QrPassModal
+                open={Boolean(selectedQrTeacher)}
+                onOpenChange={(open) => {
+                    if (!open) setSelectedQrTeacher(null);
+                }}
+                teacher={selectedQrTeacher}
             />
         </>
     );

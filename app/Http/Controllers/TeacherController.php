@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\EmploymentType;
 use App\Http\Requests\TeacherRequest;
+use App\Mail\TeacherQrPassMail;
 use App\Models\Department;
 use App\Models\Schedule;
 use App\Models\Teacher;
@@ -14,6 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -462,5 +464,66 @@ class TeacherController extends Controller
             'availableUsers' => $availableUsers,
             'roles' => Role::all()->pluck('name'),
         ]);
+    }
+
+    /**
+     * Generate the teacher's QR Pass and email it to the teacher's email address.
+     */
+    public function sendQrPassEmail(Request $request, Teacher $teacher)
+    {
+        $validated = $request->validate([
+            'qr_image_base64' => ['nullable', 'string'],
+            'email' => ['nullable', 'email', 'max:255'],
+        ]);
+
+        $recipientEmail = $validated['email'] ?? $teacher->email ?? $teacher->user?->email;
+
+        if (! $recipientEmail) {
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Teacher {$teacher->full_name} does not have an email address configured.",
+                ], 422);
+            }
+
+            return back()->with('error', "Teacher {$teacher->full_name} does not have an email address configured.");
+        }
+
+        $qrDataUrl = $validated['qr_image_base64'] ?? null;
+        $qrPngBinary = null;
+
+        if ($qrDataUrl && str_starts_with($qrDataUrl, 'data:image/png;base64,')) {
+            $base64Part = substr($qrDataUrl, strlen('data:image/png;base64,'));
+            $decoded = base64_decode($base64Part, true);
+            if ($decoded !== false) {
+                $qrPngBinary = $decoded;
+            }
+        }
+
+        $qrPayload = $teacher->qr_payload;
+        $sentByName = $request->user()?->name;
+
+        Mail::to($recipientEmail)->send(
+            new TeacherQrPassMail(
+                teacher: $teacher,
+                qrPayload: $qrPayload,
+                qrPngBinary: $qrPngBinary,
+                qrDataUrl: $qrDataUrl,
+                sentByName: $sentByName,
+            )
+        );
+
+        $message = "QR Clock-In Pass generated and emailed to {$recipientEmail}.";
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'email' => $recipientEmail,
+                'qr_payload' => $qrPayload,
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 }

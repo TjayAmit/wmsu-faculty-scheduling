@@ -20,8 +20,10 @@ import {
     FileText,
     AlertCircle,
     ArrowRight,
+    QrCode,
 } from 'lucide-react';
 import { useState } from 'react';
+import { QrPassModal } from '@/components/qr-pass-modal';
 import CreateUserAccountForm from '@/components/teachers/CreateUserAccountForm';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -72,6 +74,7 @@ export default function Show({
     const [showDelete, setShowDelete] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
+    const [showQrPassModal, setShowQrPassModal] = useState(false);
     const [unassignDraftId, setUnassignDraftId] = useState<number | null>(null);
     const [isUnassigning, setIsUnassigning] = useState(false);
 
@@ -195,6 +198,17 @@ export default function Show({
                                 <CalendarPlus className="h-4 w-4" />
                                 Assign Schedule
                             </Link>
+                        </Button>
+
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-9 gap-1.5"
+                            onClick={() => setShowQrPassModal(true)}
+                        >
+                            <QrCode className="h-4 w-4 text-primary" />
+                            QR Pass &amp; Email
                         </Button>
 
                         <Button asChild variant="outline" size="sm" className="h-9 gap-1.5">
@@ -811,6 +825,20 @@ export default function Show({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <QrPassModal
+                open={showQrPassModal}
+                onOpenChange={setShowQrPassModal}
+                teacher={{
+                    id: teacher.id,
+                    full_name: fullName,
+                    employee_id: teacher.employee_id,
+                    email: teacher.email,
+                    department: teacher.department,
+                    rank: teacher.rank,
+                    qr_payload: (teacher as any).qr_payload || `WMSU-QR:${teacher.employee_id}`,
+                }}
+            />
         </>
     );
 }

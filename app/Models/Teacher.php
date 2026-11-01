@@ -27,7 +27,7 @@ class Teacher extends Model
     #[Cast(type: 'boolean')]
     protected $is_active;
 
-    protected $appends = ['full_name', 'has_user_account'];
+    protected $appends = ['full_name', 'has_user_account', 'qr_payload'];
 
     /**
      * Get the user associated with the teacher.
@@ -123,6 +123,21 @@ class Teacher extends Model
     public function hasUserAccount(): bool
     {
         return ! is_null($this->user_id);
+    }
+
+    /**
+     * Get the signed QR Kiosk payload for this teacher.
+     */
+    public function getQrPayloadAttribute(): string
+    {
+        if (! $this->id || ! $this->employee_id) {
+            return '';
+        }
+
+        $key = (string) config('app.key', 'wmsu-kiosk-secret');
+        $sig = substr(hash_hmac('sha256', "WMSU-QR:{$this->id}:{$this->employee_id}", $key), 0, 12);
+
+        return "WMSU-QR:{$this->employee_id}:{$sig}";
     }
 
     /**

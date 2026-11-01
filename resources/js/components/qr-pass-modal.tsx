@@ -1,6 +1,7 @@
-import { Check, Copy, Download, Printer, QrCode, ShieldCheck } from 'lucide-react';
+import { Check, Copy, Download, Loader2, Mail, Printer, QrCode, Send, ShieldCheck } from 'lucide-react';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,6 +17,7 @@ export interface QrPassTeacher {
     id: number;
     full_name: string;
     employee_id: string;
+    email?: string | null;
     department?: string | null;
     rank?: string | null;
     qr_payload: string;
@@ -27,11 +29,63 @@ interface QrPassModalProps {
     teacher: QrPassTeacher | null;
 }
 
+/**
+ * Generates a high-resolution QR Code PNG for the given teacher and sends it to their email via the backend.
+ */
+export async function generateAndEmailTeacherQrPass(
+    teacher: QrPassTeacher,
+    existingQrDataUrl?: string,
+): Promise<{ success: boolean; message: string; email?: string }> {
+    const qrDataUrl =
+        existingQrDataUrl ||
+        (await QRCode.toDataURL(teacher.qr_payload, {
+            width: 320,
+            margin: 2,
+            color: {
+                dark: '#7f1d1d',
+                light: '#ffffff',
+            },
+            errorCorrectionLevel: 'H',
+        }));
+
+    const csrfToken =
+        document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || '';
+    const xsrfCookie = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('XSRF-TOKEN='))
+        ?.split('=')[1];
+
+    const res = await fetch(`/teachers/${teacher.id}/send-qr-pass`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}),
+            ...(xsrfCookie ? { 'X-XSRF-TOKEN': decodeURIComponent(xsrfCookie) } : {}),
+        },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            qr_image_base64: qrDataUrl,
+            email: teacher.email || undefined,
+        }),
+    });
+
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+        throw new Error(json.message || 'Failed to send QR Pass email.');
+    }
+
+    return json;
+}
+
 export function QrPassModal({ open, onOpenChange, teacher }: QrPassModalProps) {
     const [qrDataUrl, setQrDataUrl] = useState<string>('');
     const [copied, setCopied] = useState(false);
+    const [isSendingEmail, setIsSendingEmail] = useState(false);
+    const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
 
     useEffect(() => {
+        setEmailSentTo(null);
         if (open && teacher?.qr_payload) {
             QRCode.toDataURL(teacher.qr_payload, {
                 width: 320,
@@ -63,6 +117,21 @@ export function QrPassModal({ open, onOpenChange, teacher }: QrPassModalProps) {
         link.download = `WMSU-QR-${teacher.employee_id}-${teacher.full_name.replace(/\s+/g, '_')}.png`;
         link.href = qrDataUrl;
         link.click();
+    };
+
+    const handleSendToEmail = async () => {
+        if (isSendingEmail) return;
+        setIsSendingEmail(true);
+        try {
+            const result = await generateAndEmailTeacherQrPass(teacher, qrDataUrl || undefined);
+            setEmailSentTo(result.email || teacher.email || 'teacher email');
+            toast.success(result.message);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Unable to send QR Pass to email.';
+            toast.error(msg);
+        } finally {
+            setIsSendingEmail(false);
+        }
     };
 
     const handlePrintPass = () => {
@@ -202,10 +271,10 @@ export function QrPassModal({ open, onOpenChange, teacher }: QrPassModalProps) {
                             <img
                                 src={qrDataUrl}
                                 alt={`QR Code for ${teacher.full_name}`}
-                                className="size-52 object-contain"
+                                className="size-48 object-contain"
                             />
                         ) : (
-                            <div className="size-52 flex items-center justify-center text-xs text-muted-foreground">
+                            <div className="size-48 flex items-center justify-center text-xs text-muted-foreground">
                                 Generating QR Pass...
                             </div>
                         )}
@@ -218,6 +287,12 @@ export function QrPassModal({ open, onOpenChange, teacher }: QrPassModalProps) {
                             {teacher.department || 'Faculty Instructor'}
                             {teacher.rank ? ` • ${teacher.rank}` : ''}
                         </p>
+                        {teacher.email && (
+                            <p className="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                                <Mail className="size-3" />
+                                {teacher.email}
+                            </p>
+                        )}
                         <div className="pt-1 flex items-center justify-center gap-2">
                             <Badge variant="outline" className="font-mono text-xs border-primary/30 bg-primary/5 text-primary">
                                 ID: {teacher.employee_id}
@@ -227,6 +302,52 @@ export function QrPassModal({ open, onOpenChange, teacher }: QrPassModalProps) {
                                 Signed Token
                             </Badge>
                         </div>
+                    </div>
+
+                    {/* Send QR Pass to Teacher Email Box */}
+                    <div className="w-full rounded-xl border border-border bg-muted/30 p-3 space-y-2">
+                        <div className="flex items-center justify-between gap-2 text-left">
+                            <div className="min-w-0">
+                                <span className="block text-xs font-semibold text-foreground">
+                                    Email QR Pass to Teacher
+                                </span>
+                                <span className="block truncate text-[11px] text-muted-foreground">
+                                    {teacher.email || 'Send official QR pass image & token to email'}
+                                </span>
+                            </div>
+                            <Button
+                                type="button"
+                                size="sm"
+                                disabled={isSendingEmail || !qrDataUrl}
+                                onClick={handleSendToEmail}
+                                className="h-8 bg-red-800 hover:bg-red-900 text-white text-xs font-semibold gap-1.5 shrink-0"
+                            >
+                                {isSendingEmail ? (
+                                    <>
+                                        <Loader2 className="size-3.5 animate-spin" />
+                                        Sending...
+                                    </>
+                                ) : emailSentTo ? (
+                                    <>
+                                        <Check className="size-3.5" />
+                                        Resend Email
+                                    </>
+                                ) : (
+                                    <>
+                                        <Send className="size-3.5" />
+                                        Send to Email
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                        {emailSentTo && (
+                            <div className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1.5 text-[11px] text-emerald-700 dark:text-emerald-300 text-left">
+                                <Check className="size-3.5 shrink-0 text-emerald-600" />
+                                <span>
+                                    QR Pass sent to <strong>{emailSentTo}</strong>
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {/* Copyable Payload for Testing / Backup */}
@@ -259,10 +380,6 @@ export function QrPassModal({ open, onOpenChange, teacher }: QrPassModalProps) {
                             )}
                         </Button>
                     </div>
-
-                    <p className="text-[11px] text-muted-foreground max-w-xs">
-                        Scan this QR code once at your assigned classroom&apos;s registered Kiosk browser to immediately mark your class attendance as <strong>Present</strong>. No time-out scan is required.
-                    </p>
                 </div>
 
                 <DialogFooter className="p-4 border-t border-border/80 bg-muted/20 flex-row justify-between sm:justify-between gap-2">

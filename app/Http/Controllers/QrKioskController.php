@@ -77,6 +77,7 @@ class QrKioskController extends Controller
                 'id' => $t->id,
                 'full_name' => $t->full_name,
                 'employee_id' => $t->employee_id,
+                'email' => $t->email,
                 'department' => $t->department,
                 'rank' => $t->rank,
                 'qr_payload' => $this->kioskService->generateTeacherQrPayload($t),

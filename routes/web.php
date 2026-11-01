@@ -118,13 +118,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Self-service teacher profile claim (Teacher-role users with no linked profile)
     Route::post('teacher/claim-profile', [TeacherController::class, 'claimProfile'])->name('teacher.claim-profile');
 
-    // Teacher User Account Linking Routes
+    // Teacher User Account Linking & QR Pass Email Routes
     Route::prefix('teachers/{teacher}')->group(function () {
         Route::get('create-user-account', [TeacherController::class, 'showCreateUserAccountForm'])->name('teachers.create-user-account');
         Route::post('create-user-account', [TeacherController::class, 'createUserAccount']);
         Route::get('link-user-account', [TeacherController::class, 'showLinkUserAccountForm'])->name('teachers.link-user-account');
         Route::post('link-user-account', [TeacherController::class, 'linkUserAccount']);
         Route::delete('unlink-user-account', [TeacherController::class, 'unlinkUserAccount']);
+        Route::post('send-qr-pass', [TeacherController::class, 'sendQrPassEmail'])->name('teachers.send-qr-pass');
     });
 
     // Subjects Routes
