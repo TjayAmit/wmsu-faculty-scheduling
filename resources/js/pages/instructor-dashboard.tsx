@@ -12,12 +12,14 @@ import {
     Fingerprint,
     GraduationCap,
     MapPin,
+    QrCode,
     ShieldAlert,
     Sparkles,
     User,
     Users,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { QrPassModal } from '@/components/qr-pass-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -34,6 +36,7 @@ interface TeacherProfile {
     employment_type: string;
     biometric_pin: string | null;
     has_biometric: boolean;
+    qr_payload?: string;
 }
 
 interface SemesterInfo {
@@ -163,6 +166,7 @@ export default function InstructorDashboard({
         return DAYS_OF_WEEK.some((d) => d.key === todayDay) ? todayDay : 'monday';
     });
     const [activityTab, setActivityTab] = useState<'punches' | 'requests'>('punches');
+    const [qrModalOpen, setQrModalOpen] = useState(false);
 
     // Real-time ticking clock for Date & Time Card
     useEffect(() => {
@@ -227,6 +231,18 @@ export default function InstructorDashboard({
 
                     {/* Quick Actions */}
                     <div className="flex flex-wrap items-center gap-2">
+                        {teacher?.qr_payload && (
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="gap-2 h-9 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10"
+                                onClick={() => setQrModalOpen(true)}
+                            >
+                                <QrCode className="h-4 w-4" />
+                                My QR Pass
+                            </Button>
+                        )}
                         <Button asChild variant="outline" size="sm" className="gap-2 h-9">
                             <Link href="/teacher-schedules">
                                 <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -919,6 +935,21 @@ export default function InstructorDashboard({
                     </div>
                 </div>
             </div>
+
+            {teacher && teacher.qr_payload && (
+                <QrPassModal
+                    open={qrModalOpen}
+                    onOpenChange={setQrModalOpen}
+                    teacher={{
+                        id: teacher.id,
+                        full_name: teacher.full_name,
+                        employee_id: teacher.employee_id,
+                        department: teacher.department,
+                        rank: teacher.rank,
+                        qr_payload: teacher.qr_payload,
+                    }}
+                />
+            )}
         </>
     );
 }

@@ -61,6 +61,7 @@ class InstructorDashboardController extends Controller
                     : ($teacher->employment_type ?? 'full_time'),
                 'biometric_pin' => $teacher->biometric_pin,
                 'has_biometric' => !empty($teacher->biometric_pin),
+                'qr_payload' => app(\App\Services\Zkteco\QrKioskAttendanceService::class)->generateTeacherQrPayload($teacher),
             ];
         }
 
@@ -189,8 +190,8 @@ class InstructorDashboardController extends Controller
                 ->orderBy('start_time')
                 ->get();
 
-            // Also fetch today's biometric logs for this teacher
-            $todayPunches = ZktecoAttendanceLog::with(['classroom', 'device'])
+            // Also fetch today's biometric & QR kiosk logs for this teacher
+            $todayPunches = ZktecoAttendanceLog::with(['classroom', 'device', 'qrKiosk'])
                 ->where('teacher_id', $teacherId)
                 ->whereDate('punch_time', $today)
                 ->orderBy('punch_time', 'asc')
@@ -314,8 +315,8 @@ class InstructorDashboardController extends Controller
                     ->count();
             }
 
-            // 7. Recent Biometric Punch Logs (Last 5)
-            $recentPunches = ZktecoAttendanceLog::with(['classroom', 'device'])
+            // 7. Recent Biometric & QR Kiosk Punch Logs (Last 5)
+            $recentPunches = ZktecoAttendanceLog::with(['classroom', 'device', 'qrKiosk'])
                 ->where('teacher_id', $teacherId)
                 ->latest('punch_time')
                 ->take(5)
@@ -329,10 +330,10 @@ class InstructorDashboardController extends Controller
                         'id' => $punch->id,
                         'punch_time' => $punch->punch_time->format('M d, Y g:i A'),
                         'time_ago' => $punch->punch_time->diffForHumans(),
-                        'room' => $punch->classroom?->name ?? 'Unknown Room',
-                        'device' => $punch->device?->name ?? 'Terminal',
+                        'room' => $punch->classroom ? "{$punch->classroom->building} {$punch->classroom->room_number}" : 'Unknown Room',
+                        'device' => $punch->device?->device_name ?? $punch->qrKiosk?->kiosk_name ?? 'Terminal',
                         'punch_type' => ucfirst(str_replace('_', ' ', $punch->punch_type ?? 'check_in')),
-                        'verify_type' => ucfirst($punch->verify_type ?? 'biometric'),
+                        'verify_type' => $punch->verify_type === 'qr_kiosk' ? 'QR Kiosk' : ucfirst($punch->verify_type ?? 'biometric'),
                         'match_status' => $status,
                         'is_matched' => $status === ZktecoMatchStatus::MATCHED->value,
                         'rejection_reason' => $punch->rejection_reason,

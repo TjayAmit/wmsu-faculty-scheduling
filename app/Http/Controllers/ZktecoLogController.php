@@ -21,6 +21,7 @@ class ZktecoLogController extends Controller
         $query = ZktecoAttendanceLog::query()
             ->with([
                 'device',
+                'qrKiosk',
                 'classroom',
                 'teacher',
                 'teacherSchedule.subject',

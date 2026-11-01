@@ -13,6 +13,7 @@ use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\InstructorDashboardController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\QrKioskController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RoomScheduleController;
 use App\Http\Controllers\ScheduleController;
@@ -289,7 +290,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // ZKTeco Room Attendance Punch Logs
     Route::get('zkteco-logs', [ZktecoLogController::class, 'index'])->name('zkteco-logs.index');
+
+    // Classroom QR Kiosk Admin Management & Browser Registration Routes
+    Route::get('qr-kiosks', [QrKioskController::class, 'index'])->name('qr-kiosks.index');
+    Route::post('qr-kiosks/register-browser', [QrKioskController::class, 'registerBrowser'])->name('qr-kiosks.register-browser');
+    Route::post('qr-kiosks/unregister-browser', [QrKioskController::class, 'unregisterBrowser'])->name('qr-kiosks.unregister-browser');
+    Route::post('qr-kiosks/{qrKiosk}/toggle', [QrKioskController::class, 'toggleStatus'])->name('qr-kiosks.toggle');
+    Route::delete('qr-kiosks/{qrKiosk}', [QrKioskController::class, 'destroy'])->name('qr-kiosks.destroy');
 });
+
+// Public Classroom QR Kiosk Scanner (Outside Authenticated Routes — Verified via Browser Cookie)
+Route::get('kiosk/scanner', [QrKioskController::class, 'scanner'])->name('kiosk.scanner');
+Route::post('kiosk/scan', [QrKioskController::class, 'scan'])->name('kiosk.scan');
 
 // ZKTeco ADMS / ICLOCK Push Endpoint for Physical Hardware
 Route::match(['get', 'post'], 'iclock/cdata', [ZktecoPushController::class, 'handlePush'])

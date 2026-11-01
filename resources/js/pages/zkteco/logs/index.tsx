@@ -47,6 +47,11 @@ interface LogItem {
         device_name: string;
         ip_address: string;
     } | null;
+    qr_kiosk?: {
+        id: number;
+        kiosk_name: string;
+        browser_name?: string | null;
+    } | null;
     classroom?: {
         id: number;
         building: string;
@@ -424,7 +429,7 @@ export default function ZktecoLogsIndex({ data, filters, stats, devices }: Props
                                                         </Badge>
                                                     )}
                                                     <span className="text-xs text-muted-foreground">
-                                                        {log.device?.device_name || 'ZKTeco Device'}
+                                                        {log.device?.device_name || log.qr_kiosk?.kiosk_name || 'Classroom Terminal'}
                                                     </span>
                                                 </div>
                                             </TableCell>

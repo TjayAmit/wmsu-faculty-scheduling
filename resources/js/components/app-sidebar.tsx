@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, DoorOpen, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Activity, Shield, FileText, CalendarCheck, Flag, Fingerprint, Cpu } from 'lucide-react';
+import { BookOpen, Building2, DoorOpen, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Activity, Shield, FileText, CalendarCheck, Flag, Fingerprint, Cpu, QrCode } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -155,6 +155,12 @@ const navGroups: NavGroup[] = [
                 title: 'ZKTeco Devices',
                 href: '/zkteco-devices',
                 icon: Cpu,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
+            {
+                title: 'QR Kiosk Terminals',
+                href: '/qr-kiosks',
+                icon: QrCode,
                 roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
             },
             {

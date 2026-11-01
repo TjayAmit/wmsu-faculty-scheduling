@@ -345,7 +345,7 @@ class ZktecoAttendanceService
      * Ensure that if a teacher has active TeacherAssignments or approved DraftSchedules
      * covering the given date's day-of-week, corresponding TeacherSchedule session rows exist.
      */
-    protected function ensureTeacherSchedulesForDate(Teacher $teacher, Carbon $date): void
+    public function ensureTeacherSchedulesForDate(Teacher $teacher, Carbon $date): void
     {
         $dayName = strtolower($date->format('l'));
 

@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'zkteco_device_id',
+    'qr_kiosk_id',
     'classroom_id',
     'biometric_pin',
     'teacher_id',
@@ -36,6 +37,14 @@ class ZktecoAttendanceLog extends Model
     public function device(): BelongsTo
     {
         return $this->belongsTo(ZktecoDevice::class, 'zkteco_device_id');
+    }
+
+    /**
+     * Get the QR Kiosk browser terminal that captured the punch.
+     */
+    public function qrKiosk(): BelongsTo
+    {
+        return $this->belongsTo(QrKiosk::class, 'qr_kiosk_id');
     }
 
     /**
