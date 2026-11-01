@@ -129,7 +129,7 @@ export default function Create({
         <>
             <Head title="Create Substitute Request" />
 
-            <div className="flex h-full flex-1 flex-col gap-5 p-4 lg:p-6 w-full max-w-7xl mx-auto">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
                 {/* Back button and page title */}
                 <div className="space-y-1">
                     <Button variant="ghost" size="sm" asChild className="-ml-2 text-xs text-muted-foreground hover:text-foreground">
@@ -152,8 +152,8 @@ export default function Create({
 
                 {/* 2-Column Responsive Layout */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
-                    {/* Left Column: Form Specifications (7 cols) */}
-                    <Card className="lg:col-span-7 shadow-xs border-border">
+                    {/* Left Column: Form Specifications (7/8 cols) */}
+                    <Card className="lg:col-span-7 xl:col-span-8 shadow-xs border-border">
                         <CardHeader className="border-b border-border/70 pb-4">
                             <div className="flex items-center gap-2">
                                 <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -400,8 +400,8 @@ export default function Create({
                         </CardContent>
                     </Card>
 
-                    {/* Right Column: Live Request Summary & Workflow Guide (5 cols) */}
-                    <div className="lg:col-span-5 space-y-4">
+                    {/* Right Column: Live Request Summary & Workflow Guide (5/4 cols) */}
+                    <div className="lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-6">
                         {/* Live Summary Preview Card */}
                         <Card className="shadow-xs border-border bg-card overflow-hidden">
                             <CardHeader className="bg-muted/30 border-b border-border/70 pb-3">

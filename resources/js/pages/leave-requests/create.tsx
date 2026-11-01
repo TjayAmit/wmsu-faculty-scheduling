@@ -264,7 +264,7 @@ export default function Create({
         <>
             <Head title="File Leave Request" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 sm:p-6 lg:p-8">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
                 {/* Navigation & Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
@@ -298,7 +298,7 @@ export default function Create({
                 {/* 2-Column Responsive Layout */}
                 <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
                     {/* Left Column: Interactive Form */}
-                    <div className="space-y-6 lg:col-span-7">
+                    <div className="space-y-6 lg:col-span-7 xl:col-span-8">
                         <Card className="border shadow-xs">
                             <CardHeader className="border-b bg-muted/20 pb-4">
                                 <CardTitle className="text-base font-semibold">
@@ -681,7 +681,7 @@ export default function Create({
                     </div>
 
                     {/* Right Column: Live Document Preview & University Guidelines */}
-                    <div className="space-y-6 lg:col-span-5">
+                    <div className="space-y-6 lg:col-span-5 xl:col-span-4 lg:sticky lg:top-6">
                         {/* Live Application Card */}
                         <Card className="overflow-hidden border shadow-xs">
                             <div className="h-2 w-full bg-[#800000]" />
