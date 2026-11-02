@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AssignScheduleController;
+use App\Http\Controllers\AttendanceMonitorController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\DashboardController;
@@ -278,6 +279,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('assign-schedules/{draftSchedule}', [AssignScheduleController::class, 'destroy'])->name('assign-schedules.destroy');
 
     // ZKTeco Biometric Devices & Room-Verified Attendance Routes
+    Route::get('attendance-monitor', [AttendanceMonitorController::class, 'index'])->name('attendance-monitor.index');
     Route::get('zkteco-devices', [ZktecoDeviceController::class, 'index'])->name('zkteco-devices.index');
     Route::get('zkteco-devices/create', [ZktecoDeviceController::class, 'create'])->name('zkteco-devices.create');
     Route::post('zkteco-devices', [ZktecoDeviceController::class, 'store'])->name('zkteco-devices.store');
@@ -303,6 +305,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Public Classroom QR Kiosk Scanner (Outside Authenticated Routes — Verified via Browser Cookie)
 Route::get('kiosk/scanner', [QrKioskController::class, 'scanner'])->name('kiosk.scanner');
 Route::post('kiosk/scan', [QrKioskController::class, 'scan'])->name('kiosk.scan');
+
+// Signed Public Download Link for Teacher QR Pass (from Email)
+Route::get('teachers/{teacher}/download-qr-pass', [TeacherController::class, 'downloadQrPass'])
+    ->middleware('signed')
+    ->name('teachers.download-qr-pass');
 
 // ZKTeco ADMS / ICLOCK Push Endpoint for Physical Hardware
 Route::match(['get', 'post'], 'iclock/cdata', [ZktecoPushController::class, 'handlePush'])

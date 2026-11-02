@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Building2, DoorOpen, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Activity, Shield, FileText, CalendarCheck, Flag, Fingerprint, Cpu, QrCode } from 'lucide-react';
+import { BookOpen, Building2, DoorOpen, GraduationCap, LayoutGrid, Users, Library, CalendarDays, Calendar, Activity, Shield, FileText, CalendarCheck, Flag, Fingerprint, Cpu, QrCode, UserCheck } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -151,6 +151,12 @@ const navGroups: NavGroup[] = [
         title: 'Biometric Attendance',
         roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
         items: [
+            {
+                title: 'Attendance Monitor',
+                href: '/attendance-monitor',
+                icon: UserCheck,
+                roles: ['Admin', 'Faculty Admin', 'Faculty Staff'],
+            },
             {
                 title: 'ZKTeco Devices',
                 href: '/zkteco-devices',

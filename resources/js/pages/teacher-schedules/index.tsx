@@ -238,13 +238,13 @@ function TeacherCalendarGrid({
             </div>
 
             {/* Calendar Days Matrix */}
-            <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-7 gap-1 sm:gap-2">
                 {cells.map((day, i) => {
                     if (!day) {
                         return (
                             <div
                                 key={`empty-${i}`}
-                                className="min-h-[64px] sm:min-h-[72px] rounded-xl border border-dashed border-border/30 bg-muted/5 opacity-25"
+                                className="min-h-[52px] sm:min-h-[72px] rounded-lg sm:rounded-xl border border-dashed border-border/30 bg-muted/5 opacity-25"
                             />
                         );
                     }
@@ -262,7 +262,7 @@ function TeacherCalendarGrid({
                             type="button"
                             onClick={() => onSelectDate(date)}
                             className={cn(
-                                'group relative flex min-h-[64px] sm:min-h-[72px] flex-col justify-between rounded-xl border p-2 text-left transition-all duration-150',
+                                'group relative flex min-h-[52px] sm:min-h-[72px] min-w-0 flex-col justify-between rounded-lg sm:rounded-xl border p-1 sm:p-2 text-left transition-all duration-150',
                                 isSel
                                     ? 'border-[#800000] bg-[#800000]/5 ring-2 ring-[#800000]/25 shadow-xs dark:bg-[#800000]/10'
                                     : isToday
@@ -272,10 +272,10 @@ function TeacherCalendarGrid({
                             aria-label={`Select ${dateStr}`}
                         >
                             {/* Day Header */}
-                            <div className="flex items-center justify-between w-full">
+                            <div className="flex items-center justify-between w-full min-w-0">
                                 <span
                                     className={cn(
-                                        'flex size-6 items-center justify-center rounded-full text-xs font-semibold',
+                                        'flex size-5 sm:size-6 items-center justify-center rounded-full text-[11px] sm:text-xs font-semibold shrink-0',
                                         isSel
                                             ? 'bg-[#800000] text-white shadow-xs'
                                             : isToday
@@ -287,32 +287,33 @@ function TeacherCalendarGrid({
                                 </span>
 
                                 {isToday && !isSel && (
-                                    <span className="text-[10px] font-bold text-primary tracking-tight">Today</span>
+                                    <span className="hidden sm:inline text-[10px] font-bold text-primary tracking-tight">Today</span>
                                 )}
                             </div>
 
                             {/* Class Pills & Indicator */}
-                            <div className="mt-1 space-y-0.5">
+                            <div className="mt-1 space-y-0.5 min-w-0 w-full">
                                 {classCount > 0 ? (
                                     <div
                                         className={cn(
-                                            'inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-bold truncate max-w-full',
+                                            'inline-flex items-center gap-0.5 sm:gap-1 rounded-md px-1 sm:px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold truncate max-w-full',
                                             isSel
                                                 ? 'bg-[#800000]/15 text-[#800000] dark:text-rose-300'
                                                 : 'bg-primary/10 text-primary',
                                         )}
                                         title={`${classCount} classes scheduled`}
                                     >
-                                        <Clock className="size-2.5 shrink-0" />
-                                        <span className="truncate">{classCount} {classCount === 1 ? 'class' : 'classes'}</span>
+                                        <Clock className="size-2.5 shrink-0 hidden sm:inline" />
+                                        <span className="truncate sm:hidden">{classCount}c</span>
+                                        <span className="truncate hidden sm:inline">{classCount} {classCount === 1 ? 'class' : 'classes'}</span>
                                     </div>
                                 ) : isHoliday ? (
                                     <div
-                                        className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-400 truncate max-w-full"
+                                        className="inline-flex items-center gap-1 rounded-md bg-amber-500/10 px-1 sm:px-1.5 py-0.5 text-[9px] sm:text-[10px] font-bold text-amber-700 dark:text-amber-400 truncate max-w-full"
                                         title="Holiday"
                                     >
                                         <span className="size-1.5 rounded-full bg-amber-500 shrink-0" />
-                                        <span className="truncate">Holiday</span>
+                                        <span className="truncate hidden sm:inline">Holiday</span>
                                     </div>
                                 ) : (
                                     <div className="h-4" />
@@ -886,11 +887,11 @@ function TeacherCalendarView({
             </div>
 
             {/* 2. Interactive Calendar & Timetable Split Card */}
-            <Card className="gap-0 py-0 overflow-hidden shadow-xs border-border">
+            <Card className="gap-0 py-0 overflow-hidden shadow-xs border-border min-w-0">
                 <CardContent className="p-0">
-                    <div className="grid grid-cols-1 divide-y divide-border lg:grid-cols-12 lg:divide-x lg:divide-y-0">
+                    <div className="grid grid-cols-1 divide-y divide-border xl:grid-cols-12 xl:divide-x xl:divide-y-0">
                         {/* Left Pane (Calendar): 8 Columns on Desktop for a more spacious calendar */}
-                        <div className="p-4 sm:p-5 lg:col-span-8">
+                        <div className="p-3 sm:p-5 xl:col-span-8 min-w-0">
                             <TeacherCalendarGrid
                                 year={viewMonth.year}
                                 month={viewMonth.month}
@@ -907,7 +908,7 @@ function TeacherCalendarView({
                         </div>
 
                         {/* Right Pane (Daily Schedule): 4 Columns on Desktop (compact, focused timetable) */}
-                        <div className="bg-muted/10 p-4 sm:p-5 lg:col-span-4 flex flex-col justify-between">
+                        <div className="bg-muted/10 p-3 sm:p-5 xl:col-span-4 flex flex-col justify-between min-w-0">
                             <SelectedDaySchedulePanel
                                 selectedDate={selectedDate}
                                 schedules={selectedDaySchedules}
@@ -1320,33 +1321,39 @@ export default function Index(props: TeacherSchedulesIndexProps) {
 
     const subjects = props.subjects ?? [];
     const calendarSchedules = props.calendar_schedules ?? [];
-    const activeSemester = calendarSchedules[0]?.semester_name;
-    const activeAcademicYear = calendarSchedules[0]?.academic_year;
+    const uniqueSemesters = Array.from(
+        new Map(
+            subjects
+                .filter((s) => s.semester_name)
+                .map((s) => [`${s.semester_name}|${s.academic_year}`, { name: s.semester_name, year: s.academic_year }]),
+        ).values(),
+    );
 
     return (
         <>
             <Head title="My Schedule" />
 
-            <div className="flex h-full flex-1 flex-col gap-5 p-4 lg:p-6 w-full">
+            <div className="flex h-full flex-1 flex-col gap-5 p-4 lg:p-6 w-full min-w-0">
                 {/* Page Header with View Switcher */}
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="space-y-1">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between min-w-0">
+                    <div className="space-y-1 min-w-0">
                         <div className="flex items-center gap-2.5 flex-wrap">
                             <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                                 My Schedule
                             </h1>
-                            {activeSemester && (
+                            {uniqueSemesters.map((sem) => (
                                 <Badge
+                                    key={`${sem.name}-${sem.year}`}
                                     variant="outline"
                                     className="h-6 gap-1.5 rounded-full border-primary/25 bg-primary/5 px-2.5 text-xs font-semibold text-primary"
                                 >
-                                    <BookOpen className="size-3" />
-                                    <span>{activeSemester}</span>
-                                    {activeAcademicYear && (
-                                        <span className="font-normal text-muted-foreground">({activeAcademicYear})</span>
+                                    <BookOpen className="size-3 shrink-0" />
+                                    <span className="truncate">{sem.name}</span>
+                                    {sem.year && (
+                                        <span className="font-normal text-muted-foreground">({sem.year})</span>
                                     )}
                                 </Badge>
-                            )}
+                            ))}
                         </div>
                         <p className="text-sm text-muted-foreground">
                             {subjects.length} {subjects.length === 1 ? 'subject' : 'subjects'} enrolled · {calendarSchedules.length} teaching sessions across the term.
@@ -1354,7 +1361,7 @@ export default function Index(props: TeacherSchedulesIndexProps) {
                     </div>
 
                     {/* View Switcher Pills */}
-                    <div className="flex items-center rounded-lg border border-border bg-muted/40 p-1 shrink-0">
+                    <div className="flex items-center self-start sm:self-auto rounded-lg border border-border bg-muted/40 p-1 shrink-0 max-w-full overflow-x-auto">
                         <button
                             type="button"
                             onClick={() => setViewMode('calendar')}

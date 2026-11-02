@@ -146,9 +146,9 @@ return;
         <>
             <Head title="Request Schedule" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full">
+            <div className="flex h-full flex-1 flex-col gap-6 p-4 lg:p-6 w-full min-w-0">
                 {/* 1. Page Header (OUTSIDE table card) */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 min-w-0">
                     <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
                         Schedule Requests
                     </h1>
@@ -159,14 +159,14 @@ return;
                     </p>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border bg-muted/40 px-6 py-4">
+                <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm min-w-0">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-muted/40 px-4 sm:px-6 py-4">
                         <div className="flex items-center gap-4">
                             <span className="text-sm font-medium text-muted-foreground">
                                 {data.total} total
                             </span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                             <Select value={status} onValueChange={handleStatusChange}>
                                 <SelectTrigger className="h-9 w-[160px]">
                                     <SelectValue placeholder="Filter by status" />

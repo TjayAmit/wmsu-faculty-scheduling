@@ -2,25 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TeacherScheduleStatus;
 use App\Models\Curriculum;
 use App\Models\LeaveRequest;
 use App\Models\Section;
 use App\Models\SubstituteRequest;
 use App\Models\Teacher;
+use App\Models\TeacherAssignment;
 use App\Models\TeacherSchedule;
+use App\Services\Zkteco\ZktecoAttendanceService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class AdminDashboardController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, ZktecoAttendanceService $attendanceService)
     {
         // Calendar month — supports navigation via ?month=YYYY-MM
         $monthParam = $request->get('month');
         $calMonth = $monthParam ? Carbon::parse($monthParam.'-01') : Carbon::now();
         $calStart = $calMonth->copy()->startOfMonth();
         $calEnd = $calMonth->copy()->endOfMonth();
+
+        // Ensure all teachers with active assignments have their schedule sessions generated for this month
+        $activeTeachers = Teacher::whereHas('assignments', fn ($q) => $q->where('is_active', true))->get();
+        foreach ($activeTeachers as $teacherModel) {
+            $attendanceService->ensureTeacherSchedulesForPeriod($teacherModel, $calStart, $calEnd);
+        }
 
         $stats = [
             'total_teachers' => Teacher::count(),
@@ -33,24 +42,64 @@ class AdminDashboardController extends Controller
             'pending_substitutes' => SubstituteRequest::where('status', 'pending')->count(),
         ];
 
-        $monthSchedules = TeacherSchedule::with(['subject', 'teacher', 'semester'])
+        $now = Carbon::now();
+
+        $monthSchedules = TeacherSchedule::with(['subject', 'teacher', 'semester', 'attendanceRecord'])
             ->whereBetween('scheduled_date', [$calStart, $calEnd])
+            ->where(function ($query) {
+                // Focus on schedules under College of Education
+                $query->whereHas('teacher', function ($q) {
+                    $q->where('department', 'like', '%College of Education%');
+                })->orWhereDoesntHave('teacher');
+            })
             ->orderBy('scheduled_date')
             ->orderBy('start_time')
             ->get()
-            ->map(fn ($s) => [
-                'id' => $s->id,
-                'scheduled_date' => $s->scheduled_date->toDateString(),
-                'subject_code' => $s->subject->code ?? '',
-                'subject_title' => $s->subject->title ?? '',
-                'section' => $s->section,
-                'teacher_name' => $s->teacher ? trim("{$s->teacher->first_name} {$s->teacher->last_name}") : null,
-                'room' => $s->room,
-                'start_time' => $s->start_time,
-                'end_time' => $s->end_time,
-                'status' => $s->status instanceof \BackedEnum ? $s->status->value : $s->status,
-                'semester_name' => $s->semester->name ?? '',
-            ]);
+            ->map(function ($s) use ($now) {
+                $start = Carbon::parse($s->start_time);
+                $end = Carbon::parse($s->end_time);
+                $date = $s->scheduled_date;
+
+                $hasAttendance = !empty($s->attendance_record_id) || $s->status === TeacherScheduleStatus::COMPLETED || $s->status === 'completed';
+
+                $attendanceStatus = 'scheduled';
+                if ($s->status === TeacherScheduleStatus::CANCELLED || $s->status === 'cancelled') {
+                    $attendanceStatus = 'cancelled';
+                } elseif ($hasAttendance) {
+                    $attendanceStatus = 'present';
+                } else {
+                    $isPast = false;
+                    if ($date->isPast() && !$date->isToday()) {
+                        $isPast = true;
+                    } elseif ($date->isToday() && $now->greaterThan($end)) {
+                        $isPast = true;
+                    }
+
+                    if ($isPast) {
+                        $attendanceStatus = 'absent';
+                    } elseif ($date->isToday() && $now->between($start, $end)) {
+                        $attendanceStatus = 'in_session';
+                    } else {
+                        $attendanceStatus = 'scheduled';
+                    }
+                }
+
+                return [
+                    'id' => $s->id,
+                    'scheduled_date' => $s->scheduled_date->toDateString(),
+                    'subject_code' => $s->subject->code ?? '',
+                    'subject_title' => $s->subject->title ?? '',
+                    'section' => $s->section,
+                    'teacher_name' => $s->teacher ? trim("{$s->teacher->first_name} {$s->teacher->last_name}") : null,
+                    'department' => $s->teacher->department ?? 'College of Education',
+                    'room' => $s->room,
+                    'start_time' => $s->start_time,
+                    'end_time' => $s->end_time,
+                    'status' => $s->status instanceof \BackedEnum ? $s->status->value : $s->status,
+                    'attendance_status' => $attendanceStatus,
+                    'semester_name' => $s->semester->name ?? '',
+                ];
+            });
 
         $substituteRequests = SubstituteRequest::with(['requestingTeacher', 'substituteTeacher', 'schedule.subject'])
             ->latest()

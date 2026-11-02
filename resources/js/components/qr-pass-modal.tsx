@@ -312,7 +312,7 @@ export function QrPassModal({ open, onOpenChange, teacher }: QrPassModalProps) {
                                     Email QR Pass to Teacher
                                 </span>
                                 <span className="block truncate text-[11px] text-muted-foreground">
-                                    {teacher.email || 'Send official QR pass image & token to email'}
+                                    {teacher.email || 'Send official QR pass image to email'}
                                 </span>
                             </div>
                             <Button

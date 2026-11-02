@@ -47,14 +47,19 @@ class TeacherScheduleGenerationService
                 $schedule = $draftSchedule->schedule;
                 $semester = $schedule->semester;
 
-                // Create TeacherAssignment if it doesn't exist
-                if (! $draftSchedule->teacher_assignment_id) {
+                // Create or sync TeacherAssignment
+                if (! $draftSchedule->teacher_assignment_id || ! $draftSchedule->teacherAssignment) {
                     $teacherAssignment = $this->createTeacherAssignment($draftSchedule);
                     $this->draftScheduleRepository->update($draftSchedule->id, [
                         'teacher_assignment_id' => $teacherAssignment->id,
                     ]);
                 } else {
                     $teacherAssignment = $draftSchedule->teacherAssignment;
+                    $teacherAssignment->update([
+                        'teacher_id' => $draftSchedule->teacher_id,
+                        'schedule_id' => $draftSchedule->schedule_id,
+                        'is_active' => true,
+                    ]);
                 }
 
                 $schedules = collect();
@@ -144,23 +149,39 @@ class TeacherScheduleGenerationService
     ): Collection {
         $schedules = collect();
 
-        $period = CarbonPeriod::create($semester->start_date, $semester->end_date);
+        $periods = [CarbonPeriod::create($semester->start_date, $semester->end_date)];
 
-        foreach ($period as $date) {
-            if ($this->matchesDayOfWeek($date, $dayOfWeek)) {
-                $teacherSchedule = $this->createTeacherSchedule(
-                    $teacherAssignment,
-                    $draftSchedule,
-                    $semester,
-                    $date,
-                    $dayOfWeek,
-                    $startTime,
-                    $endTime,
-                    $room,
-                    $section
-                );
+        $currentMonthStart = Carbon::today()->startOfMonth();
+        $currentMonthEnd = Carbon::today()->endOfMonth();
+        if ($currentMonthEnd->lt(Carbon::parse($semester->start_date)) || $currentMonthStart->gt(Carbon::parse($semester->end_date))) {
+            $periods[] = CarbonPeriod::create($currentMonthStart, $currentMonthEnd);
+        }
 
-                $schedules->push($teacherSchedule);
+        $seenDates = [];
+
+        foreach ($periods as $period) {
+            foreach ($period as $date) {
+                $dateKey = $date->format('Y-m-d');
+                if (isset($seenDates[$dateKey])) {
+                    continue;
+                }
+                $seenDates[$dateKey] = true;
+
+                if ($this->matchesDayOfWeek($date, $dayOfWeek)) {
+                    $teacherSchedule = $this->createTeacherSchedule(
+                        $teacherAssignment,
+                        $draftSchedule,
+                        $semester,
+                        $date,
+                        $dayOfWeek,
+                        $startTime,
+                        $endTime,
+                        $room,
+                        $section
+                    );
+
+                    $schedules->push($teacherSchedule);
+                }
             }
         }
 
@@ -199,6 +220,27 @@ class TeacherScheduleGenerationService
         // Check if date is a holiday (this could be enhanced with a holidays table)
         $isHoliday = $this->isHoliday($date);
         $holidayName = $isHoliday ? $this->getHolidayName($date) : null;
+
+        $existing = TeacherSchedule::query()
+            ->where('teacher_id', $teacherAssignment->teacher_id)
+            ->where('subject_id', $teacherAssignment->schedule->subject_id)
+            ->whereDate('scheduled_date', $date->format('Y-m-d'))
+            ->whereTime('start_time', strlen($startTime) === 5 ? "{$startTime}:00" : $startTime)
+            ->first();
+
+        if ($existing) {
+            $existing->update([
+                'teacher_assignment_id' => $teacherAssignment->id,
+                'draft_schedule_id' => $draftSchedule->id,
+                'semester_id' => $semester->id,
+                'end_time' => $endTime,
+                'room' => $room,
+                'section' => $section,
+                'classroom_id' => $teacherAssignment->schedule->classroom_id,
+            ]);
+
+            return $existing;
+        }
 
         $data = TeacherScheduleData::forGeneration(
             teacherAssignmentId: $teacherAssignment->id,

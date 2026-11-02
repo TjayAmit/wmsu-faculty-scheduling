@@ -9,6 +9,7 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\URL;
 
 class TeacherQrPassMail extends Mailable
 {
@@ -20,6 +21,7 @@ class TeacherQrPassMail extends Mailable
         public ?string $qrPngBinary = null,
         public ?string $qrDataUrl = null,
         public ?string $sentByName = null,
+        public ?string $downloadUrl = null,
     ) {}
 
     public function envelope(): Envelope
@@ -35,10 +37,10 @@ class TeacherQrPassMail extends Mailable
             view: 'emails.teacher-qr-pass',
             with: [
                 'teacher' => $this->teacher,
-                'qrPayload' => $this->qrPayload,
                 'qrPngBinary' => $this->qrPngBinary,
                 'qrDataUrl' => $this->qrDataUrl,
                 'sentByName' => $this->sentByName,
+                'downloadUrl' => $this->downloadUrl ?? URL::signedRoute('teachers.download-qr-pass', ['teacher' => $this->teacher->id]),
             ],
         );
     }

@@ -17,6 +17,7 @@ use App\Models\ZktecoAttendanceLog;
 use App\Models\ZktecoDevice;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -348,7 +349,37 @@ class ZktecoAttendanceService
      */
     public function ensureTeacherSchedulesForDate(Teacher $teacher, CarbonInterface $date): void
     {
-        $dayName = strtolower($date->format('l'));
+        $this->ensureTeacherSchedulesForPeriod($teacher, $date, $date);
+    }
+
+    /**
+     * Ensure that all active TeacherAssignments and approved DraftSchedules for a teacher
+     * have corresponding TeacherSchedule session rows across the given date range, and remove
+     * any orphaned sessions from deleted/unapproved drafts.
+     */
+    public function ensureTeacherSchedulesForPeriod(
+        Teacher $teacher,
+        CarbonInterface $startDate,
+        CarbonInterface $endDate
+    ): void {
+        // Remove any orphaned TeacherSchedule rows whose DraftSchedule was deleted or is no longer approved
+        $approvedDraftIds = DraftSchedule::query()
+            ->where('teacher_id', $teacher->id)
+            ->where('status', 'approved')
+            ->pluck('id');
+
+        $activeAssignmentIds = TeacherAssignment::query()
+            ->where('teacher_id', $teacher->id)
+            ->where('is_active', true)
+            ->pluck('id');
+
+        TeacherSchedule::query()
+            ->where('teacher_id', $teacher->id)
+            ->where(function ($q) use ($approvedDraftIds, $activeAssignmentIds) {
+                $q->whereNotIn('draft_schedule_id', $approvedDraftIds)
+                    ->whereNotIn('teacher_assignment_id', $activeAssignmentIds);
+            })
+            ->delete();
 
         // Check active TeacherAssignments
         $assignments = TeacherAssignment::query()
@@ -382,9 +413,24 @@ class ZktecoAttendanceService
                         'is_active' => true,
                     ]
                 );
+                if (! $draft->teacher_assignment_id) {
+                    $draft->update(['teacher_assignment_id' => $assignment->id]);
+                }
                 $assignments->push($assignment);
+            } elseif (! $draft->teacher_assignment_id) {
+                $draft->update(['teacher_assignment_id' => $assignment->id]);
             }
         }
+
+        if ($assignments->isEmpty()) {
+            return;
+        }
+
+        $timeSlotsById = TimeSlot::all()->keyBy('id');
+        $period = CarbonPeriod::create(
+            Carbon::instance($startDate)->startOfDay(),
+            Carbon::instance($endDate)->startOfDay()
+        );
 
         foreach ($assignments as $assignment) {
             $schedule = $assignment->schedule;
@@ -392,17 +438,29 @@ class ZktecoAttendanceService
                 continue;
             }
 
+            $draft = DraftSchedule::firstOrCreate(
+                [
+                    'teacher_id' => $teacher->id,
+                    'schedule_id' => $schedule->id,
+                ],
+                [
+                    'teacher_assignment_id' => $assignment->id,
+                    'status' => 'approved',
+                    'reviewed_at' => now(),
+                ]
+            );
+
             foreach ($schedule->time_slots as $slot) {
                 $slotDay = strtolower($slot['day'] ?? '');
-                if ($slotDay !== $dayName) {
+                if ($slotDay === '') {
                     continue;
                 }
 
-                $startTime = $slot['start_time'] ?? null;
-                $endTime = $slot['end_time'] ?? null;
+                $startTime = $slot['start_time'] ?? $slot['start'] ?? null;
+                $endTime = $slot['end_time'] ?? $slot['end'] ?? null;
 
                 if (isset($slot['time_slot_id'])) {
-                    $timeSlotModel = TimeSlot::find($slot['time_slot_id']);
+                    $timeSlotModel = $timeSlotsById->get((int) $slot['time_slot_id']);
                     if ($timeSlotModel) {
                         $startTime = $timeSlotModel->start_time->format('H:i:s');
                         $endTime = $timeSlotModel->end_time->format('H:i:s');
@@ -413,42 +471,44 @@ class ZktecoAttendanceService
                     continue;
                 }
 
-                $exists = TeacherSchedule::query()
-                    ->where('teacher_id', $teacher->id)
-                    ->where('subject_id', $schedule->subject_id)
-                    ->whereDate('scheduled_date', $date->toDateString())
-                    ->whereTime('start_time', $startTime)
-                    ->exists();
+                if (strlen($startTime) === 5) {
+                    $startTime .= ':00';
+                }
+                if (strlen($endTime) === 5) {
+                    $endTime .= ':00';
+                }
 
-                if (! $exists) {
-                    $draft = DraftSchedule::firstOrCreate(
-                        [
-                            'teacher_id' => $teacher->id,
-                            'schedule_id' => $schedule->id,
-                        ],
-                        [
+                foreach ($period as $date) {
+                    $dayName = strtolower($date->format('l'));
+                    if ($slotDay !== $dayName) {
+                        continue;
+                    }
+
+                    $exists = TeacherSchedule::query()
+                        ->where('teacher_id', $teacher->id)
+                        ->where('subject_id', $schedule->subject_id)
+                        ->whereDate('scheduled_date', $date->toDateString())
+                        ->whereTime('start_time', $startTime)
+                        ->exists();
+
+                    if (! $exists) {
+                        TeacherSchedule::create([
                             'teacher_assignment_id' => $assignment->id,
-                            'status' => 'approved',
-                            'reviewed_at' => now(),
-                        ]
-                    );
-
-                    TeacherSchedule::create([
-                        'teacher_assignment_id' => $assignment->id,
-                        'draft_schedule_id' => $draft->id,
-                        'subject_id' => $schedule->subject_id,
-                        'semester_id' => $schedule->semester_id,
-                        'teacher_id' => $teacher->id,
-                        'scheduled_date' => $date->toDateString(),
-                        'day_of_week' => $dayName,
-                        'start_time' => $startTime,
-                        'end_time' => $endTime,
-                        'room' => $schedule->room,
-                        'classroom_id' => $schedule->classroom_id,
-                        'section' => $schedule->section,
-                        'status' => TeacherScheduleStatus::SCHEDULED,
-                        'is_holiday' => false,
-                    ]);
+                            'draft_schedule_id' => $draft->id,
+                            'subject_id' => $schedule->subject_id,
+                            'semester_id' => $schedule->semester_id,
+                            'teacher_id' => $teacher->id,
+                            'scheduled_date' => $date->toDateString(),
+                            'day_of_week' => $dayName,
+                            'start_time' => $startTime,
+                            'end_time' => $endTime,
+                            'room' => $schedule->room,
+                            'classroom_id' => $schedule->classroom_id,
+                            'section' => $schedule->section,
+                            'status' => TeacherScheduleStatus::SCHEDULED,
+                            'is_holiday' => false,
+                        ]);
+                    }
                 }
             }
         }

@@ -16,6 +16,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
 
@@ -497,11 +499,13 @@ class TeacherController extends Controller
             $decoded = base64_decode($base64Part, true);
             if ($decoded !== false) {
                 $qrPngBinary = $decoded;
+                Storage::disk('local')->put("qr-passes/teacher-{$teacher->id}.png", $qrPngBinary);
             }
         }
 
         $qrPayload = $teacher->qr_payload;
         $sentByName = $request->user()?->name;
+        $downloadUrl = URL::signedRoute('teachers.download-qr-pass', ['teacher' => $teacher->id]);
 
         Mail::to($recipientEmail)->send(
             new TeacherQrPassMail(
@@ -510,6 +514,7 @@ class TeacherController extends Controller
                 qrPngBinary: $qrPngBinary,
                 qrDataUrl: $qrDataUrl,
                 sentByName: $sentByName,
+                downloadUrl: $downloadUrl,
             )
         );
 
@@ -525,5 +530,25 @@ class TeacherController extends Controller
         }
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Download the teacher's QR Pass PNG via a signed link from the email.
+     */
+    public function downloadQrPass(Teacher $teacher)
+    {
+        $safeEmployeeId = preg_replace('/[^A-Za-z0-9_-]/', '_', (string) $teacher->employee_id);
+        $fileName = "WMSU-QR-Pass-{$safeEmployeeId}.png";
+        $storagePath = "qr-passes/teacher-{$teacher->id}.png";
+
+        if (Storage::disk('local')->exists($storagePath)) {
+            return Storage::disk('local')->download(
+                $storagePath,
+                $fileName,
+                ['Content-Type' => 'image/png']
+            );
+        }
+
+        abort(404, 'QR Pass image not found. Please request a new QR Pass email.');
     }
 }

@@ -89,19 +89,22 @@ class InstructorDashboardController extends Controller
         if ($teacher) {
             $teacherId = $teacher->id;
 
-            // 3. Active Assignments for Current Semester
+            app(\App\Services\Zkteco\ZktecoAttendanceService::class)->ensureTeacherSchedulesForPeriod(
+                $teacher,
+                Carbon::today()->startOfMonth(),
+                Carbon::today()->endOfMonth()
+            );
+
+            $timeSlotsById = \App\Models\TimeSlot::all()->keyBy('id');
+
+            // 3. Active Assignments for Teacher
             $assignments = TeacherAssignment::with(['schedule.subject', 'schedule.classroom', 'schedule.semester'])
                 ->where('teacher_id', $teacherId)
                 ->where('is_active', true)
-                ->when($currentSemester, function ($q) use ($currentSemester) {
-                    $q->whereHas('schedule', function ($sq) use ($currentSemester) {
-                        $sq->where('semester_id', $currentSemester->id);
-                    });
-                })
                 ->get();
 
             // Build assigned courses and calculate total units
-            $assignedCourses = $assignments->map(function ($assignment) {
+            $assignedCourses = $assignments->map(function ($assignment) use ($timeSlotsById) {
                 $sched = $assignment->schedule;
                 $subject = $sched?->subject;
                 $classroom = $sched?->classroom;
@@ -109,11 +112,20 @@ class InstructorDashboardController extends Controller
                 // Format time slots string
                 $slotsText = '';
                 if (!empty($sched?->time_slots) && is_array($sched->time_slots)) {
-                    $slotsText = collect($sched->time_slots)->map(function ($slot) {
+                    $slotsText = collect($sched->time_slots)->map(function ($slot) use ($timeSlotsById) {
                         $day = ucfirst($slot['day'] ?? '');
-                        $start = !empty($slot['start_time']) ? Carbon::parse($slot['start_time'])->format('g:i A') : '';
-                        $end = !empty($slot['end_time']) ? Carbon::parse($slot['end_time'])->format('g:i A') : '';
-                        return "{$day} {$start} - {$end}";
+                        $startRaw = $slot['start_time'] ?? $slot['start'] ?? null;
+                        $endRaw = $slot['end_time'] ?? $slot['end'] ?? null;
+                        if (isset($slot['time_slot_id'])) {
+                            $ts = $timeSlotsById->get((int) $slot['time_slot_id']);
+                            if ($ts) {
+                                $startRaw = $ts->start_time->format('H:i');
+                                $endRaw = $ts->end_time->format('H:i');
+                            }
+                        }
+                        $start = !empty($startRaw) ? Carbon::parse($startRaw)->format('g:i A') : '';
+                        $end = !empty($endRaw) ? Carbon::parse($endRaw)->format('g:i A') : '';
+                        return trim("{$day} {$start}" . ($end ? " - {$end}" : ''));
                     })->implode(' | ');
                 }
 
@@ -149,8 +161,16 @@ class InstructorDashboardController extends Controller
                         continue;
                     }
 
-                    $startStr = $slot['start_time'] ?? null;
-                    $endStr = $slot['end_time'] ?? null;
+                    $startStr = $slot['start_time'] ?? $slot['start'] ?? null;
+                    $endStr = $slot['end_time'] ?? $slot['end'] ?? null;
+
+                    if (isset($slot['time_slot_id'])) {
+                        $ts = $timeSlotsById->get((int) $slot['time_slot_id']);
+                        if ($ts) {
+                            $startStr = $ts->start_time->format('H:i');
+                            $endStr = $ts->end_time->format('H:i');
+                        }
+                    }
 
                     $startCarbon = $startStr ? Carbon::parse($startStr) : null;
                     $endCarbon = $endStr ? Carbon::parse($endStr) : null;

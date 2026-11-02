@@ -7,6 +7,8 @@ use App\Models\TeacherSchedule;
 use App\Repositories\TeacherScheduleRepository;
 use App\Services\TeacherScheduleGenerationService;
 use App\Services\TeacherScheduleService;
+use App\Services\Zkteco\ZktecoAttendanceService;
+use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,7 +19,8 @@ class TeacherScheduleController extends Controller
     public function __construct(
         private TeacherScheduleService $service,
         private TeacherScheduleGenerationService $generationService,
-        private TeacherScheduleRepository $repository
+        private TeacherScheduleRepository $repository,
+        private ZktecoAttendanceService $biometricService
     ) {}
 
     /**
@@ -27,7 +30,16 @@ class TeacherScheduleController extends Controller
     {
         // Teacher grouped/session view
         if (auth()->user()->isTeacher() && ! auth()->user()->hasRole('admin')) {
-            $teacherId = auth()->user()->teacher?->id ?? 0;
+            $teacher = auth()->user()->teacher;
+            $teacherId = $teacher?->id ?? 0;
+
+            if ($teacher) {
+                $this->biometricService->ensureTeacherSchedulesForPeriod(
+                    $teacher,
+                    Carbon::today()->startOfMonth(),
+                    Carbon::today()->endOfMonth()
+                );
+            }
 
             // Mode 2: session list for a specific subject
             if ($request->filled('subject_id')) {

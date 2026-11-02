@@ -29,12 +29,21 @@
 
                 <!-- QR Code Box -->
                 @if(!empty($qrPngBinary) && isset($message))
-                    <div style="display: inline-block; padding: 16px; border: 2px solid #fecaca; border-radius: 16px; background-color: #ffffff; margin: 8px 0 20px;">
+                    <div style="display: inline-block; padding: 16px; border: 2px solid #fecaca; border-radius: 16px; background-color: #ffffff; margin: 8px 0 12px;">
                         <img src="{{ $message->embedData($qrPngBinary, 'wmsu-qr-pass.png', 'image/png') }}" alt="WMSU QR Pass" width="220" height="220" style="display: block; width: 220px; height: 220px;" />
                     </div>
                 @elseif(!empty($qrDataUrl))
-                    <div style="display: inline-block; padding: 16px; border: 2px solid #fecaca; border-radius: 16px; background-color: #ffffff; margin: 8px 0 20px;">
+                    <div style="display: inline-block; padding: 16px; border: 2px solid #fecaca; border-radius: 16px; background-color: #ffffff; margin: 8px 0 12px;">
                         <img src="{{ $qrDataUrl }}" alt="WMSU QR Pass" width="220" height="220" style="display: block; width: 220px; height: 220px;" />
+                    </div>
+                @endif
+
+                <!-- Save QR Button -->
+                @if(!empty($downloadUrl))
+                    <div style="margin: 0 0 20px;">
+                        <a href="{{ $downloadUrl }}" target="_blank" download="WMSU-QR-Pass-{{ $teacher->employee_id }}.png" style="display: inline-block; background-color: #800000; color: #ffffff; font-size: 13px; font-weight: 600; text-decoration: none; padding: 10px 22px; border-radius: 8px; letter-spacing: 0.01em;">
+                            Save QR Code
+                        </a>
                     </div>
                 @endif
 
@@ -61,10 +70,6 @@
                             <td style="color: #0f172a;">{{ $teacher->rank }}</td>
                         </tr>
                         @endif
-                        <tr>
-                            <td style="color: #64748b;">Signed QR Token:</td>
-                            <td style="font-family: monospace; font-size: 11px; color: #334155; word-break: break-all;">{{ $qrPayload }}</td>
-                        </tr>
                     </table>
                 </div>
 

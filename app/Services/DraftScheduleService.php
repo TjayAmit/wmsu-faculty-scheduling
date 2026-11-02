@@ -5,6 +5,8 @@ namespace App\Services;
 use App\DTOs\DraftScheduleData;
 use App\Enums\DraftScheduleStatus;
 use App\Models\DraftSchedule;
+use App\Models\TeacherAssignment;
+use App\Models\TeacherSchedule;
 use App\Repositories\DraftScheduleRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -13,7 +15,8 @@ use Illuminate\Support\Facades\DB;
 class DraftScheduleService
 {
     public function __construct(
-        protected DraftScheduleRepository $repository
+        protected DraftScheduleRepository $repository,
+        protected TeacherScheduleGenerationService $generationService
     ) {}
 
     public function all(): iterable
@@ -34,6 +37,10 @@ class DraftScheduleService
         DB::transaction(function () use ($request, &$model, &$dto) {
             $dto = DraftScheduleData::fromRequest($request);
             $model = $this->repository->create($dto->toArray());
+
+            if ($model->isApproved()) {
+                $this->generationService->generateFromDraft($model->fresh(['schedule.semester', 'schedule.subject', 'teacherAssignment.teacher']));
+            }
         });
 
         $this->logActivity('created', $model, $dto->toArray());
@@ -51,6 +58,16 @@ class DraftScheduleService
         DB::transaction(function () use ($request, $model, &$dto, &$updatedModel) {
             $dto = DraftScheduleData::fromRequest($request);
             $updatedModel = $this->repository->update($model->id, $dto->toArray());
+
+            if ($updatedModel->isApproved()) {
+                $this->generationService->regenerateFromDraft($updatedModel->fresh(['schedule.semester', 'schedule.subject', 'teacherAssignment.teacher']));
+            } else {
+                TeacherSchedule::where('draft_schedule_id', $updatedModel->id)->delete();
+                if ($updatedModel->teacher_assignment_id) {
+                    TeacherAssignment::where('id', $updatedModel->teacher_assignment_id)->delete();
+                    $updatedModel->update(['teacher_assignment_id' => null]);
+                }
+            }
         });
 
         $this->logActivity('updated', $updatedModel, [
@@ -67,7 +84,12 @@ class DraftScheduleService
         $data = $model->toArray();
         $result = false;
 
-        DB::transaction(function () use ($id, &$result) {
+        DB::transaction(function () use ($id, $model, &$result) {
+            TeacherSchedule::where('draft_schedule_id', $model->id)->delete();
+            if ($model->teacher_assignment_id) {
+                TeacherSchedule::where('teacher_assignment_id', $model->teacher_assignment_id)->delete();
+                TeacherAssignment::where('id', $model->teacher_assignment_id)->delete();
+            }
             $result = $this->repository->delete($id);
         });
 
@@ -118,6 +140,8 @@ class DraftScheduleService
                 'reviewed_at' => now(),
                 'review_comments' => $comments,
             ]);
+
+            $this->generationService->regenerateFromDraft($updatedModel->fresh(['schedule.semester', 'schedule.subject', 'teacherAssignment.teacher']));
         });
 
         $this->logActivity('approved', $updatedModel, [
@@ -139,11 +163,18 @@ class DraftScheduleService
                 throw new \InvalidArgumentException('Draft schedule can only be reviewed from pending review status.');
             }
 
+            TeacherSchedule::where('draft_schedule_id', $model->id)->delete();
+            if ($model->teacher_assignment_id) {
+                TeacherSchedule::where('teacher_assignment_id', $model->teacher_assignment_id)->delete();
+                TeacherAssignment::where('id', $model->teacher_assignment_id)->delete();
+            }
+
             $updatedModel = $this->repository->update($model->id, [
                 'status' => DraftScheduleStatus::REJECTED->value,
                 'reviewed_by' => auth()->id(),
                 'reviewed_at' => now(),
                 'review_comments' => $comments,
+                'teacher_assignment_id' => null,
             ]);
         });
 
