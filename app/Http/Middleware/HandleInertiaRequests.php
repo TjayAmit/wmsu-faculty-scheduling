@@ -70,6 +70,8 @@ class HandleInertiaRequests extends Middleware
             $featureFlags[$flag->key] = true;
         }
 
+        $devSwitcherEnabled = ! empty($featureFlags['dev-user-switcher']);
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -81,7 +83,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'featureFlags' => $featureFlags,
-            'devUsers' => app()->environment('local')
+            'devUsers' => ($devSwitcherEnabled && app()->environment('local'))
                 ? User::with('roles')->get(['id', 'name', 'email'])
                     ->map(fn ($u) => [
                         'id' => $u->id,

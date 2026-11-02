@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { UserNavMenu } from '@/components/user-nav-menu';
+import { useFeatureFlags } from '@/hooks/use-feature-flags';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function AppSidebarHeader({
@@ -22,6 +23,9 @@ export function AppSidebarHeader({
     breadcrumbs?: BreadcrumbItemType[];
 }) {
     const { auth, devUsers } = usePage().props;
+    const { isEnabled } = useFeatureFlags();
+
+    const showDevSwitcher = isEnabled('dev-user-switcher') && Boolean(devUsers && devUsers.length > 0);
 
     return (
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border/60 bg-background px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
@@ -30,7 +34,7 @@ export function AppSidebarHeader({
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
 
                 <div className="ml-auto flex items-center gap-1 sm:gap-2">
-                    {devUsers && devUsers.length > 0 && (
+                    {showDevSwitcher && devUsers && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="h-9 gap-1.5 text-xs">

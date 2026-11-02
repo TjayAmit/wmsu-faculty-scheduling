@@ -19,6 +19,12 @@ class FeatureFlagSeeder extends Seeder
                 'description' => 'Enable/disable collapsible navigation groups in sidebar',
                 'is_enabled' => false,
             ],
+            [
+                'name' => 'DEV User Switcher',
+                'key' => 'dev-user-switcher',
+                'description' => 'Enable/disable the quick DEV user switcher dropdown in the navigation header',
+                'is_enabled' => true,
+            ],
         ];
 
         foreach ($featureFlags as $featureFlag) {
