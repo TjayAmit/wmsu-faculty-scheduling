@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\DraftSchedule;
+use App\Models\LeaveRequest;
 use App\Models\TeacherSchedule;
+use App\Models\ZktecoAttendanceLog;
 use App\Repositories\TeacherScheduleRepository;
 use App\Services\TeacherScheduleGenerationService;
 use App\Services\TeacherScheduleService;
@@ -103,29 +105,95 @@ class TeacherScheduleController extends Controller
             }
 
             // Mode 1: Calendar view (default) and subject-grouped cards
-            $sessions = TeacherSchedule::with(['subject', 'semester'])
+            $sessions = TeacherSchedule::with(['subject', 'semester', 'attendanceRecord'])
                 ->where('teacher_id', $teacherId)
                 ->orderBy('scheduled_date')
                 ->orderBy('start_time')
                 ->get();
 
-            $calendarSchedules = $sessions->map(fn ($s) => [
-                'id' => $s->id,
-                'scheduled_date' => $s->scheduled_date->toDateString(),
-                'day_of_week' => $s->day_of_week,
-                'subject_code' => $s->subject->code ?? '',
-                'subject_title' => $s->subject->title ?? '',
-                'section' => $s->section,
-                'room' => $s->room,
-                'start_time' => $s->start_time instanceof \DateTimeInterface ? $s->start_time->format('H:i:s') : (string) $s->start_time,
-                'end_time' => $s->end_time instanceof \DateTimeInterface ? $s->end_time->format('H:i:s') : (string) $s->end_time,
-                'status' => $s->status instanceof \BackedEnum ? $s->status->value : $s->status,
-                'notes' => $s->notes,
-                'is_holiday' => (bool) $s->is_holiday,
-                'holiday_name' => $s->holiday_name,
-                'semester_name' => $s->semester->name ?? '',
-                'academic_year' => $s->semester->academic_year ?? '',
-            ])->values();
+            $leaves = LeaveRequest::where('teacher_id', $teacherId)
+                ->where('status', 'approved')
+                ->get();
+
+            $punches = ZktecoAttendanceLog::where('teacher_id', $teacherId)->get();
+
+            $now = Carbon::now();
+            $totalAbsences = 0;
+            $totalPresent = 0;
+            $totalPastSessions = 0;
+
+            $calendarSchedules = $sessions->map(function ($s) use ($now, $leaves, $punches, $teacherId, &$totalAbsences, &$totalPresent, &$totalPastSessions) {
+                $schedDate = $s->scheduled_date->toDateString();
+                $startStr = $s->start_time instanceof \DateTimeInterface ? $s->start_time->format('H:i:s') : (string) $s->start_time;
+                $endStr = $s->end_time instanceof \DateTimeInterface ? $s->end_time->format('H:i:s') : (string) $s->end_time;
+                $start = Carbon::parse($schedDate . ' ' . $startStr);
+                $end = Carbon::parse($schedDate . ' ' . $endStr);
+                $isSessionEnded = $end->isPast();
+                $isSessionLive = $now->between($start, $end);
+
+                $matchedLeave = $leaves->first(function ($l) use ($schedDate) {
+                    $lStart = Carbon::parse($l->start_date)->toDateString();
+                    $lEnd = Carbon::parse($l->end_date)->toDateString();
+                    return $schedDate >= $lStart && $schedDate <= $lEnd;
+                });
+
+                $matchedPunch = $punches->first(function ($p) use ($teacherId, $s, $start, $end) {
+                    if ($p->teacher_id !== $teacherId) {
+                        return false;
+                    }
+                    if ($p->teacher_schedule_id === $s->id || ($p->attendance_record_id && $p->attendance_record_id === $s->attendance_record_id)) {
+                        return true;
+                    }
+                    $pTime = Carbon::parse($p->punch_time);
+                    return $pTime->between($start->copy()->subMinutes(30), $end);
+                });
+
+                $hasAttendance = !empty($s->attendance_record_id)
+                    || $s->status === 'completed'
+                    || ($s->status instanceof \BackedEnum && $s->status->value === 'completed')
+                    || ($s->attendanceRecord && in_array($s->attendanceRecord->status, ['present', 'late']))
+                    || !empty($matchedPunch);
+
+                $rawStatus = $s->status instanceof \BackedEnum ? $s->status->value : $s->status;
+
+                if ($rawStatus === 'cancelled') {
+                    $computedStatus = 'cancelled';
+                } elseif ($matchedLeave) {
+                    $computedStatus = 'on_leave';
+                } elseif ($hasAttendance) {
+                    $computedStatus = 'completed';
+                    if ($isSessionEnded) {
+                        $totalPastSessions++;
+                        $totalPresent++;
+                    }
+                } elseif ($isSessionEnded) {
+                    $computedStatus = 'absent';
+                    $totalPastSessions++;
+                    $totalAbsences++;
+                } elseif ($isSessionLive) {
+                    $computedStatus = 'in_session';
+                } else {
+                    $computedStatus = 'scheduled';
+                }
+
+                return [
+                    'id' => $s->id,
+                    'scheduled_date' => $schedDate,
+                    'day_of_week' => $s->day_of_week,
+                    'subject_code' => $s->subject->code ?? '',
+                    'subject_title' => $s->subject->title ?? '',
+                    'section' => $s->section,
+                    'room' => $s->room,
+                    'start_time' => $startStr,
+                    'end_time' => $endStr,
+                    'status' => $computedStatus,
+                    'notes' => $s->notes,
+                    'is_holiday' => (bool) $s->is_holiday,
+                    'holiday_name' => $s->holiday_name,
+                    'semester_name' => $s->semester->name ?? '',
+                    'academic_year' => $s->semester->academic_year ?? '',
+                ];
+            })->values();
 
             $grouped = $sessions->groupBy(fn ($s) => $s->subject_id.'-'.$s->semester_id)
                 ->map(function ($group) {
@@ -163,6 +231,9 @@ class TeacherScheduleController extends Controller
                 'mode' => 'calendar',
                 'calendar_schedules' => $calendarSchedules,
                 'subjects' => $grouped,
+                'total_absences' => $totalAbsences,
+                'total_present' => $totalPresent,
+                'total_past_sessions' => $totalPastSessions,
                 'filters' => [],
             ]);
         }

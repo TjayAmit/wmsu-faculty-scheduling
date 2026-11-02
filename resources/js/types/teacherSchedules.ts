@@ -140,6 +140,9 @@ export interface TeacherSchedulesIndexProps {
     mode: 'calendar' | 'subjects' | 'sessions' | string;
     calendar_schedules?: CalendarScheduleItem[];
     subjects?: SubjectSummary[];
+    total_absences?: number;
+    total_present?: number;
+    total_past_sessions?: number;
     sessions?: SessionsPaginated;
     subject?: SubjectDetail;
     // Admin fallback props

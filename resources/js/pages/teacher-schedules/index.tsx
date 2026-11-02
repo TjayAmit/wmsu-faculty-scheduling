@@ -13,6 +13,7 @@ import {
     Users,
     CheckCircle2,
     ArrowRight,
+    UserX,
 } from 'lucide-react';
 import { useMemo, useState, useEffect } from 'react';
 import { TablePagination } from '@/components/table-pagination';
@@ -465,77 +466,110 @@ function SelectedDaySchedulePanel({
                     ) : null}
                 </div>
             ) : (
-                <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
+                <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
                     {schedules.map((item) => {
-                        const statusVariant = getTeacherScheduleStatusVariant(item.status);
-                        const statusLabel = getTeacherScheduleStatusLabel(item.status);
+                        const isAbsent = item.status === 'absent';
+                        const isCompleted = item.status === 'completed';
+                        const isInSession = item.status === 'in_session';
+                        const isOnLeave = item.status === 'on_leave';
+                        const isCancelled = item.status === 'cancelled';
 
                         return (
-                            <Card
+                            <div
                                 key={item.id}
-                                className="overflow-hidden border border-border/80 bg-card p-3.5 shadow-2xs hover:border-primary/40 transition-colors"
+                                className={cn(
+                                    'group relative flex items-center justify-between gap-3 rounded-xl border p-2.5 transition-all shadow-2xs hover:shadow-xs',
+                                    isAbsent
+                                        ? 'border-red-200 bg-red-50/20 hover:border-red-300 dark:border-red-900/50 dark:bg-red-950/20'
+                                        : isCompleted
+                                        ? 'border-emerald-200/70 bg-emerald-50/15 hover:border-emerald-300 dark:border-emerald-900/40 dark:bg-emerald-950/20'
+                                        : isInSession
+                                        ? 'border-blue-300 bg-blue-50/25 hover:border-blue-400 dark:border-blue-900/50'
+                                        : 'border-border/80 bg-card hover:border-border'
+                                )}
                             >
-                                <div className="space-y-2.5">
-                                    {/* Row 1: Time, Section, and Status */}
-                                    <div className="flex items-center justify-between gap-2 flex-wrap">
-                                        <div className="flex items-center gap-1.5 font-bold text-xs text-primary">
-                                            <Clock className="size-3.5 shrink-0" />
-                                            <span>
-                                                {formatTime(item.start_time)} – {formatTime(item.end_time)}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-1.5">
-                                            {item.section && (
-                                                <Badge variant="outline" className="text-[10px] h-4.5 font-mono bg-background">
-                                                    {item.section}
-                                                </Badge>
-                                            )}
-                                            <Badge variant={statusVariant} className="text-[10px] h-4.5 font-medium capitalize">
-                                                {statusLabel}
-                                            </Badge>
-                                        </div>
-                                    </div>
-
-                                    {/* Row 2: Subject Info */}
-                                    <div>
-                                        <h4 className="text-sm font-bold text-foreground line-clamp-1">
-                                            {item.subject_code} — {item.subject_title}
-                                        </h4>
-                                    </div>
-
-                                    {/* Row 3: Room and Semester */}
-                                    <div className="flex items-center justify-between border-t border-border/40 pt-2 text-xs text-muted-foreground flex-wrap gap-2">
-                                        <div className="flex items-center gap-3">
-                                            <span className="flex items-center gap-1 font-medium text-foreground">
-                                                <MapPin className="size-3 text-muted-foreground" />
-                                                {item.room ? `Room ${item.room}` : 'No room assigned'}
-                                            </span>
-                                            {item.semester_name && (
-                                                <span className="flex items-center gap-1">
-                                                    <BookOpen className="size-3 text-muted-foreground" />
-                                                    {item.semester_name}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        <Link
-                                            href={teacherSchedulesShow(item.id).url}
-                                            className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline"
-                                        >
-                                            <span>View Details</span>
-                                            <ArrowRight className="size-3" />
-                                        </Link>
-                                    </div>
-
-                                    {/* Holiday or Notes */}
-                                    {item.is_holiday && (
-                                        <div className="rounded bg-amber-500/10 px-2 py-1 text-[11px] font-medium text-amber-700 dark:text-amber-400">
-                                            Holiday: {item.holiday_name || 'Official School Holiday'}
-                                        </div>
-                                    )}
+                                {/* Left: Compact Time Box */}
+                                <div className="flex flex-col items-center justify-center rounded-lg border border-border/70 bg-muted/50 px-2 py-1 text-center min-w-[70px] shrink-0 leading-tight">
+                                    <span className="text-[11px] font-bold text-foreground">
+                                        {formatTime(item.start_time)}
+                                    </span>
+                                    <span className="text-[9px] text-muted-foreground font-medium">
+                                        {formatTime(item.end_time)}
+                                    </span>
                                 </div>
-                            </Card>
+
+                                {/* Center: Subject Info, Section Badge, and Room */}
+                                <div className="min-w-0 flex-1 space-y-0.5">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                        <span className="text-xs font-bold text-foreground">
+                                            {item.subject_code}
+                                        </span>
+                                        {item.section && (
+                                            <Badge variant="outline" className="text-[9px] h-4 px-1.5 font-mono bg-background">
+                                                {item.section}
+                                            </Badge>
+                                        )}
+                                        <span className="text-[11px] text-muted-foreground truncate max-w-[190px]" title={item.subject_title}>
+                                            {item.subject_title}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground flex-wrap">
+                                        <span className="flex items-center gap-1 font-medium text-foreground/85">
+                                            <MapPin className="size-2.5 text-primary shrink-0" />
+                                            {item.room ? `Rm ${item.room}` : 'TBA'}
+                                        </span>
+                                        {item.semester_name && (
+                                            <>
+                                                <span>&bull;</span>
+                                                <span className="truncate max-w-[140px]">{item.semester_name}</span>
+                                            </>
+                                        )}
+                                        {item.is_holiday && (
+                                            <span className="font-semibold text-amber-600 dark:text-amber-400">
+                                                (Holiday: {item.holiday_name || 'No Class'})
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Right: Status Pill & View Details link */}
+                                <div className="flex flex-col items-end justify-center gap-1 shrink-0">
+                                    {isAbsent ? (
+                                        <Badge variant="outline" className="text-[10px] h-4.5 px-1.5 font-bold border-red-300 bg-red-100/70 text-red-800 dark:bg-red-950/60 dark:text-red-300">
+                                            Absent
+                                        </Badge>
+                                    ) : isCompleted ? (
+                                        <Badge variant="outline" className="text-[10px] h-4.5 px-1.5 font-semibold border-emerald-300 bg-emerald-100/70 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                                            Completed
+                                        </Badge>
+                                    ) : isInSession ? (
+                                        <Badge variant="outline" className="text-[10px] h-4.5 px-1.5 font-semibold border-blue-300 bg-blue-100/70 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300">
+                                            <span className="size-1.5 rounded-full bg-blue-500 mr-1 animate-pulse" />
+                                            In Session
+                                        </Badge>
+                                    ) : isOnLeave ? (
+                                        <Badge variant="outline" className="text-[10px] h-4.5 px-1.5 font-semibold border-amber-300 bg-amber-100/70 text-amber-800">
+                                            On Leave
+                                        </Badge>
+                                    ) : isCancelled ? (
+                                        <Badge variant="outline" className="text-[10px] h-4.5 px-1.5 font-medium border-slate-300 bg-slate-100 text-slate-700">
+                                            Cancelled
+                                        </Badge>
+                                    ) : (
+                                        <Badge variant="secondary" className="text-[10px] h-4.5 px-1.5 font-medium">
+                                            Scheduled
+                                        </Badge>
+                                    )}
+
+                                    <Link
+                                        href={teacherSchedulesShow(item.id).url}
+                                        className="text-[10px] font-semibold text-primary hover:underline inline-flex items-center gap-0.5 opacity-80 group-hover:opacity-100"
+                                    >
+                                        <span>Details</span>
+                                        <ArrowRight className="size-2.5" />
+                                    </Link>
+                                </div>
+                            </div>
                         );
                     })}
                 </div>
@@ -583,9 +617,11 @@ function SelectedDaySchedulePanel({
 function TeacherCalendarView({
     calendarSchedules = [],
     subjects = [],
+    totalAbsences,
 }: {
     calendarSchedules: CalendarScheduleItem[];
     subjects: SubjectSummary[];
+    totalAbsences?: number;
 }) {
     // 1. Semester & academic year context
     const semesterName = calendarSchedules[0]?.semester_name || null;
@@ -798,90 +834,139 @@ function TeacherCalendarView({
         handleSelectDate(next);
     };
 
+    const absencesCount = totalAbsences !== undefined
+        ? totalAbsences
+        : calendarSchedules.filter((s) => s.status === 'absent').length;
+
     return (
         <div className="space-y-6">
             {/* 1. Overview Metric Cards */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-xl border border-[#800000] bg-[#800000]/5 ring-1 ring-[#800000]/20 dark:bg-[#800000]/10 p-4 shadow-sm transition-all">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-5">
+                {/* 1. Enrolled Subjects */}
+                <div className="rounded-xl border border-border bg-card p-3.5 shadow-2xs transition-colors hover:border-primary/40">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                             Enrolled Subjects
                         </span>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <BookOpen className="h-4 w-4" />
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                            <BookOpen className="h-3.5 w-3.5" />
                         </div>
                     </div>
-                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                    <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">
                         {subjects.length}
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                         Active teaching load
                     </p>
                 </div>
 
-                <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-blue-500/40 transition-colors">
+                {/* 2. Today's Classes */}
+                <div className="rounded-xl border border-border bg-card p-3.5 shadow-2xs hover:border-purple-500/40 transition-colors">
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Term Sessions
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            Today's Classes
                         </span>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                            <CalendarDays className="h-4 w-4" />
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                            <Clock className="h-3.5 w-3.5" />
                         </div>
                     </div>
-                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
+                    <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">
+                        {todayClasses.length}
+                    </div>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                        {todayClasses.length > 0
+                            ? `${todayClasses.length} sessions today`
+                            : 'No classes today'}
+                    </p>
+                </div>
+
+                {/* 3. Class Absences (NEW! Requested by user) */}
+                <div className={cn(
+                    'rounded-xl border p-3.5 shadow-2xs transition-all',
+                    absencesCount > 0
+                        ? 'border-red-200 bg-red-50/40 dark:border-red-900/60 dark:bg-red-950/20'
+                        : 'border-border bg-card hover:border-emerald-500/40'
+                )}>
+                    <div className="flex items-center justify-between">
+                        <span className={cn(
+                            'text-[11px] font-bold uppercase tracking-wider',
+                            absencesCount > 0 ? 'text-red-700 dark:text-red-400' : 'text-muted-foreground'
+                        )}>
+                            Class Absences
+                        </span>
+                        <div className={cn(
+                            'flex h-7 w-7 items-center justify-center rounded-lg',
+                            absencesCount > 0
+                                ? 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400'
+                                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                        )}>
+                            {absencesCount > 0 ? (
+                                <UserX className="h-3.5 w-3.5" />
+                            ) : (
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                            )}
+                        </div>
+                    </div>
+                    <div className={cn(
+                        'mt-2 text-2xl font-bold tracking-tight',
+                        absencesCount > 0 ? 'text-red-700 dark:text-red-400' : 'text-foreground'
+                    )}>
+                        {absencesCount}
+                    </div>
+                    <p className={cn(
+                        'mt-0.5 text-xs truncate',
+                        absencesCount > 0 ? 'text-red-700/80 dark:text-red-400/80 font-medium' : 'text-muted-foreground'
+                    )}>
+                        {absencesCount > 0
+                            ? `${absencesCount} ${absencesCount === 1 ? 'class missed to date' : 'classes missed to date'}`
+                            : '100% Present to date'}
+                    </p>
+                </div>
+
+                {/* 4. Term Sessions */}
+                <div className="rounded-xl border border-border bg-card p-3.5 shadow-2xs hover:border-blue-500/40 transition-colors">
+                    <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            Term Sessions
+                        </span>
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                            <CalendarDays className="h-3.5 w-3.5" />
+                        </div>
+                    </div>
+                    <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">
                         {calendarSchedules.length}
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                    <p className="mt-0.5 text-xs text-muted-foreground">
                         Scheduled across semester
                     </p>
                 </div>
 
-                <div className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-purple-500/40 transition-colors">
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Today's Classes
-                        </span>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
-                            <Clock className="h-4 w-4" />
-                        </div>
-                    </div>
-                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground">
-                        {todayClasses.length}
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        {todayClasses.length > 0
-                            ? `${todayClasses.length} sessions scheduled today`
-                            : 'No classes scheduled today'}
-                    </p>
-                </div>
-
+                {/* 5. Upcoming Class */}
                 <div className={cn(
-                    'rounded-xl border p-4 shadow-sm transition-all',
+                    'col-span-2 sm:col-span-1 rounded-xl border p-3.5 shadow-2xs transition-all',
                     nextUpcomingSession
-                        ? 'border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-500/50'
+                        ? 'border-emerald-500/30 bg-emerald-50/5 hover:border-emerald-500/50'
                         : 'border-border bg-card'
                 )}>
                     <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                             Upcoming Class
                         </span>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                            <CheckCircle2 className="h-4 w-4" />
+                        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                            <Clock className="h-3.5 w-3.5" />
                         </div>
                     </div>
-                    <div className="mt-2.5 text-2xl font-bold tracking-tight text-foreground truncate">
+                    <div className="mt-2 text-2xl font-bold tracking-tight text-foreground truncate">
                         {nextUpcomingSession
                             ? formatShortDate(nextUpcomingSession.scheduled_date)
                             : calendarSchedules.length > 0
-                            ? 'Term Completed'
+                            ? 'Term Done'
                             : 'No Sessions'}
                     </div>
-                    <p className="mt-1 text-xs text-muted-foreground truncate">
+                    <p className="mt-0.5 text-xs text-muted-foreground truncate">
                         {nextUpcomingSession
                             ? `${nextUpcomingSession.subject_code} • ${formatTime(nextUpcomingSession.start_time)}`
-                            : calendarSchedules.length > 0
-                            ? `${calendarSchedules.length} sessions recorded`
-                            : 'No active schedule'}
+                            : 'No active upcoming'}
                     </p>
                 </div>
             </div>
@@ -1397,6 +1482,7 @@ export default function Index(props: TeacherSchedulesIndexProps) {
                     <TeacherCalendarView
                         calendarSchedules={calendarSchedules}
                         subjects={subjects}
+                        totalAbsences={props.total_absences}
                     />
                 ) : (
                     <SubjectsView subjects={subjects} />
