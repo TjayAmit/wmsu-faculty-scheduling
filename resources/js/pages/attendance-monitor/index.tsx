@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
     AlertCircle,
     AlertTriangle,
@@ -14,7 +14,6 @@ import {
     GraduationCap,
     Info,
     MapPin,
-    Plus,
     Printer,
     QrCode,
     RefreshCw,
@@ -652,7 +651,7 @@ export default function AttendanceMonitorPage({
                                                         <TableCell colSpan={8} className="p-0">
                                                             <div className="p-4 space-y-3 border-l-4 border-l-primary bg-background/50 m-2 rounded-lg border border-border shadow-xs">
                                                                 {/* Breakdown Header */}
-                                                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-border/80 pb-2.5">
+                                                                <div className="border-b border-border/80 pb-2.5">
                                                                     <div>
                                                                         <h4 className="font-bold text-sm text-foreground flex items-center gap-2">
                                                                             <span>Schedule &amp; Attendance Breakdown: {teacher.name}</span>
@@ -663,21 +662,6 @@ export default function AttendanceMonitorPage({
                                                                         <p className="text-[11px] text-muted-foreground mt-0.5">
                                                                             All teaching sessions ordered from present/most recent down to past dates.
                                                                         </p>
-                                                                    </div>
-
-                                                                    <div className="flex items-center gap-2">
-                                                                        {teacher.has_absences && (
-                                                                            <Button asChild size="sm" className="h-7 text-xs bg-[#800000] hover:bg-[#660000] text-white gap-1">
-                                                                                <Link href={`/substitute-requests/create?teacher_id=${teacher.id}`}>
-                                                                                    <Plus className="h-3 w-3" /> Assign Substitute
-                                                                                </Link>
-                                                                            </Button>
-                                                                        )}
-                                                                        <Button asChild variant="outline" size="sm" className="h-7 text-xs gap-1">
-                                                                            <Link href={`/leave-requests/create?teacher_id=${teacher.id}`}>
-                                                                                File Leave
-                                                                            </Link>
-                                                                        </Button>
                                                                     </div>
                                                                 </div>
 
