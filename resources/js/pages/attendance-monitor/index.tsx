@@ -8,7 +8,6 @@ import {
     CheckCircle2,
     ChevronDown,
     ChevronRight,
-    Clock,
     Cpu,
     Filter,
     GraduationCap,
@@ -660,7 +659,7 @@ export default function AttendanceMonitorPage({
                                                                             </Badge>
                                                                         </h4>
                                                                         <p className="text-[11px] text-muted-foreground mt-0.5">
-                                                                            All teaching sessions ordered from present/most recent down to past dates.
+                                                                            All evaluated past teaching sessions ordered from present/most recent down to past dates.
                                                                         </p>
                                                                     </div>
                                                                 </div>
@@ -673,7 +672,6 @@ export default function AttendanceMonitorPage({
                                                                             const isPresent = session.status === 'present';
                                                                             const isOnLeave = session.status === 'on_leave';
                                                                             const isInSession = session.status === 'in_session';
-                                                                            const isScheduled = session.status === 'scheduled';
 
                                                                             return (
                                                                                 <div
@@ -750,11 +748,6 @@ export default function AttendanceMonitorPage({
                                                                                                 <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" /> In Session
                                                                                             </Badge>
                                                                                         )}
-                                                                                        {isScheduled && (
-                                                                                            <Badge variant="outline" className="border-slate-400/40 bg-slate-500/10 text-slate-700 dark:text-slate-300 text-xs px-2 py-0.5 gap-1">
-                                                                                                <Clock className="h-3 w-3" /> Upcoming
-                                                                                            </Badge>
-                                                                                        )}
 
                                                                                         {/* When clock-in happened / Audit record */}
                                                                                         <div className="text-[10px] text-muted-foreground mt-1 text-right">
@@ -775,7 +768,7 @@ export default function AttendanceMonitorPage({
                                                                     </div>
                                                                 ) : (
                                                                     <div className="py-6 text-center text-xs text-muted-foreground">
-                                                                        No class sessions found for this teacher in the selected period.
+                                                                        No past scheduled sessions evaluated for this instructor in the selected period.
                                                                     </div>
                                                                 )}
                                                             </div>

@@ -214,6 +214,11 @@ class AttendanceMonitorController extends Controller
                     $auditSource = 'System Verified Attendance';
                 }
 
+                // Only include sessions that are already in the past or have attendance/leave evaluated (exclude future upcoming sessions)
+                if ($status === 'scheduled') {
+                    continue;
+                }
+
                 $breakdown[] = [
                     'id' => $s->id,
                     'subject_code' => $s->subject?->code ?? 'N/A',
